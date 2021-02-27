@@ -1,4 +1,5 @@
 import re
+from data_file import User
 
 
 def is_email_valid(email):
@@ -7,6 +8,11 @@ def is_email_valid(email):
         return True
     else:
         return False
+
+
+def get_class_user(auth_user_id):
+    user1 = User(auth_user_id, '123@gmail.com', '123ifks3', 'Hayden', 'Smith', 'handle', '1234', 'owner')
+    return user1
 
 
 def auth_login_v1(email, password):
