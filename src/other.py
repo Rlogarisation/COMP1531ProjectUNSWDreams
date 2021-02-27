@@ -1,5 +1,9 @@
+from data_file import clear_data
+
+
 def clear_v1():
-    pass
+    clear_data()
+
 
 def search_v1(auth_user_id, query_str):
     return {

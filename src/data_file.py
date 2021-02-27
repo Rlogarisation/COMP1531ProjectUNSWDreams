@@ -9,6 +9,8 @@ class User:
         self.u_id = u_id
         self.email = email
         self.password = password
+        if not isinstance(self.password, str):
+            raise TypeError("password must be string")
         self.name_first = name_first
         self.name_last = name_last
         self.handle_str = handle_str
@@ -83,6 +85,16 @@ data = {
     # a list of class Message
     'class_messages': []
 }
+
+
+def clear_data():
+    global data
+    data = {
+        'class_users': [],
+        'class_channels': [],
+        'class_messages': []
+    }
+
 
 """
 Methods to use class
