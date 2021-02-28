@@ -56,7 +56,7 @@ def test_auth_register_lastName_length():
 # test several users can successfully register
 def test_auth_register_valid_small():
     clear_v1()
-    # register a user with valid inputs
+    # register two users with valid inputs
     register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
     register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
 
@@ -119,4 +119,44 @@ tests for auth_login_v1
 """
 
 
+# test for email entered is not a valid email
+def test_auth_login_invalid_email():
+    clear_v1()
+    with pytest.raises(InputError):
+        auth_login_v1('123.@com', '12345ufd')
+        auth_login_v1('a.,#0@test.com', '0823hdskhji')
 
+
+# test for email entered does not belong to a user
+def test_auth_login_not_registered_email():
+    clear_v1()
+    # register a user
+    auth_register_v1('haha@gmail.com', '123123123')
+    # login the user with not registered email
+    # will give error
+    with pytest.raises(InputError):
+        auth_login_v1('haha2@gmail.com', '123123123')
+
+
+# test for password is not correct
+def test_auth_login_wrong_password():
+    clear_v1()
+    auth_register_v1('haha@gmail.com', '123123123')
+    with pytest.raises(InputError):
+        auth_login_v1('haha@gmail.com', 'jfqowei0-23opj')
+
+
+# test for users can login successfully
+def test_auth_login_valid():
+    clear_v1()
+    # register two users with valid inputs
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+
+    # login the two registered users
+    login1 = auth_login_v1('haha@gmail.com', '123123123')
+    login2 = auth_login_v1('test@testexample.com', 'wp01^#$dp1o23')
+
+    # test the auth_user_id returned by login is the same with register
+    assert register1 == login1
+    assert register2 == login2
