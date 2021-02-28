@@ -10,6 +10,7 @@ from src.error import InputError
 tests for auth_register_v1
 """
 
+
 # test email does not match the regular expression
 def test_auth_register_invalid_email():
     clear_v1()
