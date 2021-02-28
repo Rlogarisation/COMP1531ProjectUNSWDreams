@@ -90,17 +90,20 @@ def test_auth_register_valid_large():
 # test if a valid handle is generated
 def test_auth_register_handle_valid():
     clear_v1()
-    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-    register2 = auth_register_v1('test@testexample.com', 'wp01^#123', 'Tommmmmmiweljnsyuoeqiof', 'Green')
-    register3 = auth_register_v1('haha2@gmail.com', '123jcqewp2', 'Peter', 'White')
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'zxcvbnmasdfg', 'hjklqwe')
+    register2 = auth_register_v1('test@testexample.com', 'wp01^#123', 'zxcvbnmasdfg', 'hjklqwert')
+    register3 = auth_register_v1('haha2@gmail.com', '123jcqewp2', 'zxcvbnmasdfg', 'hjklqwert')
+    register4 = auth_register_v1('haha3@gmail.com', '123jcqewp2', 'zxcvbnmasdfg', 'hjklqwertiowjec')
 
     auth_user_id1 = register1['auth_user_id']
     auth_user_id2 = register2['auth_user_id']
     auth_user_id3 = register3['auth_user_id']
+    auth_user_id4 = register3['auth_user_id']
 
     user1 = get_class_user(auth_user_id1)
     user2 = get_class_user(auth_user_id2)
     user3 = get_class_user(auth_user_id3)
+    user4 = get_class_user(auth_user_id4)
 
     """
     - test if the handle is already taken, append the concatenated names with 
@@ -109,9 +112,10 @@ def test_auth_register_handle_valid():
     - test if the concatenation is longer than 20 characters, it is cutoff at 20 characters.
     """
 
-    assert user1.handle_str == 'peterwhite'
-    assert user3.handle_str == 'paterwhite0'
-    assert user2.handle_str == 'tommmmmmiweljnsgreen'
+    assert user1.handle_str == 'zxcvbnmasdfghjklqwe'
+    assert user2.handle_str == 'zxcvbnmasdfghjklqwer'
+    assert user3.handle_str == 'zxcvbnmasdfghjklqwe0'
+    assert user4.handle_str == 'zxcvbnmasdfghjklqwe1'
 
 
 """
