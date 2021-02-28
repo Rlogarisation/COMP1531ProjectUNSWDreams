@@ -37,16 +37,16 @@ import pytest
 #          expected outcome is output of {name, owner_members, all_members}
 # Occurs when channel is valid
 def test_channel_details_v1_success():
-
+    pass
 
 # Case 2 - tests for input error due to invalid channel
 #          expected outcome is input error
 # Occurs when channel_id does not refer to a valid channel.
 def test_channel_details_v1_inputErrorChannel():
-
+    pass
 
 # Case 3 - tests for access error
 #          expected outcome is access error
 # Occurs when the authorised user is not a member of channel with channel_id
 def test_channel_details_v1_accessError():
-
+    pass

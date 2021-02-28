@@ -38,27 +38,28 @@ import pytest
 #          expected outcome is user gets invited to a channel and gets added to it
 # Occurs when channel is valid and user is valid whilst having not been invited before
 def test_channel_invite_v1_success():
-    
+    pass
 
 # Case 2 - tests for repeated invite instances
 #          expected outcome is recognizes user invited is already in the channel and does nothing
 # Occurs when channel is valid and user is already inside the channel
 def test_channel_invite_v1_repeated():
-
+    pass
 
 # Case 3 - tests for input error due to invalid channel
 #          expected outcome is input error
 # Occurs when channel_id does not refer to a valid channel.
 def test_channel_invite_v1_inputErrorChannel():
-
+    pass
 
 # Case 4 - tests for input error due to invalid user
 #          expected outcome is input error
 # Occurs when u_id does not refer to a valid user.
 def test_channel_invite_v1_inputErrorUser():
-
+    pass
 
 # Case 5 - tests for access error
 #          expected outcome is access error
 # Occurs when the authorised user is not already a member of the channel
 def test_channel_invite_v1_accessError():
+    pass
