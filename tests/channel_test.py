@@ -1,5 +1,5 @@
-import random, pytest, data
-from src import other, auth, channels, channel, error
+import random, pytest
+from src import other, auth, channels, channel, error, data_file
 
 
 def test_channel_messages_v1(auth_user_id, channel_id, start):
