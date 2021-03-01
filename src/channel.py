@@ -27,8 +27,6 @@ def channel_details_v1(auth_user_id, channel_id):
 
 # TODO:
 def channel_messages_v1(auth_user_id, channel_id, start):
-    data_file.Channel.__init__()
-    data_file.User.__init__()
 
     return {
         "messages": [
