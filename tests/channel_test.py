@@ -1,4 +1,4 @@
-import random, pytest
+import random, pytest, data
 from src import other, auth, channels, channel, error
 
 
@@ -40,9 +40,9 @@ def test_channel_join_v1():
 
     def test_invalid_channel_id():
         # Test for invalid channel id
-        invalid_id = random.randint(0,10)
+        invalid_id = random.randint(0, 10)
         with pytest.raises(error.InputError):
-            channel.channel_join_v1(joiner_token,invalid_id)
+            channel.channel_join_v1(joiner_token, invalid_id)
 
     def test_join_private_channel():
         with pytest.raises(error.AccessError):
