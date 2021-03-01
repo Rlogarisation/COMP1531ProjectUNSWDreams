@@ -45,6 +45,8 @@ class Channel:
         self.all_members = []    # a list of all members of the channel
         self.owner_members = []  # a list of all owners of the channel
         self.messages = []
+        self.start = -1
+        self.end = -1
 
     def return_type_channel(self):
         """dictionary contains types { channel_id, name }"""
