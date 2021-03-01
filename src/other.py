@@ -1,9 +1,10 @@
-from data_file import clear_data, User
-from auth import get_class_user, auth_register_v1
+from .data_file import data
 
 
 def clear_v1():
-    clear_data()
+    data['class_users'] = []
+    data['class_channels'] = []
+    return {}
 
 
 def search_v1(auth_user_id, query_str):
