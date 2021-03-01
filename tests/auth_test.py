@@ -1,9 +1,8 @@
 # by Lan Lin
 
 import pytest
-import numpy
 from src.other import clear_v1
-from src.auth import auth_login_v1, auth_register_v1, get_class_user
+from src.auth import auth_login_v1, auth_register_v1, get_user_by_auth_id
 from src.error import InputError
 
 """
@@ -80,11 +79,13 @@ def test_auth_register_valid_large():
     id_list = []
     for index in range(50):
         person = auth_register_v1('example'+str(index)+'@testexample.com', 'abcuief98dh', 'Tom', 'Green')
-        id_list[index] = person['auth_user_id']
+        # check the auth_user_id generated is correct
+        assert person['auth_user_id'] == (index + 1)
+        id_list.append(person['auth_user_id'])
 
     # check all auth_user_ids are unique
     # check the number of registered users are correct
-    assert numpy.unique(id_list).size == len(id_list) == 50
+    assert len(set(id_list)) == len(id_list) == 50
 
 
 # test if a valid handle is generated
@@ -98,12 +99,12 @@ def test_auth_register_handle_valid():
     auth_user_id1 = register1['auth_user_id']
     auth_user_id2 = register2['auth_user_id']
     auth_user_id3 = register3['auth_user_id']
-    auth_user_id4 = register3['auth_user_id']
+    auth_user_id4 = register4['auth_user_id']
 
-    user1 = get_class_user(auth_user_id1)
-    user2 = get_class_user(auth_user_id2)
-    user3 = get_class_user(auth_user_id3)
-    user4 = get_class_user(auth_user_id4)
+    user1 = get_user_by_auth_id(auth_user_id1)
+    user2 = get_user_by_auth_id(auth_user_id2)
+    user3 = get_user_by_auth_id(auth_user_id3)
+    user4 = get_user_by_auth_id(auth_user_id4)
 
     """
     - test if the handle is already taken, append the concatenated names with 
@@ -135,7 +136,7 @@ def test_auth_login_invalid_email():
 def test_auth_login_not_registered_email():
     clear_v1()
     # register a user
-    auth_register_v1('haha@gmail.com', '123123123')
+    auth_register_v1('haha@gmail.com', '123123123', 'Tom', 'Green')
     # login the user with not registered email
     # will give error
     with pytest.raises(InputError):
@@ -145,7 +146,7 @@ def test_auth_login_not_registered_email():
 # test for password is not correct
 def test_auth_login_wrong_password():
     clear_v1()
-    auth_register_v1('haha@gmail.com', '123123123')
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'Green')
     with pytest.raises(InputError):
         auth_login_v1('haha@gmail.com', 'jfqowei0-23opj')
 
@@ -162,5 +163,9 @@ def test_auth_login_valid():
     login2 = auth_login_v1('test@testexample.com', 'wp01^#$dp1o23')
 
     # test the auth_user_id returned by login is the same with register
+    # test the auth_user_id generated is correct
     assert register1 == login1
     assert register2 == login2
+    assert register1['auth_user_id'] == login1['auth_user_id'] == 1
+    assert register2['auth_user_id'] == login2['auth_user_id'] == 2
+
