@@ -27,13 +27,13 @@ def msg_send(channel_id, msg_id, u_id, msg, time):
     }
 
     for i in data_file.data["class_channels"]:
-        if i["channel_id"] == channel_id:
-            i.message.insert(0, message)
+        if i.channel_id == channel_id:
+            i.message.append(0, message)
             break
     return
 
 
-def test_channel_messages_v1(auth_user_id, channel_id, start):
+def test_channel_messages_v1():
     def test_invalid_channel_id():
         other.clear_v1()
 
@@ -119,10 +119,18 @@ def test_channel_messages_v1(auth_user_id, channel_id, start):
         # # 1. return -1 : for no more message after start
         # message_stored = channel.channel_messages_v1(user1["token"], Testing_channel_id, 0).message
         # assert len(message_stored) == 50
+        pass
 
     def test_more_than_50_msg():
         pass
 
+
+    # ================================TESTING===============================
+    test_invalid_channel_id()
+    test_auth_missing()
+    test_no_msg()
+    test_less_than_50_msg()
+    test_more_than_50_msg()
     pass
 
 
@@ -151,40 +159,40 @@ def test_channel_join_v1():
     owner = auth.auth_login_v1("TheOwner@test.com", "thisispassword")
     assert type(owner) is dict
     owner_u_id = owner["u_id"]
-    owner_token = owner["token"]
+    owner_auth_user_id = owner["auth_user_id"]
     assert owner_u_id is not None
     assert type(owner_u_id) is int
-    assert type(owner_token) is str
+    assert type(owner_auth_user_id) is int
 
     # create the accesser for joining and leaving
     auth.auth_register_v1("TheJoiner@test.com", "joinerpassword", "Roger", "Luo")
     joiner = auth.auth_login_v1("TheJoiner@test.com", "joinerpassword")
     assert type(joiner) is dict
     joiner_u_id = joiner["u_id"]
-    joiner_token = joiner["token"]
+    joiner_auth_id = joiner["auth_user_id"]
     assert joiner_u_id is not None
     assert type(joiner_u_id) is int
-    assert type(joiner_token) is str
+    assert type(joiner_auth_id) is int
     # create testing channel
-    channel_id = channels.channels_create_v1(owner_token, "Testing Channel", True)
+    channel_id = channels.channels_create_v1(owner_auth_user_id, "Testing Channel", True)
     assert channel_id is not None
     assert type(channel_id) is int
 
-    # ====================Testing=====================
+    # ====================Test Functions=====================
 
     def test_channel_join_normal():
         # Test for correctly executed
-        assert channel.channel_join_v1(joiner_token, channel_id) == None, "test_channel_join_normal failed!!"
+        assert channel.channel_join_v1(joiner_auth_id, channel_id) == None, "test_channel_join_normal failed!!"
 
     def test_invalid_channel_id():
         # Test for invalid channel id
         invalid_id = random.randint(0, 10)
         with pytest.raises(error.InputError("test_invalid_channel_id failed!!")):
-            channel.channel_join_v1(joiner_token, invalid_id)
+            channel.channel_join_v1(joiner_auth_id, invalid_id)
 
     def test_join_private_channel():
         with pytest.raises(error.AccessError("test_join_private_channel failed!!")):
-            channel.channel_join_v1(joiner_token, channel_id)
+            channel.channel_join_v1(joiner_auth_id, channel_id)
 
     # ====================Testing=====================
     test_channel_join_normal()
