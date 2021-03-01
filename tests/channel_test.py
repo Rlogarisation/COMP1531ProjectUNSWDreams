@@ -45,12 +45,12 @@ def test_channel_messages_v1():
         user2 = auth.auth_login_v1("user2@test.com", "user2password")
 
         # create channel for testing
-        Testing_channel_id = channels.channels_create_v1(user1["token"], "channel_test", True)
-        channel.channel_invite_v1(user1["token"], Testing_channel_id, user2["u_id"])
+        Testing_channel_id = channels.channels_create_v1(user1["auth_user_id"], "channel_test", True)
+        channel.channel_invite_v1(user1["auth_user_id"], Testing_channel_id, user2["u_id"])
 
         # testing for channel message function for invalid channel id inputError
         with pytest.raises(error.InputError("test_invalid_channel_id failed!!")):
-            channel.channel_messages_v1(user1["token"], Testing_channel_id, 10)
+            channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id, 10)
         pass
 
     def test_auth_missing():
@@ -67,12 +67,12 @@ def test_channel_messages_v1():
         user3 = auth.auth_login_v1("user3@test.com", "user3password")
 
         # create channel by user1 for testing
-        Testing_channel_id = channels.channels_create_v1(user1["token"], "channel_test", True)
-        channel.channel_invite_v1(user1["token"], Testing_channel_id, user2["u_id"])
+        Testing_channel_id = channels.channels_create_v1(user1["auth_user_id"], "channel_test", True)
+        channel.channel_invite_v1(user1["auth_user_id"], Testing_channel_id, user2["u_id"])
 
         # testing for channel message function for invalid channel id inputError
         with pytest.raises(error.InputError("test_auth_missing failed!!")):
-            channel.channel_messages_v1(user3["token"], Testing_channel_id, 0)
+            channel.channel_messages_v1(user3["auth_user_id"], Testing_channel_id, 0)
         pass
 
     def test_no_msg():
@@ -86,11 +86,11 @@ def test_channel_messages_v1():
         user2 = auth.auth_login_v1("user2@test.com", "user2password")
 
         # create channel for testing
-        Testing_channel_id = channels.channels_create_v1(user1["token"], "channel_test", True)
-        channel.channel_invite_v1(user1["token"], Testing_channel_id, user2["u_id"])
+        Testing_channel_id = channels.channels_create_v1(user1["auth_user_id"], "channel_test", True)
+        channel.channel_invite_v1(user1["auth_user_id"], Testing_channel_id, user2["u_id"])
 
         # 1. return -1 : for no more message after start
-        message_stored = channel.channel_messages_v1(user1["token"], Testing_channel_id, 0).message
+        message_stored = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id, 0).message
         assert message_stored == None, "test_no_msg failed!!"
 
     def test_less_than_50_msg():
@@ -104,26 +104,25 @@ def test_channel_messages_v1():
         user2 = auth.auth_login_v1("user2@test.com", "user2password")
 
         # create channel for testing
-        Testing_channel_id = channels.channels_create_v1(user1["token"], "channel_test", True)
+        Testing_channel_id = channels.channels_create_v1(user1["auth_user_id"], "channel_test", True)
 
         # send testing message into channel chat
         for i in range(1, 3):
-            msg_send(Testing_channel_id, i, user1["token"], "testing message", i)
+            msg_send(Testing_channel_id, i, user1["auth_user_id"], "testing message", i)
 
         # FIXME:
         # 这边data_file里面没有start 和 end，对message的首尾无法定位
-        # check_msg_amount = channel.channel_messages_v1(user1['token'], Testing_channel_id, 0)
+        # check_msg_amount = channel.channel_messages_v1(user1['auth_user_id'], Testing_channel_id, 0)
 
         # assert(check_msg_amount[])
 
         # # 1. return -1 : for no more message after start
-        # message_stored = channel.channel_messages_v1(user1["token"], Testing_channel_id, 0).message
+        # message_stored = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id, 0).message
         # assert len(message_stored) == 50
         pass
 
     def test_more_than_50_msg():
         pass
-
 
     # ================================TESTING===============================
     test_invalid_channel_id()
@@ -131,6 +130,7 @@ def test_channel_messages_v1():
     test_no_msg()
     test_less_than_50_msg()
     test_more_than_50_msg()
+
     pass
 
 
