@@ -39,6 +39,8 @@ class User:
 
 class Channel:
     def __init__(self, name, channel_id, is_public):
+        self.start = -1
+        self.end = -1
         self.name = name
         self.channel_id = channel_id
         self.is_public = is_public
@@ -81,19 +83,8 @@ data = {
     # a list of class User
     'class_users': [],
     # a list of class Channel
-    'class_channels': [],
-    # a list of class Message
-    'class_messages': []
+    'class_channels': []
 }
-
-
-def clear_data():
-    global data
-    data = {
-        'class_users': [],
-        'class_channels': [],
-        'class_messages': []
-    }
 
 
 """
