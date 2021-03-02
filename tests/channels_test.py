@@ -4,6 +4,7 @@ from src.error import InputError
 from src.other import clear_v1
 from src.auth import auth_login_v1, auth_register_v1, get_user_by_auth_id
 from src.channel import get_channel_by_channel_id
+from src.data_file import data
 
 
 def test_channels_create_length_of_name():
@@ -67,6 +68,9 @@ def test_channels_create_valid():
     assert owner in channel1.owner_members
     assert owner in channel2.all_members
     assert owner in channel2.owner_members
+
+    assert data['class_channels'][0].name == 'public_channel'
+    assert data['class_channels'][1].name == 'private_channel'
 
 
 
