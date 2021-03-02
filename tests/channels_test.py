@@ -44,13 +44,6 @@ def test_channels_correct_channel():
 	# channels_create_v1(auth_user_id, name, is_public)
 	channel_id1 = channels_create_v1(auth_user_id1, "SheepChannel", is_public=True)['channel_id']
 	
-	# Obtain the detail of a channel,
-	# so we can obtain the u_id for next step.
-	# channel_details_v1(auth_user_id, channel_id)
-	channel_detail1 = channel_details_v1(auth_user_id1, channel_id1)
-	# Invite user into certain channel
-	# channel_invite_v1(auth_user_id, channel_id, u_id)
-	channel_invite_v1(auth_user_id1, channel_id1, channel_detail1['owner_members'][0]['u_id'])
 	# List the channel of this user belongs to
 	channel_list = channels_list_v1(auth_user_id1)
 	# Check the information of authorised user is correct
@@ -68,15 +61,7 @@ def test_channels_multiple_channels():
 	channel_id1 = channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)['channel_id']
 	channel_id2 = channels_create_v1(auth_user_id1, "BussinessChannel", is_public=True)['channel_id']
 	channel_id3 = channels_create_v1(auth_user_id1, "LawChannel", is_public=True)['channel_id']
-	# Obtain the detail of a channel,
-	# so we can obtain the u_id for next step.
-	channel_detail1 = channel_details_v1(auth_user_id1, channel_id1)
-	channel_detail2 = channel_details_v1(auth_user_id1, channel_id2)
-	channel_detail3 = channel_details_v1(auth_user_id1, channel_id3)
-	# Invite user into corresponding channels
-	channel_invite_v1(auth_user_id1, channel_id1, channel_detail1['owner_members'][0]['u_id'])
-	channel_invite_v1(auth_user_id1, channel_id2, channel_detail2['owner_members'][0]['u_id'])
-	channel_invite_v1(auth_user_id1, channel_id3, channel_detail3['owner_members'][0]['u_id'])
+	
 	# List the channel of this user belongs to
 	channel_list = channels_list_v1(auth_user_id1)
 	# Check the information of authorised user is correct
@@ -95,13 +80,13 @@ def test_channels_multiple_users():
 	user2 = get_user_by_auth_id(auth_user_id2)
 	# Create a channel
 	channel_id1 = channels_create_v1(auth_user_id1, "mesterChannel", is_public=True)['channel_id']
-	# Obtain the detail of a channel,
+	# Obtain the u_id of user,
 	# so we can obtain the u_id for next step.
-	channel_detail1 = channel_details_v1(auth_user_id1, channel_id1)
-	channel_detail2 = channel_details_v1(auth_user_id2, channel_id1)
-	# Invite both users into corresponding channel
-	channel_invite_v1(auth_user_id1, channel_id1, channel_detail1['owner_members'][0]['u_id'])
-	channel_invite_v1(auth_user_id2, channel_id1, channel_detail2['all_members'][0]['u_id'])
+	# first input in inviter, third input is invitee.
+	channel_invite_v1(auth_user_id1, channel_id1, user2.u_id)
+
+	
+	#channel_invite_v1(auth_user_id1, channel_id1, channel_detail2['owner_members'][0]['u_id'])
 	# List the channel of first user belongs to
 	channel_user1 = channels_list_v1(auth_user_id1)
 	# List the channel of second user belongs to
@@ -109,6 +94,23 @@ def test_channels_multiple_users():
 	# Check the information of authorised user is correct
 	assert(channel_user1[0]['name'] == "mesterChannel")
 	assert(channel_user2[0]['name'] == "mesterChannel")
+
+def test_channels_oneUser_multiple_private_channels():
+	clear_v1()
+	# Initiate a user
+	register1 = auth_register_v1("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
+	auth_user_id1 = register1['auth_user_id']
+	user1 = get_user_by_auth_id(auth_user_id1)
+	# Create 2 private channels and 2 public channels
+	channel_id1 = channels_create_v1(auth_user_id1, "ChannelAPublic", is_public=True)['channel_id']
+	channel_id2 = channels_create_v1(auth_user_id1, "ChannelBPublic", is_public=True)['channel_id']
+	channel_id3 = channels_create_v1(auth_user_id1, "ChannelCPrivate", is_public=False)['channel_id']
+	channel_id4 = channels_create_v1(auth_user_id1, "ChannelDPrivate", is_public=False)['channel_id']
+	# List all the public channel of the user belongs to
+	channel_user1 = channels_list_v1(auth_user_id1)
+	# Check the information of authorised user is correct
+	assert len(channel_user1) == 2
+
 
 	
 #############################################################################
@@ -142,13 +144,6 @@ def test_allchannels_correct_channel():
 	# Create a channel
 	# channels_create_v1(auth_user_id, name, is_public)
 	channel_id1 = channels_create_v1(auth_user_id1, "SheepChannel", is_public = True)['channel_id']
-	# Obtain the detail of a channel,
-	# so we can obtain the u_id for next step.
-	# channel_details_v1(auth_user_id, channel_id)
-	channel_detail1 = channel_details_v1(auth_user_id1, channel_id1)
-	# Invite user into certain channel
-	# channel_invite_v1(auth_user_id, channel_id, u_id)
-	channel_invite_v1(auth_user_id1, channel_id1, channel_detail1['owner_members'][0]['u_id'])
 	# List the channel of this user belongs to
 	channel_user = channels_listall_v1(auth_user_id1)
 	# Check the information of authorised user is correct
@@ -165,15 +160,6 @@ def test_allchannels_multiple_channels():
 	channel_id1 = channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)['channel_id']
 	channel_id2 = channels_create_v1(auth_user_id1, "BussinessChannel", is_public=True)['channel_id']
 	channel_id3 = channels_create_v1(auth_user_id1, "LawChannel", is_public=True)['channel_id']
-	# Obtain the detail of a channel,
-	# so we can obtain the u_id for next step.
-	channel_detail1 = channel_details_v1(auth_user_id1, channel_id1)
-	channel_detail2 = channel_details_v1(auth_user_id1, channel_id2)
-	channel_detail3 = channel_details_v1(auth_user_id1, channel_id3)
-	# Invite user into corresponding channels
-	channel_invite_v1(auth_user_id1, channel_id1, channel_detail1['owner_members'][0]['u_id'])
-	channel_invite_v1(auth_user_id1, channel_id2, channel_detail2['owner_members'][0]['u_id'])
-	channel_invite_v1(auth_user_id1, channel_id3, channel_detail3['owner_members'][0]['u_id'])
 	# List the channel of this user belongs to
 	channel_user = channels_listall_v1(auth_user_id1)
 	# Check the information of authorised user is correct
@@ -194,18 +180,15 @@ def test_allchannels_multiple_users():
 	channel_id1 = channels_create_v1(auth_user_id1, "mesterChannel", is_public=True)['channel_id']
 	# Obtain the detail of a channel,
 	# so we can obtain the u_id for next step.
-	channel_detail1 = channel_details_v1(auth_user_id1, channel_id1)
-	channel_detail2 = channel_details_v1(auth_user_id2, channel_id1)
-	# Invite both users into corresponding channel
-	channel_invite_v1(auth_user_id1, channel_id1, channel_detail1['owner_members'][0]['u_id'])
-	channel_invite_v1(auth_user_id2, channel_id1, channel_detail2['all_members'][0]['u_id'])
+	# Invite second user into corresponding channel
+	channel_invite_v1(auth_user_id1, channel_id1, user2.u_id)
 	# List the channel of first user belongs to
 	channel_user1 = channels_listall_v1(auth_user_id1)
 	# List the channel of second user belongs to
 	channel_user2 = channels_listall_v1(auth_user_id2)
 	# Check the information of authorised user is correct
 	assert(channel_user1[0]['name'] == "mesterChannel")
-	# assert(channel_user2[0]['name'] == "mesterChannel")
+	assert(channel_user2[0]['name'] == "mesterChannel")
 
 def test_allchannels_private():
 	clear_v1()
@@ -219,15 +202,6 @@ def test_allchannels_private():
 	channel_id1 = channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)['channel_id']
 	channel_id2 = channels_create_v1(auth_user_id1, "BussinessChannel", is_public=False)['channel_id']
 	channel_id3 = channels_create_v1(auth_user_id1, "LawChannel", is_public=False)['channel_id']
-	# Obtain the detail of a channel,
-	# so we can obtain the u_id for next step.
-	channel_detail1 = channel_details_v1(auth_user_id1, channel_id1)
-	channel_detail2 = channel_details_v1(auth_user_id1, channel_id2)
-	channel_detail3 = channel_details_v1(auth_user_id1, channel_id3)
-	# Invite user into corresponding channels
-	channel_invite_v1(auth_user_id1, channel_id1, channel_detail1['owner_members'][0]['u_id'])
-	channel_invite_v1(auth_user_id1, channel_id2, channel_detail2['owner_members'][0]['u_id'])
-	channel_invite_v1(auth_user_id1, channel_id3, channel_detail3['owner_members'][0]['u_id'])
 	# List the channel of this user belongs to
 	channel_user1 = channels_listall_v1(auth_user_id1)
 	# Check the information of authorised user is correct
