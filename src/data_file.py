@@ -16,12 +16,17 @@ class User:
         self.handle_str = handle_str
         self.auth_user_id = auth_user_id
         self.role = role
-        # not sure any other role types, like global owner?????
-        # may modify this later
-        if self.role not in ['owner', 'member']:
+        # The one who registers the first will be the global owner
+        # The users who register afterward will be a global member
+        # The role does not indicate the 'owner' or
+        # a 'member' of a channel in this part
+        if self.role not in ['global owner', 'global member']:
             raise Exception("role must be 'owner' or 'member")
 
-        self.part_of_channel = []  # a list of all channels that the authorised user is part of
+        # a list of all channels that the authorised user is part of
+        # including the user is a memeber and the user is an owner of the channel
+        self.part_of_channel = []
+        self.channel_owns = []  # a list of all channels that the user is the owner of the channel
 
     def return_type_user(self):
         """in 6.1.1 Data Types
@@ -44,9 +49,9 @@ class Channel:
         self.name = name
         self.channel_id = channel_id
         self.is_public = is_public
-        if not isinstance(self.is_public, bool):        # is_public must be type of bool
+        if not isinstance(self.is_public, bool):  # is_public must be type of bool
             raise TypeError("is_public must be bool")
-        self.all_members = []    # a list of all members of the channel
+        self.all_members = []  # a list of all members of the channel, including members and owners
         self.owner_members = []  # a list of all owners of the channel
         self.messages = []
 
@@ -85,7 +90,6 @@ data = {
     # a list of class Channel
     'class_channels': []
 }
-
 
 """
 Methods to use class
