@@ -16,19 +16,30 @@ class User:
         self.handle_str = handle_str
         self.auth_user_id = auth_user_id
         self.role = role
-        # not sure any other role types, like global owner?????
-        # may modify this later
-        if self.role not in ["owner", "member"]:
+        # The one who registers the first will be the global owner
+        # The users who register afterward will be a global member
+        # The role does not indicate the 'owner' or
+        # a 'member' of a channel in this part
+        if self.role not in ['global owner', 'global member']:
             raise Exception("role must be 'owner' or 'member")
 
-        self.part_of_channel = []  # a list of all channels that the authorised user is part of
+        # a list of all channels that the authorised user is part of
+        # including the user is a memeber and the user is an owner of the channel
+        self.part_of_channel = []
+        self.channel_owns = []  # a list of all channels that the user is the owner of the channel
 
     def return_type_user(self):
         """in 6.1.1 Data Types
-        (outputs only) named exactly user
-        Dictionary containing u_id, email, name_first, name_last, handle_str
+            (outputs only) named exactly user
+            Dictionary containing u_id, email, name_first, name_last, handle_str
         """
-        return {"u_id": self.u_id, "email": self.email, "name_first": self.name_first, "name_last": self.name_last, "handle_str": self.handle_str}
+        return {
+            'u_id': self.u_id,
+            'email': self.email,
+            'name_first': self.name_first,
+            'name_last': self.name_last,
+            'handle_str': self.handle_str
+        }
 
 
 class Channel:
@@ -40,13 +51,16 @@ class Channel:
         self.is_public = is_public
         if not isinstance(self.is_public, bool):  # is_public must be type of bool
             raise TypeError("is_public must be bool")
-        self.all_members = []  # a list of all members of the channel
+        self.all_members = []  # a list of all members of the channel, including members and owners
         self.owner_members = []  # a list of all owners of the channel
         self.messages = []
 
     def return_type_channel(self):
         """dictionary contains types { channel_id, name }"""
-        return {"channel_id": self.channel_id, "name": self.name}
+        return {
+            'channel_id': self.channel_id,
+            'name': self.name
+        }
 
 
 class Message:
@@ -62,33 +76,37 @@ class Message:
         dictionary contains types
         { message_id, u_id, message, time_created }
         """
-        return {"message_id": self.message_id, "u_id": self.u_id, "message": self.message, "time_created": self.time_created}
+        return {
+            'message_id': self.message_id,
+            'u_id': self.u_id,
+            'message': self.message,
+            'time_created': self.time_created
+        }
 
 
 data = {
     # a list of class User
-    "class_users": [],
+    'class_users': [],
     # a list of class Channel
-    "class_channels": [],
+    'class_channels': []
 }
-
 
 """
 Methods to use class
 """
-if __name__ == "__main__":
+if __name__ == '__main__':
     # Method 1: directly give paramaters, be careful about the sequence and type of inputs
     try:
-        user1 = User(1, "123@gmail.com", "123ifks3", "Hayden", "Smith", "handle", "1234", "owners")
+        user1 = User(1, '123@gmail.com', '123ifks3', 'Hayden', 'Smith', 'handle', '1234', 'owners')
         print(f"The uid of the user1 is {user1.u_id}")
         print(f"The role of the user1 is {user1.name_last}")
     except Exception as e:
         print(f"Error! {e}")
 
     # Method 2:
-    channel1 = Channel(name="Channel of Hayden", channel_id=1, is_public=True)
+    channel1 = Channel(name='Channel of Hayden', channel_id=1, is_public=True)
     print(f"is_public of channel1 is {channel1.is_public}")
     try:
-        channel2 = Channel(name="Channel of Andrew", channel_id=2, is_public="Yes")
+        channel2 = Channel(name='Channel of Andrew', channel_id=2, is_public='Yes')
     except TypeError as e:
         print(f"Error! {e}")
