@@ -72,6 +72,12 @@ def test_auth_register_valid_small():
     auth_user_id2 = register2['auth_user_id']
     assert auth_user_id1 != auth_user_id2
 
+    # test the global role is correct for the user
+    user1 = get_user_by_auth_id(auth_user_id1)
+    user2 = get_user_by_auth_id(auth_user_id2)
+    assert user1.role == 'global owner'
+    assert user2.role == 'global member'
+
 
 # test large number of users can register successfully
 def test_auth_register_valid_large():
@@ -80,7 +86,7 @@ def test_auth_register_valid_large():
     for index in range(50):
         person = auth_register_v1('example'+str(index)+'@testexample.com', 'abcuief98dh', 'Tom', 'Green')
         # check the auth_user_id generated is correct
-        assert person['auth_user_id'] == (index + 1)
+        assert person['auth_user_id'] == index
         id_list.append(person['auth_user_id'])
 
     # check all auth_user_ids are unique
@@ -166,6 +172,6 @@ def test_auth_login_valid():
     # test the auth_user_id generated is correct
     assert register1 == login1
     assert register2 == login2
-    assert register1['auth_user_id'] == login1['auth_user_id'] == 1
-    assert register2['auth_user_id'] == login2['auth_user_id'] == 2
+    assert register1['auth_user_id'] == login1['auth_user_id'] == 0
+    assert register2['auth_user_id'] == login2['auth_user_id'] == 1
 
