@@ -59,7 +59,7 @@ def auth_register_check_error(email, password, name_first, name_last):
 
 # create a new u_id
 def create_uid():
-    u_id = len(data['class_users']) + 1
+    u_id = len(data['class_users'])
     return u_id
 
 
@@ -108,8 +108,11 @@ def create_handle(name_first, name_last):
         return handle
 
 
-def create_role():
-    return 'member'
+def create_role(u_id):
+    if u_id == 0:
+        return 'global owner'
+    else:
+        return 'global member'
 
 
 # Given a user's first and last name, email address, and password,
@@ -120,7 +123,7 @@ def auth_register_v1(email, password, name_first, name_last):
     u_id = create_uid()
     auth_user_id = create_auth_user_id(u_id)
     handle = create_handle(name_first, name_last)
-    role = create_role()
+    role = create_role(u_id)
 
     user_ = User(u_id, email, password, name_first, name_last, handle, auth_user_id, role)
     data['class_users'].append(user_)
