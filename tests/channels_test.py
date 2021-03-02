@@ -43,7 +43,7 @@ def test_channels_correct_channel():
 	# Create a channel
 	# channels_create_v1(auth_user_id, name, is_public)
 	channel_id1 = channels_create_v1(auth_user_id1, "SheepChannel", is_public=True)['channel_id']
-
+	
 	# Obtain the detail of a channel,
 	# so we can obtain the u_id for next step.
 	# channel_details_v1(auth_user_id, channel_id)
@@ -94,7 +94,7 @@ def test_channels_multiple_users():
 	auth_user_id2 = register2['auth_user_id']
 	user2 = get_user_by_auth_id(auth_user_id2)
 	# Create a channel
-	channel_id1 = channels_create_v1(auth_user_id1, "mesterChannel", is_public=True)
+	channel_id1 = channels_create_v1(auth_user_id1, "mesterChannel", is_public=True)['channel_id']
 	# Obtain the detail of a channel,
 	# so we can obtain the u_id for next step.
 	channel_detail1 = channel_details_v1(auth_user_id1, channel_id1)
@@ -141,7 +141,7 @@ def test_allchannels_correct_channel():
 	user1 = get_user_by_auth_id(auth_user_id1)
 	# Create a channel
 	# channels_create_v1(auth_user_id, name, is_public)
-	channel_id1 = channels_create_v1(auth_user_id1, "SheepChannel", is_public = True)
+	channel_id1 = channels_create_v1(auth_user_id1, "SheepChannel", is_public = True)['channel_id']
 	# Obtain the detail of a channel,
 	# so we can obtain the u_id for next step.
 	# channel_details_v1(auth_user_id, channel_id)
@@ -162,9 +162,9 @@ def test_allchannels_multiple_channels():
 	auth_user_id1 = register1['auth_user_id']
 	user1 = get_user_by_auth_id(auth_user_id1)
 	# Create multiple channels
-	channel_id1 = channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)
-	channel_id2 = channels_create_v1(auth_user_id1, "BussinessChannel", is_public=True)
-	channel_id3 = channels_create_v1(auth_user_id1, "LawChannel", is_public=True)
+	channel_id1 = channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)['channel_id']
+	channel_id2 = channels_create_v1(auth_user_id1, "BussinessChannel", is_public=True)['channel_id']
+	channel_id3 = channels_create_v1(auth_user_id1, "LawChannel", is_public=True)['channel_id']
 	# Obtain the detail of a channel,
 	# so we can obtain the u_id for next step.
 	channel_detail1 = channel_details_v1(auth_user_id1, channel_id1)
@@ -191,7 +191,7 @@ def test_allchannels_multiple_users():
 	auth_user_id2 = register2['auth_user_id']
 	user2 = get_user_by_auth_id(auth_user_id2)
 	# Create a channel
-	channel_id1 = channels_create_v1(auth_user_id1, "mesterChannel", is_public=True)
+	channel_id1 = channels_create_v1(auth_user_id1, "mesterChannel", is_public=True)['channel_id']
 	# Obtain the detail of a channel,
 	# so we can obtain the u_id for next step.
 	channel_detail1 = channel_details_v1(auth_user_id1, channel_id1)
@@ -216,9 +216,9 @@ def test_allchannels_private():
 	# Create multiple channels
 	# First channel is public, but all others are private,
 	# listall function able to check all of these.
-	channel_id1 = channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)
-	channel_id2 = channels_create_v1(auth_user_id1, "BussinessChannel", is_public=False)
-	channel_id3 = channels_create_v1(auth_user_id1, "LawChannel", is_public=False)
+	channel_id1 = channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)['channel_id']
+	channel_id2 = channels_create_v1(auth_user_id1, "BussinessChannel", is_public=False)['channel_id']
+	channel_id3 = channels_create_v1(auth_user_id1, "LawChannel", is_public=False)['channel_id']
 	# Obtain the detail of a channel,
 	# so we can obtain the u_id for next step.
 	channel_detail1 = channel_details_v1(auth_user_id1, channel_id1)
