@@ -122,7 +122,7 @@ TEST CASES:
 
 """
 
-def test_channels_correct_channel():
+def test_allchannels_correct_channel():
 	clear_v1()
 	# Initiate a user
 	user1 = auth_register_v1("ZhengRogerLuo@gmail.com", "happysheepQAQ", "Zheng", "Luo")
@@ -142,7 +142,7 @@ def test_channels_correct_channel():
 	assert(channel_user['channels'][0]['name'] == "SheepChannel")
 
 
-def test_channels_multiple_channels():
+def test_allchannels_multiple_channels():
 	clear_v1()
 	# Initiate a user
 	user1 = auth_register_v1("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
@@ -166,7 +166,7 @@ def test_channels_multiple_channels():
 	assert(channel_user['channels'][1]['name'] == "BussinessChannel")
 	assert(channel_user['channels'][2]['name'] == "LawChannel")
 
-def test_channels_multiple_users():
+def test_allchannels_multiple_users():
 	clear_v1()
 	# Initiate multiple users
 	user1 = auth_register_v1("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
@@ -188,7 +188,7 @@ def test_channels_multiple_users():
 	assert(channel_user1['channels'][0]['name'] == "mesterChannel")
 	assert(channel_user2['channels'][0]['name'] == "mesterChannel")
 
-def test_channels_private():
+def test_allchannels_private():
 	clear_v1()
 	# Initiate a user
 	user1 = auth_register_v1("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
