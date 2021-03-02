@@ -1,12 +1,11 @@
-from data_file import User, Channels, data
-from error import InputError, AccessError
-import channels.py
+from .data_file import User, Channel, data
+from .error import InputError, AccessError
 
 # Function checking if channel exists in current data
 # Return channel dictionary if it exists and if not return None
 def get_channel_by_channel_id(channel_id):
-    for channel in data["class_channels"]
-        if channel_id == channel.channel_id
+    for channel in data["class_channels"]:
+        if channel_id == channel.channel_id:
             return channel
             break
     return None
@@ -14,8 +13,8 @@ def get_channel_by_channel_id(channel_id):
 # Function checking if user exists in current data
 # Return user dictionary if it exists and if not return None  
 def get_user_by_u_id(u_id):
-    for user in data["class_users"]
-        if u_id == user.u_id
+    for user in data["class_users"]:
+        if u_id == user.u_id:
             return user
             break
     return None
@@ -24,8 +23,8 @@ def get_user_by_u_id(u_id):
 # Return user dictionary if it exists and if not return None
 def is_user_in_channel(channel_id, u_id):
     channel = get_channel_by_channel_id(channel_id)
-    for user in channel.all_members
-        if u_id == user.u_id
+    for user in channel.all_members:
+        if u_id == user.u_id:
             return user
     return None
 
@@ -36,13 +35,13 @@ def error_check (channel_id, u_id, auth_user_id):
     # if user or channel is invalid throw inputError
     error_test1 = get_channel_by_channel_id(channel_id)
     error_test2 = get_user_by_u_id(u_id)
-    if error_test1 == None or error_test2 == None
+    if error_test1 == None or error_test2 == None:
         raise(InputError)
 
     # Checking for AccessError
     # error_test3 checks if user inviting the other user is in the channel
     error_test3 = is_user_in_channel(channel_id, auth_user_id)
-    if error_test3 == None
+    if error_test3 == None:
         raise(AccessError)
 
 # Function adding user into specified channel and adds that channel into user class
@@ -113,15 +112,15 @@ def channel_details_v1(auth_user_id, channel_id):
     """
     # Case 1 InputError checks
     # Checks for cases of InputError indicated by invalid channel_id 
-    inputerror_test = get_channel_by_channel_id(channel_id)
-    if inputerror_test == None:
+    input_error_test = get_channel_by_channel_id(channel_id)
+    if input_error_test == None:
         raise(InputError)
 
     # Case 2 AccessError checks
     # Checks for cases of AccessError indicated by authorised user calling
     # channel_invite_v1 function into a channel he is not part in
-    accesserrror_test = is_user_in_channel(channel_id, auth_user_id)
-    if accesserror_test == None:
+    access_error_test = is_user_in_channel(channel_id, auth_user_id)
+    if access_error_test == None:
         raise(AccessError)
 
     # Case 3 succesfull function calling
