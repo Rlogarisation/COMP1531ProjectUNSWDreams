@@ -1,6 +1,8 @@
+from typing import Dict
 from .data_file import data
 from .error import InputError, AccessError
 from .auth import get_user_by_auth_id
+
 # from data_file import Channel, data
 
 
@@ -10,10 +12,14 @@ def get_channel_by_channel_id(channel_id):
     #         return channel
     #     else:
     #         return None
-    if channel_id >= len(data['class_channels']):
+
+    # FiXME:
+    # 这边的channel_id是一个int,但是data["class_channels"]是一个Dict,无法使用Len()
+
+    if channel_id >= len(data["class_channels"]):
         return None
-    elif data['class_channels'][channel_id]:
-        return data['class_channels'][channel_id]
+    elif data["class_channels"][channel_id]:
+        return data["class_channels"][channel_id]
     else:
         return None
 
@@ -30,37 +36,51 @@ def get_user_by_u_id(u_id):
 
 def channel_messages_v1(auth_user_id, channel_id, start):
     return {
-        'messages': [
+        "messages": [
             {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_created': 1582426789,
+                "message_id": 1,
+                "u_id": 1,
+                "message": "Hello world",
+                "time_created": 1582426789,
             }
         ],
-        'start': 0,
-        'end': 50,
+        "start": 0,
+        "end": 50,
     }
 
 
 def channel_leave_v1(auth_user_id, channel_id):
-    return {
-    }
+    return {}
 
 
 def channel_join_v1(auth_user_id, channel_id):
-    return {
-    }
+    target_channel = get_channel_by_channel_id(channel_id)
+    if target_channel is None:
+        raise (InputError("channel_join_v1 : invalid channel_id."))
+
+    if target_channel.is_public is False:
+        raise (AccessError("channel_join_v1 : channel is PRIVATE."))
+
+    assert type(auth_user_id) is int
+    if auth_user_id == -1:
+        raise (InputError("channel_join_v1 : invalid auth_user_id"))
+
+    new_member = get_user_by_auth_id(auth_user_id)
+
+    for i in data["class_channel"]:
+        if i.channel_id == channel_id:
+            i["all_members"].append(new_member)
+            break
+
+    return {}
 
 
 def channel_addowner_v1(auth_user_id, channel_id, u_id):
-    return {
-    }
+    return {}
 
 
 def channel_removeowner_v1(auth_user_id, channel_id, u_id):
-    return {
-    }
+    return {}
 
 
 # check if the user is a member of channel
@@ -79,17 +99,17 @@ def error_check(channel_id, u_id, auth_user_id):
     # if user or channel is invalid throw inputError
     channel_ = get_channel_by_channel_id(channel_id)
     if channel_ is None:
-        raise InputError('Channel_id does not refer to a valid channel')
+        raise InputError("Channel_id does not refer to a valid channel")
 
     invitee = get_user_by_u_id(u_id)
     if invitee is None:
-        raise InputError('u_id does not refer to a valid user')
+        raise InputError("u_id does not refer to a valid user")
 
     # Checking for AccessError
     # error_test3 checks if user inviting the other user is in the channel
     sender = is_user_in_channel(channel_id, auth_user_id)
     if sender is None:
-        raise AccessError('The authorised user is not a member of the channel')
+        raise AccessError("The authorised user is not a member of the channel")
 
 
 # Function adding user into specified channel and adds that channel into user class
@@ -159,14 +179,14 @@ def channel_details_v1(auth_user_id, channel_id):
     # Checks for cases of InputError indicated by invalid channel_id
     channel = get_channel_by_channel_id(channel_id)
     if channel is None:
-        raise InputError('Channel_id does not refer to a valid channel')
+        raise InputError("Channel_id does not refer to a valid channel")
 
     # Case 2 AccessError checks
     # Checks for cases of AccessError indicated by authorised user calling
     # channel_invite_v1 function into a channel he is not part in
     sender = is_user_in_channel(channel_id, auth_user_id)
     if sender is None:
-        raise AccessError('The authorised user is not a member of the channel')
+        raise AccessError("The authorised user is not a member of the channel")
 
     # Case 3 succesfull function calling
     # Expected outcome is function return basic details on the channel
@@ -174,23 +194,15 @@ def channel_details_v1(auth_user_id, channel_id):
     owner_list = []
     member_list = []
     for owner in channel.owner_members:
-        dict_owner = {
-            'u_id': owner.u_id,
-            'name_first': owner.name_first,
-            'name_last': owner.name_last
-        }
+        dict_owner = {"u_id": owner.u_id, "name_first": owner.name_first, "name_last": owner.name_last}
         owner_list.append(dict_owner)
 
     for member in channel.all_members:
-        dict_member = {
-            'u_id': member.u_id,
-            'name_first': member.name_first,
-            'name_last': member.name_last
-        }
+        dict_member = {"u_id": member.u_id, "name_first": member.name_first, "name_last": member.name_last}
         member_list.append(dict_member)
 
     return {
-        'name': channel.name,
-        'owner_members': owner_list,
-        'all_members': member_list,
+        "name": channel.name,
+        "owner_members": owner_list,
+        "all_members": member_list,
     }
