@@ -70,10 +70,17 @@ def channels_listall_v1(auth_user_id):
     user = get_user_by_auth_id(auth_user_id)
 
     # Call return_type_channel(self) in order to get dictionary return
-    listall_return = []
+    list_return = []
     for channel in user.part_of_channel:
-        listall_return.append(channel.return_type_channel)
-    return listall_return
+        channel_id_re = channel.channel_id
+        channel_name_re = channel.name
+        dict_re = {
+            'channel_id': channel_id_re,
+            'name': channel_name_re
+        }
+        list_return.append(dict_re)
+
+    return list_return
 
 
 
