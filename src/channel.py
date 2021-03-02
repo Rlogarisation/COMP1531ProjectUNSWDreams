@@ -1,6 +1,25 @@
+from .data_file import Channel, data
+from .error import InputError
+from .auth import get_user_by_auth_id
+# from data_file import Channel, data
+
+
+def get_channel_by_channel_id(channel_id):
+    # for channel in data['class_channels']:
+    #     if channel_id == channel.channel_id:
+    #         return channel
+    #     else:
+    #         return None
+    if data['class_channels'][channel_id]:
+        return data['class_channels'][channel_id]
+    else:
+        return None
+
+
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {
     }
+
 
 def channel_details_v1(auth_user_id, channel_id):
     return {
