@@ -112,15 +112,13 @@ def test_channel_messages_v1():
         for i in range(1, 3):
             msg_send(Testing_channel_id, i, user1["auth_user_id"], "testing message", i)
 
-        # FIXME:
-        # 这边data_file里面没有start 和 end，对message的首尾无法定位
-        # check_msg_amount = channel.channel_messages_v1(user1['auth_user_id'], Testing_channel_id, 0)
+        check_msg_amount = channel.channel_messages_v1(user1['auth_user_id'], Testing_channel_id, 0)
 
-        # assert(check_msg_amount[])
+        assert(check_msg_amount[])
 
-        # # 1. return -1 : for no more message after start
-        # message_stored = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id, 0).message
-        # assert len(message_stored) == 50
+        # 1. return -1 : for no more message after start
+        message_stored = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id, 0).message
+        assert len(message_stored) == 50
         pass
 
     def test_more_than_50_msg():

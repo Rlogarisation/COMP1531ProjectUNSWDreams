@@ -13,9 +13,6 @@ def get_channel_by_channel_id(channel_id):
     #     else:
     #         return None
 
-    # FiXME:
-    # 这边的channel_id是一个int,但是data["class_channels"]是一个Dict,无法使用Len()
-
     if channel_id >= len(data["class_channels"]):
         return None
     elif data["class_channels"][channel_id]:
@@ -54,7 +51,8 @@ def channel_leave_v1(auth_user_id, channel_id):
 
 
 def channel_join_v1(auth_user_id, channel_id):
-    target_channel = get_channel_by_channel_id(channel_id)
+    target_channel = get_channel_by_channel_id(channel_id['channel_id'])
+
     if target_channel is None:
         raise (InputError("channel_join_v1 : invalid channel_id."))
 
@@ -67,7 +65,7 @@ def channel_join_v1(auth_user_id, channel_id):
 
     new_member = get_user_by_auth_id(auth_user_id)
 
-    for i in data["class_channel"]:
+    for i in data["class_channels"]:
         if i.channel_id == channel_id:
             i["all_members"].append(new_member)
             break
