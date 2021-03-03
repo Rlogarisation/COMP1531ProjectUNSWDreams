@@ -124,7 +124,27 @@ def test_less_than_50_msg():
 
 
 def test_more_than_50_msg():
-    pass
+    other.clear_v1()
+
+    # create 2 users
+    user1 = auth.auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+    user1 = auth.auth_login_v1("user1@test.com", "user1password")
+
+    user2 = auth.auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
+    user2 = auth.auth_login_v1("user2@test.com", "user2password")
+
+    # create channel for testing
+    Testing_channel_id = channels.channels_create_v1(user1["auth_user_id"], "channel_test", True)
+
+    # send testing message into channel chat
+    for i in range(1, 99):
+        msg_send(Testing_channel_id["channel_id"], i, user1["auth_user_id"], "testing message", i)
+
+    check_msg_amount = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)
+
+    # 1. return -1 : for no more message after start
+    message_stored = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)['messages']
+    assert len(message_stored) == 50
 
 
 """

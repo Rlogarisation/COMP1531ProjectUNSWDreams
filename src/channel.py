@@ -56,7 +56,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 
     return_msg = []
     if num_msgs > (start + 50):
-        return_msg = target_channel.messages[start : start + 51]
+        return_msg = target_channel.messages[start : start + 50]
     else:
         return_msg = target_channel.messages[start:]
 
