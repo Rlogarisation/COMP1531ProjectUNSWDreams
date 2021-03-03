@@ -6,10 +6,11 @@
 
 import pytest
 from src.auth import auth_login_v1, auth_register_v1, get_user_by_auth_id, create_role
-from src.channel import channel_invite_v1, channel_details_v1, channel_join_v1, channel_messages_v1
+from src.channel import channel_invite_v1, channel_details_v1, channel_join_v1, channel_messages_v1, get_channel_by_channel_id
 from src.channels import channels_list_v1, channels_create_v1, channels_listall_v1
 from src.error import InputError
 from src.other import clear_v1
+from src.data_file import data
 
 
 
