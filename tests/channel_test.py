@@ -119,7 +119,7 @@ def test_less_than_50_msg():
     check_msg_amount = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)
 
     # 1. return -1 : for no more message after start
-    message_stored = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)['messages']
+    message_stored = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)["messages"]
     assert len(message_stored) == 2
 
 
@@ -143,7 +143,7 @@ def test_more_than_50_msg():
     check_msg_amount = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)
 
     # 1. return -1 : for no more message after start
-    message_stored = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)['messages']
+    message_stored = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)["messages"]
     assert len(message_stored) == 50
 
 
@@ -163,7 +163,7 @@ Error:
 """
 
 
-def test_channel_join_v1():
+def test_channel_join_normal():
     # clear all previous changes
     other.clear_v1()
 
@@ -192,28 +192,73 @@ def test_channel_join_v1():
     assert channel_id is not None
     assert type(channel_id["channel_id"]) is int
 
-    # ====================Test Functions=====================
+    # Test for correctly executed
+    assert channel.channel_join_v1(joiner_auth_id, channel_id["channel_id"]) == {}, "test_channel_join_normal failed!!"
 
-    def test_channel_join_normal():
-        # Test for correctly executed
-        assert channel.channel_join_v1(joiner_auth_id, channel_id["channel_id"]) == {}, "test_channel_join_normal failed!!"
 
-    def test_invalid_channel_id():
-        # Test for invalid channel id
-        invalid_id = {"channel_id": random.randint(0, 10)}
-        with pytest.raises(error.InputError):
-            channel.channel_join_v1(joiner_auth_id, invalid_id["channel_id"])
+def test_invalid_channel_id():
+    # clear all previous changes
+    other.clear_v1()
 
-    def test_join_private_channel():
-        # create testing private channel
-        channel_id_2 = channels.channels_create_v1(owner_auth_user_id, "Testing Channel_2", False)
-        assert channel_id_2 is not None
-        assert type(channel_id_2["channel_id"]) is int
-        with pytest.raises(error.AccessError):
-            channel.channel_join_v1(joiner_auth_id, channel_id_2["channel_id"])
+    # create the owner for testing
+    auth.auth_register_v1("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
+    owner = auth.auth_login_v1("TheOwner@test.com", "thisispassword")
+    assert type(owner) is dict
+    owner_u_id = auth.get_user_by_auth_id(owner["auth_user_id"]).u_id
+    owner_auth_user_id = owner["auth_user_id"]
+    assert owner_u_id is not None
+    assert type(owner_u_id) is int
+    assert type(owner_auth_user_id) is int
 
-    # ====================Testing=====================
-    test_channel_join_normal()
-    test_invalid_channel_id()
-    test_join_private_channel()
-    pass
+    # create the accesser for joining and leaving
+    auth.auth_register_v1("TheJoiner@test.com", "joinerpassword", "Roger", "Luo")
+    joiner = auth.auth_login_v1("TheJoiner@test.com", "joinerpassword")
+    assert type(joiner) is dict
+    joiner_u_id = auth.get_user_by_auth_id(joiner["auth_user_id"]).u_id
+    joiner_auth_id = joiner["auth_user_id"]
+    assert joiner_u_id is not None
+    assert type(joiner_u_id) is int
+    assert type(joiner_auth_id) is int
+
+    # create testing channel
+    channel_id = channels.channels_create_v1(owner_auth_user_id, "Testing Channel", True)
+    assert channel_id is not None
+    assert type(channel_id["channel_id"]) is int
+
+    # Test for invalid channel id
+    invalid_id = {"channel_id": random.randint(0, 10)}
+    with pytest.raises(error.InputError):
+        channel.channel_join_v1(joiner_auth_id, invalid_id["channel_id"])
+
+
+def test_join_private_channel():
+    # clear all previous changes
+    other.clear_v1()
+
+    # create the owner for testing
+    auth.auth_register_v1("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
+    owner = auth.auth_login_v1("TheOwner@test.com", "thisispassword")
+    assert type(owner) is dict
+    owner_u_id = auth.get_user_by_auth_id(owner["auth_user_id"]).u_id
+    owner_auth_user_id = owner["auth_user_id"]
+    assert owner_u_id is not None
+    assert type(owner_u_id) is int
+    assert type(owner_auth_user_id) is int
+
+    # create the accesser for joining and leaving
+    auth.auth_register_v1("TheJoiner@test.com", "joinerpassword", "Roger", "Luo")
+    joiner = auth.auth_login_v1("TheJoiner@test.com", "joinerpassword")
+    assert type(joiner) is dict
+    joiner_u_id = auth.get_user_by_auth_id(joiner["auth_user_id"]).u_id
+    joiner_auth_id = joiner["auth_user_id"]
+    assert joiner_u_id is not None
+    assert type(joiner_u_id) is int
+    assert type(joiner_auth_id) is int
+
+    # create testing private channel
+    channel_id_2 = channels.channels_create_v1(owner_auth_user_id, "Testing Channel_2", False)
+
+    assert channel_id_2 is not None
+    assert type(channel_id_2["channel_id"]) is int
+    with pytest.raises(error.AccessError):
+        channel.channel_join_v1(joiner_auth_id, channel_id_2["channel_id"])
