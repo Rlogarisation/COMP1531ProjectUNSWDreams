@@ -78,12 +78,6 @@ def create_channel_id():
     return channel_id
 
 
-
-def create_channel_id():
-    channel_id = len(data['class_channels'])
-    return channel_id
-
-
 def channels_create_v1(auth_user_id, name, is_public):
     # error check that the name is more than 20 characters
     if len(name) > 20:
