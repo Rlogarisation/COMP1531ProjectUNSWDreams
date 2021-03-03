@@ -28,109 +28,102 @@ def msg_send(channel_id, msg_id, u_id, msg, time):
 
     for i in data_file.data["class_channels"]:
         if i.channel_id == channel_id:
-            i.message.append(0, message)
+            i.messages.insert(0, message)
             break
     return
 
 
-def test_channel_messages_v1():
-    def test_invalid_channel_id():
-        other.clear_v1()
+def test_invalid_channel_id():
+    other.clear_v1()
 
-        # create 2 users
-        user1 = auth.auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
-        user1 = auth.auth_login_v1("user1@test.com", "user1password")
-        user01 = auth.get_user_by_auth_id(user1["auth_user_id"])
+    # create 2 users
+    user1 = auth.auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+    user1 = auth.auth_login_v1("user1@test.com", "user1password")
+    first_user = auth.get_user_by_auth_id(user1["auth_user_id"])
 
-        user2 = auth.auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
-        user2 = auth.auth_login_v1("user2@test.com", "user2password")
-        user02 = auth.get_user_by_auth_id(user2["auth_user_id"])
+    user2 = auth.auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
+    user2 = auth.auth_login_v1("user2@test.com", "user2password")
+    second_user = auth.get_user_by_auth_id(user2["auth_user_id"])
 
-        # create channel for testing
-        Testing_channel_id = channels.channels_create_v1(user01.auth_user_id, "channel_test", True)
-        channel.channel_invite_v1(user01.auth_user_id, Testing_channel_id, user02.u_id)
+    # create channel for testing
+    Testing_channel_id = channels.channels_create_v1(first_user.auth_user_id, "channel_test", True)
+    channel.channel_invite_v1(first_user.auth_user_id, Testing_channel_id["channel_id"], second_user.u_id)
 
-        # testing for channel message function for invalid channel id inputError
-        with pytest.raises(error.InputError("test_invalid_channel_id failed!!")):
-            channel.channel_messages_v1(user01.auth_user_id, Testing_channel_id, 10)
-        pass
+    # testing for channel message function for invalid channel id inputError
+    with pytest.raises(error.InputError):
+        channel.channel_messages_v1(first_user.auth_user_id, Testing_channel_id["channel_id"], 10)
 
-    def test_auth_missing():
-        other.clear_v1()
 
-        # create 2 users and author people
-        user1 = auth.auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
-        user1 = auth.auth_login_v1("user1@test.com", "user1password")
+def test_auth_missing():
+    other.clear_v1()
 
-        user2 = auth.auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
-        user2 = auth.auth_login_v1("user2@test.com", "user2password")
+    # create 2 users and author people
+    user1 = auth.auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+    user1 = auth.auth_login_v1("user1@test.com", "user1password")
+    first_user = auth.get_user_by_auth_id(user1["auth_user_id"])
 
-        user3 = auth.auth_register_v1("user3@test.com", "user3password", "ShiTong", "Yuan")
-        user3 = auth.auth_login_v1("user3@test.com", "user3password")
+    user2 = auth.auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
+    user2 = auth.auth_login_v1("user2@test.com", "user2password")
+    second_user = auth.get_user_by_auth_id(user2["auth_user_id"])
 
-        # create channel by user1 for testing
-        Testing_channel_id = channels.channels_create_v1(user1["auth_user_id"], "channel_test", True)
-        channel.channel_invite_v1(user1["auth_user_id"], Testing_channel_id, user2.u_id)
+    user3 = auth.auth_register_v1("user3@test.com", "user3password", "ShiTong", "Yuan")
+    user3 = auth.auth_login_v1("user3@test.com", "user3password")
 
-        # testing for channel message function for invalid channel id inputError
-        with pytest.raises(error.InputError("test_auth_missing failed!!")):
-            channel.channel_messages_v1(user3["auth_user_id"], Testing_channel_id, 0)
-        pass
+    # create channel by user1 for testing
+    Testing_channel_id = channels.channels_create_v1(first_user.auth_user_id, "channel_test", True)
+    channel.channel_invite_v1(first_user.auth_user_id, Testing_channel_id["channel_id"], second_user.u_id)
 
-    def test_no_msg():
-        other.clear_v1()
+    # testing for channel message function for invalid channel id inputError
+    with pytest.raises(error.InputError):
+        channel.channel_messages_v1(user3["auth_user_id"], Testing_channel_id["channel_id"], 0)
 
-        # create 2 users
-        user1 = auth.auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
-        user1 = auth.auth_login_v1("user1@test.com", "user1password")
 
-        user2 = auth.auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
-        user2 = auth.auth_login_v1("user2@test.com", "user2password")
+def test_no_msg():
+    other.clear_v1()
 
-        # create channel for testing
-        Testing_channel_id = channels.channels_create_v1(user1["auth_user_id"], "channel_test", True)
-        channel.channel_invite_v1(user1["auth_user_id"], Testing_channel_id, user2.u_id)
+    # create 2 users
+    user1 = auth.auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+    user1 = auth.auth_login_v1("user1@test.com", "user1password")
+    first_user = auth.get_user_by_auth_id(user1["auth_user_id"])
 
-        # 1. return -1 : for no more message after start
-        message_stored = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id, 0).message
-        assert message_stored == None, "test_no_msg failed!!"
+    user2 = auth.auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
+    user2 = auth.auth_login_v1("user2@test.com", "user2password")
+    second_user = auth.get_user_by_auth_id(user2["auth_user_id"])
 
-    def test_less_than_50_msg():
-        other.clear_v1()
+    # create channel for testing
+    Testing_channel_id = channels.channels_create_v1(first_user.auth_user_id, "channel_test", True)
+    channel.channel_invite_v1(first_user.auth_user_id, Testing_channel_id["channel_id"], second_user.u_id)
 
-        # create 2 users
-        user1 = auth.auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
-        user1 = auth.auth_login_v1("user1@test.com", "user1password")
+    # 1. return -1 : for no more message after start
+    message_stored = channel.channel_messages_v1(first_user.auth_user_id, Testing_channel_id["channel_id"], 0)["messages"]
+    assert message_stored == [], "test_no_msg failed!!"
 
-        user2 = auth.auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
-        user2 = auth.auth_login_v1("user2@test.com", "user2password")
 
-        # create channel for testing
-        Testing_channel_id = channels.channels_create_v1(user1["auth_user_id"], "channel_test", True)
+def test_less_than_50_msg():
+    other.clear_v1()
 
-        # send testing message into channel chat
-        for i in range(1, 3):
-            msg_send(Testing_channel_id, i, user1["auth_user_id"], "testing message", i)
+    # create 2 users
+    user1 = auth.auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+    user1 = auth.auth_login_v1("user1@test.com", "user1password")
 
-        check_msg_amount = channel.channel_messages_v1(user1['auth_user_id'], Testing_channel_id, 0)
+    user2 = auth.auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
+    user2 = auth.auth_login_v1("user2@test.com", "user2password")
 
-        assert(check_msg_amount[])
+    # create channel for testing
+    Testing_channel_id = channels.channels_create_v1(user1["auth_user_id"], "channel_test", True)
 
-        # 1. return -1 : for no more message after start
-        message_stored = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id, 0).message
-        assert len(message_stored) == 50
-        pass
+    # send testing message into channel chat
+    for i in range(1, 3):
+        msg_send(Testing_channel_id["channel_id"], i, user1["auth_user_id"], "testing message", i)
 
-    def test_more_than_50_msg():
-        pass
+    check_msg_amount = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)
 
-    # ================================TESTING===============================
-    # test_invalid_channel_id()
-    # test_auth_missing()
-    # test_no_msg()
-    # test_less_than_50_msg()
-    # test_more_than_50_msg()
+    # 1. return -1 : for no more message after start
+    message_stored = channel.channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)['messages']
+    assert len(message_stored) == 2
 
+
+def test_more_than_50_msg():
     pass
 
 
@@ -183,17 +176,21 @@ def test_channel_join_v1():
 
     def test_channel_join_normal():
         # Test for correctly executed
-        assert channel.channel_join_v1(joiner_auth_id, channel_id) == None, "test_channel_join_normal failed!!"
+        assert channel.channel_join_v1(joiner_auth_id, channel_id["channel_id"]) == {}, "test_channel_join_normal failed!!"
 
     def test_invalid_channel_id():
         # Test for invalid channel id
-        invalid_id = random.randint(0, 10)
-        with pytest.raises(error.InputError("test_invalid_channel_id failed!!")):
-            channel.channel_join_v1(joiner_auth_id, invalid_id)
+        invalid_id = {"channel_id": random.randint(0, 10)}
+        with pytest.raises(error.InputError):
+            channel.channel_join_v1(joiner_auth_id, invalid_id["channel_id"])
 
     def test_join_private_channel():
-        with pytest.raises(error.AccessError("test_join_private_channel failed!!")):
-            channel.channel_join_v1(joiner_auth_id, channel_id)
+        # create testing private channel
+        channel_id_2 = channels.channels_create_v1(owner_auth_user_id, "Testing Channel_2", False)
+        assert channel_id_2 is not None
+        assert type(channel_id_2["channel_id"]) is int
+        with pytest.raises(error.AccessError):
+            channel.channel_join_v1(joiner_auth_id, channel_id_2["channel_id"])
 
     # ====================Testing=====================
     test_channel_join_normal()

@@ -32,17 +32,38 @@ def get_user_by_u_id(u_id):
 
 
 def channel_messages_v1(auth_user_id, channel_id, start):
+    if auth_user_id == -1:
+        raise (InputError("channel_messages_v1: invalid token."))
+
+    target_channel = get_channel_by_channel_id(channel_id)
+    if target_channel == None:
+        raise (InputError("channel_messages_v1: invalid channel_id."))
+
+    # check if target user is in channel's members
+    target_user = get_user_by_auth_id(auth_user_id)
+    target_auth_user_id = target_user.auth_user_id
+    user_inside = False
+    for i in target_channel.all_members:
+        if i.auth_user_id == target_auth_user_id:
+            user_inside = True
+            break
+    if user_inside == False:
+        raise(InputError("channel_messages_v1 : target user is not in channel"))
+
+    num_msgs = len(target_channel.messages)
+    if num_msgs < start:
+        raise (InputError("channel_messages_v1 : the start >= total messages."))
+
+    return_msg = []
+    if num_msgs > (start + 50):
+        return_msg = target_channel.messages[start : start + 51]
+    else:
+        return_msg = target_channel.messages[start:]
+
     return {
-        "messages": [
-            {
-                "message_id": 1,
-                "u_id": 1,
-                "message": "Hello world",
-                "time_created": 1582426789,
-            }
-        ],
-        "start": 0,
-        "end": 50,
+        "messages": return_msg,
+        "start": target_channel.start,
+        "end": target_channel.end,
     }
 
 
@@ -51,7 +72,7 @@ def channel_leave_v1(auth_user_id, channel_id):
 
 
 def channel_join_v1(auth_user_id, channel_id):
-    target_channel = get_channel_by_channel_id(channel_id['channel_id'])
+    target_channel = get_channel_by_channel_id(channel_id)
 
     if target_channel is None:
         raise (InputError("channel_join_v1 : invalid channel_id."))
@@ -67,7 +88,7 @@ def channel_join_v1(auth_user_id, channel_id):
 
     for i in data["class_channels"]:
         if i.channel_id == channel_id:
-            i["all_members"].append(new_member)
+            i.all_members.append(new_member)
             break
 
     return {}
