@@ -48,7 +48,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
             user_inside = True
             break
     if user_inside == False:
-        raise(InputError("channel_messages_v1 : target user is not in channel"))
+        raise (InputError("channel_messages_v1 : target user is not in channel"))
 
     num_msgs = len(target_channel.messages)
     if num_msgs < start:
