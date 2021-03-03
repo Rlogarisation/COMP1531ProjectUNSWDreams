@@ -1,30 +1,75 @@
-from .data_file import Channel, data
-from .error import InputError
-from .other import clear_v1
+# channels.py is used to implement the functions for channels
+# including channels_list and chennels_listall
+# for 21T1 COMP1531 project
+# Written by Zheng Luo (z5206267@ad.unsw.edu.au) on 02/Mar/2021
+
+
 from .auth import auth_login_v1, auth_register_v1, get_user_by_auth_id
 from .channel import get_channel_by_channel_id
+from .error import InputError
+from .data_file import Channel, data
+from .other import clear_v1
+
+
+#############################################################################
+#                                                                           #
+#                               Channels_list_v1                            #
+#                                                                           #
+#############################################################################
+"""
+channels_list():
+
+Provide a list of all channels 
+(and their associated details) that the authorised user is part of.
+
+Parameters:(auth_user_id)
+Return Type:{channels}
+
+"""
 
 
 def channels_list_v1(auth_user_id):
-    return {
-        'channels': [
-            {
-                'channel_id': 1,
-                'name': 'My Channel',
-            }
-        ],
-    }
+
+    # Pull the data of user from data_file
+    user = get_user_by_auth_id(auth_user_id)
+
+    # Call return_type_channel(self) in order to get dictionary return
+    list_return = []
+    for channel in user.part_of_channel:
+        if (channel.is_public == True):
+            list_return.append(channel.return_type_channel())
+    return list_return
+
+#############################################################################
+#                                                                           #
+#                           Channels_listall_v1                             #
+#                                                                           #
+#############################################################################
+"""
+channels_listall_v1:
+
+Provide a list of all channels (and their associated details)
+Explaination:
+channel_listall_v1 should list all channels, 
+including those that are private, regardless of who calls it.
+
+Parameters:(auth_user_id)
+Return Type:{channels}
+"""
+
 
 
 def channels_listall_v1(auth_user_id):
-    return {
-        'channels': [
-            {
-                'channel_id': 1,
-                'name': 'My Channel',
-            }
-        ],
-    }
+    # Pull the data of user from data_file
+    user = get_user_by_auth_id(auth_user_id)
+
+    # Call return_type_channel(self) in order to get dictionary return
+    list_return = []
+    for channel in user.part_of_channel:
+        list_return.append(channel.return_type_channel())
+    return list_return
+
+
 
 
 def create_channel_id():
@@ -54,3 +99,9 @@ def channels_create_v1(auth_user_id, name, is_public):
     return {
         'channel_id': channel_id
     }
+
+
+
+
+
+
