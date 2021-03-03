@@ -1,5 +1,11 @@
+from .data_file import data
+
+
 def clear_v1():
-    pass
+    data['class_users'] = []
+    data['class_channels'] = []
+    return {}
+
 
 def search_v1(auth_user_id, query_str):
     return {
