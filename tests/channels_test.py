@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # channels_test.py is used to test the file called channels 
 # for 21T1 COMP1531 project
 # Written by Zheng Luo (z5206267@ad.unsw.edu.au) on 28/Feb/2021
@@ -209,14 +208,13 @@ def test_allchannels_private():
 	assert(channel_user1[0]['name'] == "EngineeringChannel")
 	assert(channel_user1[1]['name'] == "BussinessChannel")
 	assert(channel_user1[2]['name'] == "LawChannel")
-=======
-import pytest
-from src.channels import channels_create_v1
-from src.error import InputError
-from src.other import clear_v1
-from src.auth import auth_login_v1, auth_register_v1, get_user_by_auth_id
-from src.channel import get_channel_by_channel_id
-from src.data_file import data
+
+#############################################################################
+#                                                                           #
+#                        Test for channels_create_v1                        #
+#                                                                           #
+#############################################################################
+
 
 
 def test_channels_create_length_of_name():
@@ -287,4 +285,3 @@ def test_channels_create_valid():
 
 
 
->>>>>>> master
