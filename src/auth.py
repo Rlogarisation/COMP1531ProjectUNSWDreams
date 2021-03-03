@@ -1,6 +1,11 @@
 import re
 from .data_file import User, data
 from .error import InputError
+<<<<<<< HEAD
+=======
+# from data_file import User, data
+# from error import InputError
+>>>>>>> master
 
 
 # check if email entered is valid

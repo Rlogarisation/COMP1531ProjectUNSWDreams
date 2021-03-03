@@ -58,6 +58,7 @@ Return Type:{channels}
 """
 
 
+
 def channels_listall_v1(auth_user_id):
     # Pull the data of user from data_file
     user = get_user_by_auth_id(auth_user_id)
@@ -68,6 +69,12 @@ def channels_listall_v1(auth_user_id):
         list_return.append(channel.return_type_channel())
     return list_return
 
+
+
+
+def create_channel_id():
+    channel_id = len(data['class_channels'])
+    return channel_id
 
 
 

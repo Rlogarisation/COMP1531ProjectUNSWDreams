@@ -1,4 +1,8 @@
 from .data_file import data
+<<<<<<< HEAD
+=======
+# from data_file import data
+>>>>>>> master
 
 
 def clear_v1():
