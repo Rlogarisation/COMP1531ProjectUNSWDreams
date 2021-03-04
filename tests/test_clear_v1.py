@@ -10,7 +10,9 @@ def test_clear_v1():
     clear_v1()
 
     #create an user with details to run test
-    user_id = auth_register_v1('user@gmail.com', 'qwe1212', 'shaozhen', 'yan')
+    register = auth_register_v1('user@gmail.com', 'qwe1212', 'shaozhen', 'yan')
+    user_id = register['auth_user_id']
+
     #create a channel 
     channel_id = channels_create_v1(user_id, 'test_channel', True)
     #check if the user and channel are created correctly in the empty dict
