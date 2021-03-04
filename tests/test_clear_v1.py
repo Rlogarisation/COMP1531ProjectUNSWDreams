@@ -28,7 +28,8 @@ def test_clear_v1():
     
     #clear the information we created and check the validity of clear_v1
     clear_v1()
-    assert data['class_channels'] is None
+    assert data['class_channels'] == []
+    assert data['class_user'] == []
     
     
     
