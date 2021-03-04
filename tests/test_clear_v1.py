@@ -21,10 +21,10 @@ def test_clear_v1():
     
     user1 = get_user_by_auth_id(user_id)
     
-    assert user1[0].u_id == user_id
-    assert user1[0].email == 'user@gmail.com'
-    assert user1[0].name_first == 'shaozhen'
-    assert user1[0].name_last == 'yan'
+    assert user1.u_id == user_id
+    assert user1.email == 'user@gmail.com'
+    assert user1.name_first == 'shaozhen'
+    assert user1.name_last == 'yan'
     
     #clear the information we created and check the validity of clear_v1
     clear_v1()
