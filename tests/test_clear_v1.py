@@ -16,7 +16,7 @@ def test_clear_v1():
     channel1_id = channels_create_v1(user_id, 'test_channel', True)
     #check if the user and channel are created correctly in the empty dict
     assert data['class_channels'][0].name == 'test_channel'
-    assert data['class_channels'][0].channel1_id == channel1_id 
+    assert data['class_channels'][0].channel_id == channel1_id 
     assert data['class_channels'][0].is_public == True
     
     user1 = get_user_by_auth_id(user_id)
