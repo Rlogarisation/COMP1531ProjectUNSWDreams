@@ -13,7 +13,7 @@ def test_clear_v1():
     register = auth_register_v1('user@gmail.com', 'qwe1212', 'shaozhen', 'yan')
     user_id = register['auth_user_id']
     #create a channel 
-    channel1_id = channels_create_v1(user_id, 'test_channel', True)
+    channel1_id = channels_create_v1(user_id, 'test_channel', True)['channel_id']
     #check if the user and channel are created correctly in the empty dict
     assert data['class_channels'][0].name == 'test_channel'
     assert data['class_channels'][0].channel_id == channel1_id 
