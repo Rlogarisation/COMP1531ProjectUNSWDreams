@@ -140,45 +140,6 @@ def add_user_into_channel(channel, invitee):
     channel.all_members.append(invitee)
 
 
-def channel_invite_v1(auth_user_id, channel_id, u_id):
-    """
-    Author : Emir Aditya Zen
-
-    Background
-    channel_invite_v1 - Invites a user (with user id u_id) to join a channel with ID channel_id.
-                        Once invited the user is added to the channel immediately
-
-    Parameters: (auth_user_id, channel_id, u_id)
-    Return Type: {}
-
-    InputError when any of:
-        channel_id does not refer to a valid channel.
-        u_id does not refer to a valid user
-
-    AccessError when any of:
-        the authorised user is not already a member of the channel
-
-    """
-
-    # Case 1 error checks
-    # Checks for cases of InputError indicated by invalid channel_id or u_id
-    # In addition, checks for cases of AccessError indicated by authorised user calling
-    # channel_invite_v1 function into a channel he is not part in
-    error_check(channel_id, u_id, auth_user_id)
-
-    # Case 2 no error occurs but user invited is already part of channel
-    # Expected outcome is channel_invite_v1 function will just ignore the second
-    # invitation call
-    invitee = get_user_by_u_id(u_id)
-    channel = get_channel_by_channel_id(channel_id)
-    if channel not in invitee.part_of_channel:
-        # Case 3 succesfull function calling
-        # Expected outcome is invited user is now a member of the channel specified
-        add_user_into_channel(channel, invitee)
-
-    return {}
-
-
 def channel_details_v1(auth_user_id, channel_id):
     """
     Author : Emir Aditya Zen
