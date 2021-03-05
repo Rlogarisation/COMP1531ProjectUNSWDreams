@@ -67,6 +67,7 @@ def test_channel_invite_v1_success():
     output = channel_details_v1(user_1_id_auth, Channel_1_id)
     
     assert output['all_members'][0].u_id == user_1_id
+    assert output['all_members'][1].u_id == user_2_id
     assert output['owner_members'][0].u_id == user_1_id
     assert output['name'] == 'channelone'
 
@@ -105,6 +106,7 @@ def test_channel_invite_v1_repeated():
     output = channel_details_v1(user_1_id_auth, Channel_1_id)
     
     assert output['all_members'][0].u_id == user_1_id
+    assert output['all_members'][1].u_id == user_2_id
     assert output['owner_members'][0].u_id == user_1_id
     assert output['name'] == 'channelone'
 
