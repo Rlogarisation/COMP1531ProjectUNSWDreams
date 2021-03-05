@@ -128,3 +128,7 @@ dmypy.json
 
 # pycharm folder
 .idea/
+
+# Mac DS_Store
+.DS_Store
+*/.DS_Store
