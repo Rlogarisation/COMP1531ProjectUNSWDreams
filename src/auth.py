@@ -1,6 +1,6 @@
 import re
-from .data_file import User, data
-from .error import InputError
+from src.data_file import User, data
+from src.error import InputError
 # from data_file import User, data
 # from error import InputError
 
@@ -130,9 +130,6 @@ def auth_register_v1(email, password, name_first, name_last):
     user_ = User(u_id, email, password, name_first, name_last, handle, auth_user_id, role)
     data['class_users'].append(user_)
 
-    # return {
-    #     'auth_user_id': 1,
-    # }
     return {
         'auth_user_id': auth_user_id
     }
@@ -163,7 +160,3 @@ def auth_login_v1(email, password):
     return {
         'auth_user_id': user.auth_user_id
     }
-
-    # return {
-    #     'auth_user_id': 1,
-    # }
