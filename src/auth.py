@@ -1,8 +1,6 @@
 import re
 from src.data_file import User, data
 from src.error import InputError
-# from data_file import User, data
-# from error import InputError
 
 
 # check if email entered is valid

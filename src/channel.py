@@ -201,14 +201,29 @@ def channel_details_v1(auth_user_id, channel_id):
     owner_list = []
     member_list = []
     for owner in channel.owner_members:
-        dict_owner = {"u_id": owner.u_id, "name_first": owner.name_first, "name_last": owner.name_last}
+        dict_owner = {
+            "u_id": owner.u_id,
+            "email": owner.email,
+            "name_first": owner.name_first,
+            "name_last": owner.name_last,
+            "handle_str": owner.handle_str
+        }
         owner_list.append(dict_owner)
 
     for member in channel.all_members:
-        dict_member = {"u_id": member.u_id, "name_first": member.name_first, "name_last": member.name_last}
+        dict_member = {
+            "u_id": member.u_id,
+            "email": member.email,
+            "name_first": member.name_first,
+            "name_last": member.name_last,
+            "handle_str": member.handle_str
+        }
         member_list.append(dict_member)
 
     return {
+        'name': channel.name,
+        'owner_members': owner_list,
+        'all_members': member_list
     }
 
 
