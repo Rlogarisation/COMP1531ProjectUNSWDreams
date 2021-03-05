@@ -140,6 +140,89 @@ def add_user_into_channel(channel, invitee):
     channel.all_members.append(invitee)
 
 
+def channel_details_v1(auth_user_id, channel_id):
+    """
+    Author : Emir Aditya Zen
+
+    Background
+    channel_invite_v1 - Given a Channel with ID channel_id that the authorised user
+                        is part of, provide basic details about the channel
+
+    Parameters: (auth_user_id, channel_id)
+    Return Type: {name, owner_members, all_members}
+
+    InputError when any of:
+        channel_id does not refer to a valid channel.
+
+    AccessError when any of:
+        Authorised user is not a member of channel with channel_id
+
+    """
+    # Case 1 InputError checks
+    # Checks for cases of InputError indicated by invalid channel_id
+    channel = get_channel_by_channel_id(channel_id)
+    if channel is None:
+        raise InputError("Channel_id does not refer to a valid channel")
+
+    # Case 2 AccessError checks
+    # Checks for cases of AccessError indicated by authorised user calling
+    # channel_invite_v1 function into a channel he is not part in
+    sender = is_user_in_channel(channel_id, auth_user_id)
+    if sender is None:
+        raise AccessError("The authorised user is not a member of the channel")
+
+    # Case 3 succesfull function calling
+    # Expected outcome is function return basic details on the channel
+    # he/she is in through a dictionary form
+    owner_list = []
+    member_list = []
+    for owner in channel.owner_members:
+        dict_owner = {"u_id": owner.u_id, "name_first": owner.name_first, "name_last": owner.name_last}
+        owner_list.append(dict_owner)
+
+    for member in channel.all_members:
+        dict_member = {"u_id": member.u_id, "name_first": member.name_first, "name_last": member.name_last}
+        member_list.append(dict_member)
+
+    return {
+    }
+
+
+# check if the user is a member of channel
+def is_user_in_channel(channel_id, auth_user_id):
+    channel = get_channel_by_channel_id(channel_id)
+    for user in channel.all_members:
+        if auth_user_id == user.auth_user_id:
+            return user
+    return None
+
+
+# Checks if function channel_invite_v1 will generate an error
+def error_check(channel_id, u_id, auth_user_id):
+    # Checking for InputError
+    # error_test1 and error_test2 checks if channel and user is valid or not
+    # if user or channel is invalid throw inputError
+    channel_ = get_channel_by_channel_id(channel_id)
+    if channel_ is None:
+        raise InputError('Channel_id does not refer to a valid channel')
+
+    invitee = get_user_by_u_id(u_id)
+    if invitee is None:
+        raise InputError('u_id does not refer to a valid user')
+
+    # Checking for AccessError
+    # error_test3 checks if user inviting the other user is in the channel
+    sender = is_user_in_channel(channel_id, auth_user_id)
+    if sender is None:
+        raise AccessError('The authorised user is not a member of the channel')
+
+
+# Function adding user into specified channel and adds that channel into user class
+def add_user_into_channel(channel, invitee):
+    invitee.part_of_channel.append(channel)
+    channel.all_members.append(invitee)
+
+
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     """
     Author : Emir Aditya Zen
@@ -201,14 +284,14 @@ def channel_details_v1(auth_user_id, channel_id):
     # Checks for cases of InputError indicated by invalid channel_id
     channel = get_channel_by_channel_id(channel_id)
     if channel is None:
-        raise InputError("Channel_id does not refer to a valid channel")
+        raise InputError('Channel_id does not refer to a valid channel')
 
     # Case 2 AccessError checks
     # Checks for cases of AccessError indicated by authorised user calling
     # channel_invite_v1 function into a channel he is not part in
     sender = is_user_in_channel(channel_id, auth_user_id)
     if sender is None:
-        raise AccessError("The authorised user is not a member of the channel")
+        raise AccessError('The authorised user is not a member of the channel')
 
     # Case 3 succesfull function calling
     # Expected outcome is function return basic details on the channel
@@ -216,14 +299,26 @@ def channel_details_v1(auth_user_id, channel_id):
     owner_list = []
     member_list = []
     for owner in channel.owner_members:
-        dict_owner = {"u_id": owner.u_id, "name_first": owner.name_first, "name_last": owner.name_last}
+        dict_owner = {
+            'u_id': owner.u_id,
+            'name_first': owner.name_first,
+            'name_last': owner.name_last
+        }
         owner_list.append(dict_owner)
 
     for member in channel.all_members:
-        dict_member = {"u_id": member.u_id, "name_first": member.name_first, "name_last": member.name_last}
+        dict_member = {
+            'u_id': member.u_id,
+            'name_first': member.name_first,
+            'name_last': member.name_last
+        }
         member_list.append(dict_member)
 
     return {
+        'name': channel.name,
+        'owner_members': owner_list,
+        'all_members': member_list,
     }
+
 
 
