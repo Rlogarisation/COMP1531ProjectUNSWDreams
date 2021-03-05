@@ -1,9 +1,8 @@
 # Imports the necessary function implementations
-from src.auth import auth_login_v1, auth_register_v1, get_user_by_auth_id
-from src.channel import channel_invite_v1, channel_details_v1, channel_messages_v1, channel_join_v1, get_channel_by_channel_id
+from src.auth import auth_login_v1, auth_register_v1
+from src.channel import channel_invite_v1, channel_details_v1, channel_messages_v1, channel_join_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
 from src.other import clear_v1
-from src.data_file import data
 
 # Imports the possible error output
 from src.error import InputError, AccessError
@@ -32,6 +31,11 @@ AccessError when any of:
     the authorised user is not already a member of the channel
 
 """
+#############################################################################
+#                                                                           #
+#                       Test for channel_invite_v1                           #
+#                                                                           #
+#############################################################################
 
 
 # Case 1 - tests for valid function implementation (no errors expected)
@@ -52,10 +56,7 @@ def test_channel_invite_v1_success():
 
     user_1_id_auth = login1["auth_user_id"]
     user_2_id_auth = login2["auth_user_id"]
-    user1 = get_user_by_auth_id(user_1_id_auth)
-    user2 = get_user_by_auth_id(user_2_id_auth)
-    user_2_id = user2.u_id
-    user_1_id = user1.u_id
+    user_2_id = user_2_id_auth
 
     # Create Channel_1 made by user_1 and get its id
     create_channel1 = channels_create_v1(user_1_id_auth, "channelone", True)
@@ -69,11 +70,11 @@ def test_channel_invite_v1_success():
 
     # Hence checks that Channel_1 exists, has 2 members, and the members are
     # user_1 and user_2
-    channel1 = get_channel_by_channel_id(Channel_1_id)
-    assert channel1 is not None
-    assert channel1.all_members[0].u_id == user_1_id
-    assert channel1.all_members[1].u_id == user_2_id
-    assert len(channel1.all_members) == 2
+    channel_members = channel_details_v1(user_1_id_auth, Channel_1_id)['all_members']
+    user1 = channel_members[0]
+    user2 = channel_members[1]
+    assert user1['email'] == 'haha@gmail.com'
+    assert user2['email'] == 'test@testexample.com'
 
 
 # Case 2 - tests for repeated invite instances
@@ -88,13 +89,7 @@ def test_channel_invite_v1_repeated():
     # login the two registered users
     auth_id1 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
     auth_id2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
-
-    user1 = get_user_by_auth_id(auth_id1)
-    user2 = get_user_by_auth_id(auth_id2)
-
-    # Identify user_id and auth_user_id for 2 registered user for testing
-    user_1_id = user1.u_id
-    user_2_id = user2.u_id
+    user_2_id = auth_id2
 
     # Create Channel_1 made by user_1 and get its id
     Channel_1_id = channels_create_v1(auth_id1, "channelone", True)["channel_id"]
@@ -109,11 +104,11 @@ def test_channel_invite_v1_repeated():
 
     # Hence checks that Channel_1 exists, has 2 members, and the members are
     # user_1 and user_2
-    channel1 = get_channel_by_channel_id(Channel_1_id)
-    assert channel1 is not None
-    assert channel1.all_members[0].u_id == user_1_id
-    assert channel1.all_members[1].u_id == user_2_id
-    assert len(channel1.all_members) == 2
+    channel_members = channel_details_v1(auth_id1, Channel_1_id)['all_members']
+    user1 = channel_members[0]
+    user2 = channel_members[1]
+    assert user1['email'] == 'haha@gmail.com'
+    assert user2['email'] == 'test@testexample.com'
 
 
 # Case 3 - tests for input error due to invalid channel
@@ -128,9 +123,7 @@ def test_channel_invite_v1_inputErrorChannel():
     # login the two registered users
     auth_id1 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
     auth_id2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
-
-    user2 = get_user_by_auth_id(auth_id2)
-    user_2_id = user2.u_id
+    user_2_id = auth_id2
 
     # Create Channel_1 made by user_1 and get its id
     Channel_1_id = channels_create_v1(auth_id1, "channelone", True)["channel_id"]
@@ -155,9 +148,7 @@ def test_channel_invite_v1_inputErrorUser():
     # login the two registered users
     auth_id1 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
     auth_id2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
-
-    user2 = get_user_by_auth_id(auth_id2)
-    user_2_id = user2.u_id
+    user_2_id = auth_id2
 
     # Create Channel_1 made by user_1 and get its id
     Channel_1_id = channels_create_v1(auth_id1, "channelone", True)["channel_id"]
@@ -185,9 +176,7 @@ def test_channel_invite_v1_accessError():
     auth_id1 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
     auth_id2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
     auth_id3 = auth_login_v1("hah2@gmail.com", "9uisbxh83h")["auth_user_id"]
-
-    user3 = get_user_by_auth_id(auth_id3)
-    user_3_id = user3.u_id
+    user_3_id = auth_id3
 
     # Create Channel_1 made by user_1 and get its id
     Channel_1_id = channels_create_v1(auth_id1, "channelone", True)["channel_id"]
@@ -216,6 +205,11 @@ AccessError when any of:
     Authorised user is not a member of channel with channel_id
 
 """
+#############################################################################
+#                                                                           #
+#                       Test for channel_detail_v1                           #
+#                                                                           #
+#############################################################################
 
 
 # Case 1 - tests for valid function implementation with a single group member
@@ -230,10 +224,7 @@ def test_channel_details_v1_success():
     # login the two registered users
     auth_id1 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
     auth_id2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
-
-    user2 = get_user_by_auth_id(auth_id2)
-    user1 = get_user_by_auth_id(auth_id1)
-    user_2_id = user2.u_id
+    user_2_id = auth_id2
 
     # Create Channel_1 made by user_1 and get its id
     Channel_1_id = channels_create_v1(auth_id1, "channelone", True)["channel_id"]
@@ -242,9 +233,9 @@ def test_channel_details_v1_success():
     # Calls details function for testing
     output = channel_details_v1(auth_id1, Channel_1_id)
 
-    assert output["all_members"][0]["name_first"] == user1.name_first
-    assert output["all_members"][1]["name_first"] == user2.name_first
-    assert output["owner_members"][0]["name_first"] == user1.name_first
+    assert output["all_members"][0]["name_first"] == 'Peter'
+    assert output["all_members"][1]["name_first"] == 'Tom'
+    assert output["owner_members"][0]["name_first"] == 'Peter'
     assert output["name"] == "channelone"
 
 
@@ -306,6 +297,11 @@ Error:
 - the auth user is not in this 
 
 """
+#############################################################################
+#                                                                           #
+#                       Test for channel_messages_v1                           #
+#                                                                           #
+#############################################################################
 
 
 def msg_send(channel_id, msg_id, u_id, msg, time):

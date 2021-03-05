@@ -10,6 +10,11 @@ from src.channels import channels_create_v1
 """
 tests for auth_register_v1
 """
+#############################################################################
+#                                                                           #
+#                       Test for auth_register_v1                           #
+#                                                                           #
+#############################################################################
 
 
 # test email does not match the regular expression
@@ -129,6 +134,11 @@ def test_auth_register_handle_valid():
 """
 tests for auth_login_v1
 """
+#############################################################################
+#                                                                           #
+#                       Test for auth_login_v1                           #
+#                                                                           #
+#############################################################################
 
 
 # test for email entered is not a valid email
