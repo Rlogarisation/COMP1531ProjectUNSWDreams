@@ -63,16 +63,12 @@ def test_channel_invite_v1_success():
     
     # Expected output is user_2 joins the Channel_1
     
-    # Hence checks that Channel_1 exists, has 2 members, and the members are
-    # user_1 and user_2
-    num_members = 0
-    for channel in data['class_channels']:
-        if channel.channel_id == Channel_1_id:
-            num_members = len(channel.all_members)
-            break
-    assert channel.all_members[0].u_id == user_1_id
-    assert channel.all_members[1].u_id == user_2_id
-    assert num_members == 2
+    # Calls details function for testing
+    output = channel_details_v1(user_1_id_auth, Channel_1_id)
+    
+    assert output['all_members'][0].u_id == user_1_id
+    assert output['owner_members'][0].u_id == user_1_id
+    assert output['name'] == 'channelone'
 
 # Case 2 - tests for repeated invite instances
 #          expected outcome is recognizes user invited is already in the channel and does nothing
@@ -105,16 +101,12 @@ def test_channel_invite_v1_repeated():
     # Expected output is user_2 joins the Channel_1 on the first invite and 
     # ignores the second invite
     
-    # Hence checks that Channel_1 exists, has 2 members, and the members are
-    # user_1 and user_2
-    num_members = 0
-    for channel in data['class_channels']:
-        if channel.channel_id == Channel_1_id:
-            num_members = len(channel.all_members)
-            break
-    assert channel.all_members[0].u_id == user_1_id
-    assert channel.all_members[1].u_id == user_2_id
-    assert num_members == 2
+    # Calls details function for testing
+    output = channel_details_v1(user_1_id_auth, Channel_1_id)
+    
+    assert output['all_members'][0].u_id == user_1_id
+    assert output['owner_members'][0].u_id == user_1_id
+    assert output['name'] == 'channelone'
 
 # Case 3 - tests for input error due to invalid channel
 #          expected outcome is input error
