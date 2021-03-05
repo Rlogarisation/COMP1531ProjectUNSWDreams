@@ -31,6 +31,21 @@ def get_user_by_u_id(u_id):
         return None
 
 
+def msg_send(channel_id, msg_id, u_id, msg, time):
+    message = {
+        "message_id": msg_id,
+        "u_id": u_id,
+        "message": msg,
+        "time_created": time,
+    }
+
+    for i in data["class_channels"]:
+        if i.channel_id == channel_id:
+            i.messages.insert(0, message)
+            break
+    return
+
+
 def channel_messages_v1(auth_user_id, channel_id, start):
     if auth_user_id == -1:
         raise (InputError("channel_messages_v1: invalid token."))
