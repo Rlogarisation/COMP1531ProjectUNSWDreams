@@ -70,6 +70,8 @@ def test_channel_invite_v1_success():
     assert output['all_members'][1].u_id == user_2_id
     assert output['owner_members'][0].u_id == user_1_id
     assert output['name'] == 'channelone'
+    assert len(output['all_members']) == 2
+    assert len(output['owner_members']) == 1
 
 # Case 2 - tests for repeated invite instances
 #          expected outcome is recognizes user invited is already in the channel and does nothing
@@ -109,6 +111,8 @@ def test_channel_invite_v1_repeated():
     assert output['all_members'][1].u_id == user_2_id
     assert output['owner_members'][0].u_id == user_1_id
     assert output['name'] == 'channelone'
+    assert len(output['all_members']) == 2
+    assert len(output['owner_members']) == 1
 
 # Case 3 - tests for input error due to invalid channel
 #          expected outcome is input error
@@ -248,6 +252,8 @@ def test_channel_details_v1_success_single():
     assert output['all_members'][0].u_id == user_1_id
     assert output['owner_members'][0].u_id == user_1_id
     assert output['name'] == 'channelone'
+    assert len(output['all_members']) == 1
+    assert len(output['owner_members']) == 1
     
 # Case 2 - tests for valid function implementation with multiple group member
 #          expected outcome is output of {name, owner_members, all_members}
@@ -283,6 +289,8 @@ def test_channel_details_v1_success_multiple():
     assert output['all_members'][1].u_id == user_2_id
     assert output['owner_members'][0].u_id == user_1_id
     assert output['name'] == 'channelone'
+    assert len(output['all_members']) == 2
+    assert len(output['owner_members']) == 1
 
 # Case 3 - tests for input error due to invalid channel
 #          expected outcome is input error
