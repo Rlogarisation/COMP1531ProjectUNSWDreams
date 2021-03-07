@@ -16,8 +16,8 @@ from src.data_file import Channel, data
 #                                                                           #
 #############################################################################
 """
-channels_list():
-
+Author: Zheng Roger Luo
+Background :
 Provide a list of all channels (both public and private channels)
 (and their associated details) that the authorised user is part of.
 
@@ -44,8 +44,8 @@ def channels_list_v1(auth_user_id):
 #                                                                           #
 #############################################################################
 """
-channels_listall_v1:
-
+Author: Zheng Roger Luo
+Background :
 Provide a list of all channels (and their associated details) 
 regardless who calls, or owns it.
 
