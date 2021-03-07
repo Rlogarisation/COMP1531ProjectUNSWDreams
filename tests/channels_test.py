@@ -5,8 +5,7 @@
 
 import pytest
 from src.auth import auth_login_v1, auth_register_v1, create_role
-from src.channel import channel_invite_v1, channel_details_v1, channel_join_v1, channel_messages_v1, \
-	get_channel_by_channel_id
+from src.channel import channel_invite_v1, channel_details_v1, channel_join_v1, channel_messages_v1
 from src.channels import channels_list_v1, channels_create_v1, channels_listall_v1
 from src.error import InputError, AccessError
 from src.other import clear_v1
@@ -19,8 +18,7 @@ from src.other import clear_v1
 """
 channels_list():
 
-Provide a list of all channels 
-(and their associated details) that the authorised user is part of.
+Provide a list of all channels (both public and private channels).
 
 Parameters:(auth_user_id)
 Return Type:{channels}
@@ -140,10 +138,8 @@ def test_allchannels_correct_channel():
 	# Create a channel
 	# channels_create_v1(auth_user_id, name, is_public)
 	channel_id1 = channels_create_v1(auth_user_id1, "SheepChannel", is_public=True)['channel_id']
-	# List the channel of this user belongs to
-	channel_user = channels_listall_v1(auth_user_id1)
-	# Check the information of authorised user is correct
-	assert (channel_user[0]['name'] == "SheepChannel")
+	# List amount of channels
+	assert(len(channels_listall_v1(auth_user_id1)) == 1)
 
 
 def test_allchannels_multiple_channels():
