@@ -6,7 +6,6 @@
 
 
 from src.auth import auth_login_v1, auth_register_v1, get_user_by_auth_id
-from .channel import get_channel_by_channel_id
 from src.error import InputError, AccessError
 from src.data_file import Channel, data
 
@@ -16,8 +15,8 @@ from src.data_file import Channel, data
 #                                                                           #
 #############################################################################
 """
-channels_list():
-
+Author: Zheng Roger Luo
+Background :
 Provide a list of all channels (both public and private channels)
 (and their associated details) that the authorised user is part of.
 
@@ -44,8 +43,8 @@ def channels_list_v1(auth_user_id):
 #                                                                           #
 #############################################################################
 """
-channels_listall_v1:
-
+Author: Zheng Roger Luo
+Background :
 Provide a list of all channels (and their associated details) 
 regardless who calls, or owns it.
 

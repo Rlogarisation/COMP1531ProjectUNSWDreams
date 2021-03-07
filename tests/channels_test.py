@@ -4,7 +4,7 @@
 
 
 import pytest
-from src.auth import auth_login_v1, auth_register_v1, create_role
+from src.auth import auth_login_v1, auth_register_v1
 from src.channel import channel_invite_v1, channel_details_v1, channel_join_v1, channel_messages_v1
 from src.channels import channels_list_v1, channels_create_v1, channels_listall_v1
 from src.error import InputError, AccessError
@@ -213,6 +213,17 @@ def test_listall_invalid_user():
 	with pytest.raises(AccessError):
 		channels_listall_v1(auth_user_id_invalid)
 
+
+"""
+Author: Lan Lin
+
+Tests for channels_create_v1 function implementation
+
+Tests content:
+1. Channel's name is more than 20 characters
+2. The input of is_public is bool
+3. The function can successfully create channels
+"""
 #############################################################################
 #                                                                           #
 #                        Test for Channels_create_v1                        #
