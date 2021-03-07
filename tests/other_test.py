@@ -21,4 +21,4 @@ def test_clear_v1():
     
     #clear the information we created and check the validity of clear_v1
     clear_v1()
-    assert channels_listall_v1(user_id) == {}
+    assert channels_listall_v1(user_id) is None
