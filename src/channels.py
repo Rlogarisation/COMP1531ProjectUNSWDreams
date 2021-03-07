@@ -19,7 +19,7 @@ from src.data_file import Channel, data
 """
 channels_list():
 
-Provide a list of all channels 
+Provide a list of all channels (both public and private channels)
 (and their associated details) that the authorised user is part of.
 
 Parameters:(auth_user_id)
@@ -36,8 +36,7 @@ def channels_list_v1(auth_user_id):
     # Call return_type_channel(self) in order to get dictionary return
     list_return = []
     for channel in user.part_of_channel:
-        if channel.is_public:
-            list_return.append(channel.return_type_channel())
+        list_return.append(channel.return_type_channel())
     return list_return
 
 
@@ -49,10 +48,8 @@ def channels_list_v1(auth_user_id):
 """
 channels_listall_v1:
 
-Provide a list of all channels (and their associated details)
-Explaination:
-channel_listall_v1 should list all channels, 
-including those that are private, regardless of who calls it.
+Provide a list of all channels (and their associated details) 
+regardless who calls, or owns it.
 
 Parameters:(auth_user_id)
 Return Type:{channels}

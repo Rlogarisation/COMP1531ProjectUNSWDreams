@@ -18,8 +18,7 @@ from src.other import clear_v1
 """
 channels_list():
 
-Provide a list of all channels 
-(and their associated details) that the authorised user is part of.
+Provide a list of all channels (both public and private channels).
 
 Parameters:(auth_user_id)
 Return Type:{channels}
@@ -107,7 +106,7 @@ def test_channels_oneUser_multiple_private_channels():
 	# List all the public channel of the user belongs to
 	channel_user1 = channels_list_v1(auth_user_id1)
 	# Check the information of authorised user is correct
-	assert len(channel_user1) == 2
+	assert len(channel_user1) == 4
 
 
 #############################################################################
