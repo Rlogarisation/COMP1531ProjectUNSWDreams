@@ -2,12 +2,19 @@
 
 import pytest
 from src.other import clear_v1
-from src.auth import auth_login_v1, auth_register_v1, get_user_by_auth_id
+from src.auth import auth_login_v1, auth_register_v1
 from src.error import InputError
+from src.channel import channel_details_v1, channel_invite_v1
+from src.channels import channels_create_v1
 
 """
 tests for auth_register_v1
 """
+#############################################################################
+#                                                                           #
+#                       Test for auth_register_v1                           #
+#                                                                           #
+#############################################################################
 
 
 # test email does not match the regular expression
@@ -72,12 +79,6 @@ def test_auth_register_valid_small():
     auth_user_id2 = register2['auth_user_id']
     assert auth_user_id1 != auth_user_id2
 
-    # test the global role is correct for the user
-    user1 = get_user_by_auth_id(auth_user_id1)
-    user2 = get_user_by_auth_id(auth_user_id2)
-    assert user1.role == 'global owner'
-    assert user2.role == 'global member'
-
 
 # test large number of users can register successfully
 def test_auth_register_valid_large():
@@ -103,14 +104,19 @@ def test_auth_register_handle_valid():
     register4 = auth_register_v1('haha3@gmail.com', '123jcqewp2', 'zxcvbnmasdfg', 'hjklqwertiowjec')
 
     auth_user_id1 = register1['auth_user_id']
-    auth_user_id2 = register2['auth_user_id']
-    auth_user_id3 = register3['auth_user_id']
-    auth_user_id4 = register4['auth_user_id']
+    user_id2 = register2['auth_user_id']
+    user_id3 = register3['auth_user_id']
+    user_id4 = register4['auth_user_id']
 
-    user1 = get_user_by_auth_id(auth_user_id1)
-    user2 = get_user_by_auth_id(auth_user_id2)
-    user3 = get_user_by_auth_id(auth_user_id3)
-    user4 = get_user_by_auth_id(auth_user_id4)
+    channel_id = channels_create_v1(auth_user_id1, 'Zoom', True)['channel_id']
+    channel_invite_v1(auth_user_id1, channel_id, user_id2)
+    channel_invite_v1(auth_user_id1, channel_id, user_id3)
+    channel_invite_v1(auth_user_id1, channel_id, user_id4)
+    channel_members = channel_details_v1(auth_user_id1, channel_id)['all_members']
+    member1 = channel_members[0]
+    member2 = channel_members[1]
+    member3 = channel_members[2]
+    member4 = channel_members[3]
 
     """
     - test if the handle is already taken, append the concatenated names with 
@@ -119,15 +125,20 @@ def test_auth_register_handle_valid():
     - test if the concatenation is longer than 20 characters, it is cutoff at 20 characters.
     """
 
-    assert user1.handle_str == 'zxcvbnmasdfghjklqwe'
-    assert user2.handle_str == 'zxcvbnmasdfghjklqwer'
-    assert user3.handle_str == 'zxcvbnmasdfghjklqwe0'
-    assert user4.handle_str == 'zxcvbnmasdfghjklqwe1'
+    assert member1['handle_str'] == 'zxcvbnmasdfghjklqwe'
+    assert member2['handle_str'] == 'zxcvbnmasdfghjklqwer'
+    assert member3['handle_str'] == 'zxcvbnmasdfghjklqwe0'
+    assert member4['handle_str'] == 'zxcvbnmasdfghjklqwe1'
 
 
 """
 tests for auth_login_v1
 """
+#############################################################################
+#                                                                           #
+#                       Test for auth_login_v1                           #
+#                                                                           #
+#############################################################################
 
 
 # test for email entered is not a valid email
