@@ -1,10 +1,11 @@
-from .data_file import data
-# from data_file import data
+from src.data_file import data
+
 
 def clear_v1():
     data['class_users'] = []
     data['class_channels'] = []
-    return{}
+    return {}
+
 
 def search_v1(auth_user_id, query_str):
     return {
