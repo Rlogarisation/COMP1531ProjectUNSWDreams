@@ -1,9 +1,10 @@
+# for 21T1 COMP1531 project
+# Written by Shi Tong Yuan (z5192519@ad.unsw.edu.au) on 02/Mar/2021
+
 from typing import Dict
 from .data_file import data
 from .error import InputError, AccessError
 from .auth import get_user_by_auth_id
-
-# from data_file import Channel, data
 
 
 def get_channel_by_channel_id(channel_id):
@@ -71,7 +72,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 
     return_msg = []
     if num_msgs > (start + 50):
-        return_msg = target_channel.messages[start : start + 50]
+        return_msg = target_channel.messages[start: start + 50]
     else:
         return_msg = target_channel.messages[start:]
 
@@ -84,7 +85,6 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 
 def channel_leave_v1(auth_user_id, channel_id):
     return {}
-
 
 
 def channel_join_v1(auth_user_id, channel_id):
@@ -110,10 +110,8 @@ def channel_join_v1(auth_user_id, channel_id):
     return {}
 
 
-
 def channel_addowner_v1(auth_user_id, channel_id, u_id):
     return {}
-
 
 
 def channel_removeowner_v1(auth_user_id, channel_id, u_id):
