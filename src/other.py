@@ -1,5 +1,4 @@
-from .data_file import data
-# from data_file import data
+from src.data_file import data
 
 
 def clear_v1():
