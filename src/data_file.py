@@ -1,6 +1,7 @@
 """
-Define different classes and data structures
-By Lan Lin
+Define different classes: User, Channel, Message
+Define data structure: data
+Written by: Lan Lin
 """
 
 
