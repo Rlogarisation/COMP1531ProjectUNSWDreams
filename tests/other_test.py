@@ -24,5 +24,6 @@ def test_clear_v1():
     assert channels_listall_v1(user_id)[1] == {'channel_id': 1, 'name': 'test_private_channel'}
     
     #clear the information we created and check the validity of clear_v1
-    clear_v1()
-    assert channels_listall_v1(user_id)[0] == []
+    register = auth_register_v1('user@gmail.com', 'qwe1212', 'shaozhen', 'yan')
+    user_id = register['auth_user_id']
+    assert channels_listall_v1(user_id) == []
