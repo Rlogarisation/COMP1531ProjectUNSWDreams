@@ -3,7 +3,6 @@ from src.data_file import data
 from src.error import InputError, AccessError
 from src.auth import get_user_by_auth_id
 
-
 #############################################################################
 #                                                                           #
 #                           Interface function                              #
@@ -29,7 +28,6 @@ AccessError:
 
 """
 
-
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     # Case 1 error checks
     # Checks for cases of InputError indicated by invalid channel_id or u_id
@@ -40,14 +38,12 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     # Case 2 no error occurs but user invited is already part of channel
     # Expected outcome is channel_invite_v1 function will just ignore the second
     # invitation call
-    if (is_user_in_channel(channel_id, u_id) != None):
-        return {}
-    
-    # Case 3 succesfull function calling
-    # Expected outcome is invited user is now a member of the channel specified
     channel = get_channel_by_channel_id(channel_id)
     invitee = get_user_by_u_id(u_id)
-    add_user_into_channel (channel,invitee)
+    if channel not in invitee.part_of_channel:
+        # Case 3 succesfull function calling
+        # Expected outcome is invited user is now a member of the channel specified
+        add_user_into_channel (channel,invitee)
 
     return {
     }
