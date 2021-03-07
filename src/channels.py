@@ -7,9 +7,8 @@
 
 from src.auth import auth_login_v1, auth_register_v1, get_user_by_auth_id
 from .channel import get_channel_by_channel_id
-from src.error import InputError
+from src.error import InputError, AccessError
 from src.data_file import Channel, data
-
 
 #############################################################################
 #                                                                           #
@@ -29,7 +28,6 @@ Return Type:{channels}
 
 
 def channels_list_v1(auth_user_id):
-
     # Pull the data of user from data_file
     user = get_user_by_auth_id(auth_user_id)
 
@@ -66,7 +64,21 @@ def channels_listall_v1(auth_user_id):
         list_return.append(i.return_type_channel())
     return list_return
 
-    
+#############################################################################
+#                                                                           #
+#                           channels_create_v1                             #
+#                                                                           #
+#############################################################################
+
+
+"""
+Author: Lan Lin
+Background :
+Creates a new channel with that name that is either a public or private channel
+
+Parameters: auth_user_id, name, is_public
+Return Type: { channel_id }
+"""
 
 
 def create_channel_id():

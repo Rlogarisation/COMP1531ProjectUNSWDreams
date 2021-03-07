@@ -8,7 +8,19 @@ from src.channel import channel_details_v1, channel_invite_v1
 from src.channels import channels_create_v1
 
 """
-tests for auth_register_v1
+Author: Lan Lin
+
+Test for auth_register_v1 function implementation
+
+Tests content:
+1. The email is invalid
+2. The email address is already been used by another user
+3. Password length is less than 6 characters
+4. The length of name_first is not between 1 and 50
+5. The length of name_last is not between 1 and 50
+6. Successfully register several users
+7. Successfully register large amount users
+8. Test if the handle generated is valid
 """
 #############################################################################
 #                                                                           #
@@ -132,7 +144,15 @@ def test_auth_register_handle_valid():
 
 
 """
-tests for auth_login_v1
+Author : Lan Lin
+
+Test for auth_login_v1 function implementation
+
+Tests content:
+1. The email is invalid
+2. The email address does not belong to any user
+3. Password is wrong
+4. The users can successfully register
 """
 #############################################################################
 #                                                                           #

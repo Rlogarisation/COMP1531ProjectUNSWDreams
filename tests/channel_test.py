@@ -13,7 +13,7 @@ import pytest
 
 
 """
-Author : Emir Aditya Zen
+Author: Emir Aditya Zen
 
 This file is for testing channel_invite_v1 function implementation
 
@@ -106,6 +106,7 @@ def test_channel_invite_v1_repeated():
     # Hence checks that Channel_1 exists, has 2 members, and the members are
     # user_1 and user_2
     channel_members = channel_details_v1(auth_id1, Channel_1_id)['all_members']
+    assert len(channel_members) == 2
     user1 = channel_members[0]
     user2 = channel_members[1]
     assert user1['email'] == 'haha@gmail.com'

@@ -1,6 +1,14 @@
 from src.data_file import data
 
 
+"""
+Author: Lan Lin
+
+Background
+Resets the internal data of the application to it's initial state
+"""
+
+
 def clear_v1():
     data['class_users'] = []
     data['class_channels'] = []
