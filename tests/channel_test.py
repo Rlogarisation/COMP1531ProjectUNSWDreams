@@ -17,23 +17,23 @@ Author : Emir Aditya Zen
 This file is for testing channel_invite_v1 function implementation
 
 Background
-channel_invite_v1 - Invites a user (with user id u_id) to join a channel with ID channel_id. 
-                    Once invited the user is added to the channel immediately
+Invites a user (with user id u_id) to join a channel with ID channel_id.
+Once invited the user is added to the channel immediately
 
 Parameters: (auth_user_id, channel_id, u_id)
 Return Type: {}
 
-InputError when any of:
-    channel_id does not refer to a valid channel.
-    u_id does not refer to a valid user
+InputError:
+- channel_id does not refer to a valid channel.
+- u_id does not refer to a valid user
 
-AccessError when any of:
-    the authorised user is not already a member of the channel
+AccessError:
+- the authorised user is not already a member of the channel
 
 """
 #############################################################################
 #                                                                           #
-#                       Test for channel_invite_v1                           #
+#                       Test for channel_invite_v1                          #
 #                                                                           #
 #############################################################################
 
@@ -192,17 +192,17 @@ Author : Emir Aditya Zen
 This file is for testing channel_details_v1 function implementation
 
 Background
-channel_invite_v1 - Given a Channel with ID channel_id that the authorised user 
-                    is part of, provide basic details about the channel
+Given a Channel with ID channel_id that the authorised user
+is part of, provide basic details about the channel
 
 Parameters: (auth_user_id, channel_id)
 Return Type: {name, owner_members, all_members}
 
-InputError when any of:
-    channel_id does not refer to a valid channel.
+InputError:
+- channel_id does not refer to a valid channel.
 
-AccessError when any of:
-    Authorised user is not a member of channel with channel_id
+AccessError:
+- Authorised user is not a member of channel with channel_id
 
 """
 #############################################################################
@@ -284,24 +284,30 @@ def test_channel_details_v1_accessError():
 
 
 """
-channel_messages_v1()
-Description:
-Given a Channel with ID channel_id that the authorised user is part of, return up to 50 messages between index "start" and "start + 50". Message with index 0 is the most recent message in the  This function returns a new index "end" which is the value of "start + 50", or, if this function has returned the least recent messages in the channel, returns -1 in "end" to indicate there are no more messages to load after this return.
+Author : Shi Tong Yuan
 
-Error:
-1. InputError
-- invalid channel id
+This file is for testing channel_messages_v1 function implementation
+
+Background
+Given a Channel with ID channel_id that the authorised user is part of, return up to 50 messages between index "start" and "start + 50". Message with index 0 is the most recent message in the channel. This function returns a new index "end" which is the value of "start + 50", or, if this function has returned the least recent messages in the channel, returns -1 in "end" to indicate there are no more messages to load after this return.
+
+Parameters: (auth_user_id, channel_id, start)
+Return Type: {messages, start, end}
+
+InputError:
+- Channel ID is not a valid channel
 - start is greater than the total number of messages in the channel
 
-2. AccessError
-- the auth user is not in this 
+AccessError:
+- Authorised user is not a member of channel with channel_id
 
 """
 #############################################################################
 #                                                                           #
-#                       Test for channel_messages_v1                           #
+#                       Test for channel_messages_v1                        #
 #                                                                           #
 #############################################################################
+
 
 def test_invalid_channel_id():
     clear_v1()
@@ -418,19 +424,28 @@ def test_more_than_50_msg():
 
 
 """
-channel_join_v1()
-Description:
+Author : Shi Tong Yuan
+
+This file is for testing channel_join_v1 function implementation
+
+Background
 Given a channel_id of a channel that the authorised user can join, adds them to that channel
 
+Parameters: (auth_user_id, channel_id)
+Return Type: {}
 
-Error:
-1. InputError
+InputError:
 - Channel ID is not a valid channel
 
-2. AccessError
+AccessError:
 - channel_id refers to a channel that is private (when the authorised user is not a global owner)
 
 """
+#############################################################################
+#                                                                           #
+#                         Test for channel_join_v1                          #
+#                                                                           #
+#############################################################################
 
 
 def test_channel_join_normal():
