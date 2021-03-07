@@ -3,16 +3,13 @@
 # Written by Zheng Luo (z5206267@ad.unsw.edu.au) on 28/Feb/2021
 
 
-
 import pytest
-from src.auth import auth_login_v1, auth_register_v1, get_user_by_auth_id, create_role
-from src.channel import channel_invite_v1, channel_details_v1, channel_join_v1, channel_messages_v1, get_channel_by_channel_id
+from src.auth import auth_login_v1, auth_register_v1, create_role
+from src.channel import channel_invite_v1, channel_details_v1, channel_join_v1, channel_messages_v1, \
+	get_channel_by_channel_id
 from src.channels import channels_list_v1, channels_create_v1, channels_listall_v1
 from src.error import InputError
 from src.other import clear_v1
-from src.data_file import data
-
-
 
 #############################################################################
 #                                                                           #
@@ -34,6 +31,7 @@ TEST CASES:
 
 """
 
+
 def test_channels_correct_channel():
 	clear_v1()
 	# Initiate a user
@@ -44,12 +42,11 @@ def test_channels_correct_channel():
 	# Create a channel
 	# channels_create_v1(auth_user_id, name, is_public)
 	channel_id1 = channels_create_v1(auth_user_id1, "SheepChannel", is_public=True)['channel_id']
-	
+
 	# List the channel of this user belongs to
 	channel_list = channels_list_v1(auth_user_id1)
 	# Check the information of authorised user is correct
-	#assert isinstance(channel_list[0], dict)
-	assert(channel_list[0]['name'] == 'SheepChannel')
+	assert (channel_list[0]['name'] == 'SheepChannel')
 
 
 def test_channels_multiple_channels():
@@ -62,13 +59,14 @@ def test_channels_multiple_channels():
 	channel_id1 = channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)['channel_id']
 	channel_id2 = channels_create_v1(auth_user_id1, "BussinessChannel", is_public=True)['channel_id']
 	channel_id3 = channels_create_v1(auth_user_id1, "LawChannel", is_public=True)['channel_id']
-	
+
 	# List the channel of this user belongs to
 	channel_list = channels_list_v1(auth_user_id1)
 	# Check the information of authorised user is correct
-	assert(channel_list[0]['name'] == "EngineeringChannel")
-	assert(channel_list[1]['name'] == "BussinessChannel")
-	assert(channel_list[2]['name'] == "LawChannel")
+	assert (channel_list[0]['name'] == "EngineeringChannel")
+	assert (channel_list[1]['name'] == "BussinessChannel")
+	assert (channel_list[2]['name'] == "LawChannel")
+
 
 def test_channels_multiple_users():
 	clear_v1()
@@ -86,15 +84,15 @@ def test_channels_multiple_users():
 	# first input in inviter, third input is invitee.
 	channel_invite_v1(auth_user_id1, channel_id1, user2)
 
-	
-	#channel_invite_v1(auth_user_id1, channel_id1, channel_detail2['owner_members'][0]['u_id'])
+	# channel_invite_v1(auth_user_id1, channel_id1, channel_detail2['owner_members'][0]['u_id'])
 	# List the channel of first user belongs to
 	channel_user1 = channels_list_v1(auth_user_id1)
 	# List the channel of second user belongs to
 	channel_user2 = channels_list_v1(auth_user_id2)
 	# Check the information of authorised user is correct
-	assert(channel_user1[0]['name'] == "mesterChannel")
-	assert(channel_user2[0]['name'] == "mesterChannel")
+	assert (channel_user1[0]['name'] == "mesterChannel")
+	assert (channel_user2[0]['name'] == "mesterChannel")
+
 
 def test_channels_oneUser_multiple_private_channels():
 	clear_v1()
@@ -113,7 +111,6 @@ def test_channels_oneUser_multiple_private_channels():
 	assert len(channel_user1) == 2
 
 
-	
 #############################################################################
 #                                                                           #
 #                       Test for channels_listall_v1                        #
@@ -136,6 +133,7 @@ TEST CASES:
 
 """
 
+
 def test_allchannels_correct_channel():
 	clear_v1()
 	# Initiate a user
@@ -144,11 +142,11 @@ def test_allchannels_correct_channel():
 	user1 = auth_user_id1
 	# Create a channel
 	# channels_create_v1(auth_user_id, name, is_public)
-	channel_id1 = channels_create_v1(auth_user_id1, "SheepChannel", is_public = True)['channel_id']
+	channel_id1 = channels_create_v1(auth_user_id1, "SheepChannel", is_public=True)['channel_id']
 	# List the channel of this user belongs to
 	channel_user = channels_listall_v1(auth_user_id1)
 	# Check the information of authorised user is correct
-	assert(channel_user[0]['name'] == "SheepChannel")
+	assert (channel_user[0]['name'] == "SheepChannel")
 
 
 def test_allchannels_multiple_channels():
@@ -164,9 +162,10 @@ def test_allchannels_multiple_channels():
 	# List the channel of this user belongs to
 	channel_user = channels_listall_v1(auth_user_id1)
 	# Check the information of authorised user is correct
-	assert(channel_user[0]['name'] == "EngineeringChannel")
-	assert(channel_user[1]['name'] == "BussinessChannel")
-	assert(channel_user[2]['name'] == "LawChannel")
+	assert (channel_user[0]['name'] == "EngineeringChannel")
+	assert (channel_user[1]['name'] == "BussinessChannel")
+	assert (channel_user[2]['name'] == "LawChannel")
+
 
 def test_allchannels_multiple_users():
 	clear_v1()
@@ -188,8 +187,9 @@ def test_allchannels_multiple_users():
 	# List the channel of second user belongs to
 	channel_user2 = channels_listall_v1(auth_user_id2)
 	# Check the information of authorised user is correct
-	assert(channel_user1[0]['name'] == "mesterChannel")
-	assert(channel_user2[0]['name'] == "mesterChannel")
+	assert (channel_user1[0]['name'] == "mesterChannel")
+	assert (channel_user2[0]['name'] == "mesterChannel")
+
 
 def test_allchannels_private():
 	clear_v1()
@@ -206,9 +206,10 @@ def test_allchannels_private():
 	# List the channel of this user belongs to
 	channel_user1 = channels_listall_v1(auth_user_id1)
 	# Check the information of authorised user is correct
-	assert(channel_user1[0]['name'] == "EngineeringChannel")
-	assert(channel_user1[1]['name'] == "BussinessChannel")
-	assert(channel_user1[2]['name'] == "LawChannel")
+	assert (channel_user1[0]['name'] == "EngineeringChannel")
+	assert (channel_user1[1]['name'] == "BussinessChannel")
+	assert (channel_user1[2]['name'] == "LawChannel")
+
 
 #############################################################################
 #                                                                           #
@@ -216,73 +217,42 @@ def test_allchannels_private():
 #                                                                           #
 #############################################################################
 
-
-
+# test if the name of the channel to be created is less than 20 characters
 def test_channels_create_length_of_name():
-    clear_v1()
-    register = auth_register_v1('shaozhen@gmail.com', 'qwe1212', 'shaozhen', 'yan')
-    auth_user_id = register['auth_user_id']
-    # check the length of name is more than 20 characters
-    with pytest.raises(InputError):
-        channels_create_v1(auth_user_id, 'A name clearly more than 20 characters', True)
-
-
-# check the channle is public or not
-def test_channels_create_public_or_not():
-    clear_v1()
-    register = auth_register_v1('shaozhen@gmail.com', 'qwe1212', 'shaozhen', 'yan')
-    auth_user_id = register['auth_user_id']
-
-    public_channel_id = channels_create_v1(auth_user_id, "public_channel", True)['channel_id']
-    private_channel_id = channels_create_v1(auth_user_id, "private_channel", False)['channel_id']
-    assert private_channel_id == 1
-    channel_public = get_channel_by_channel_id(public_channel_id)
-    channel_private = get_channel_by_channel_id(private_channel_id)
-
-    assert channel_public
-    assert channel_private
-    assert channel_public.is_public
-    assert (channel_private.is_public is False)
+	clear_v1()
+	register = auth_register_v1('shaozhen@gmail.com', 'qwe1212', 'shaozhen', 'yan')
+	auth_user_id = register['auth_user_id']
+	# check the length of name is more than 20 characters
+	with pytest.raises(InputError):
+		channels_create_v1(auth_user_id, 'A name clearly more than 20 characters', True)
 
 
 # check the is_public is boolean or not
 def test_channels_create_is_public_bool():
-    clear_v1()
-    register = auth_register_v1('shaozhen@gmail.com', 'qwe1212', 'shaozhen', 'yan')
-    auth_user_id = register['auth_user_id']
-    with pytest.raises(InputError):
-        channels_create_v1(auth_user_id, 'good_channel', 'not_a_bool')
+	clear_v1()
+	register = auth_register_v1('shaozhen@gmail.com', 'qwe1212', 'shaozhen', 'yan')
+	auth_user_id = register['auth_user_id']
+	with pytest.raises(InputError):
+		channels_create_v1(auth_user_id, 'good_channel', 'not_a_bool')
 
 
 # test if the channel has been created successfully
 def test_channels_create_valid():
-    clear_v1()
-    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-    login = auth_login_v1('haha@gmail.com', '123123123')
-    auth_user_id = login['auth_user_id']
-    owner = get_user_by_auth_id(auth_user_id)
+	clear_v1()
+	auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+	login = auth_login_v1('haha@gmail.com', '123123123')
+	auth_user_id = login['auth_user_id']
 
-    channel1_id = channels_create_v1(auth_user_id, "public_channel", True)['channel_id']
-    channel2_id = channels_create_v1(auth_user_id, "private_channel", False)['channel_id']
+	channel1_id = channels_create_v1(auth_user_id, "public_channel", True)['channel_id']
+	channel2_id = channels_create_v1(auth_user_id, "private_channel", False)['channel_id']
 
-    channel1 = get_channel_by_channel_id(channel1_id)
-    channel2 = get_channel_by_channel_id(channel2_id)
-
-    assert channel1 in owner.part_of_channel
-    assert channel2 in owner.part_of_channel
-    assert len(owner.part_of_channel) == 2
-    assert channel1 in owner.channel_owns
-    assert channel2 in owner.channel_owns
-    assert len(owner.channel_owns) == 2
-
-    assert owner in channel1.all_members
-    assert owner in channel1.owner_members
-    assert owner in channel2.all_members
-    assert owner in channel2.owner_members
-
-    assert data['class_channels'][0].name == 'public_channel'
-    assert data['class_channels'][1].name == 'private_channel'
-
-
-
-
+	channel_detail1 = channel_details_v1(auth_user_id, channel1_id)
+	channel_detail2 = channel_details_v1(auth_user_id, channel2_id)
+	assert channel_detail1['name'] == 'public_channel'
+	assert channel_detail2['name'] == 'private_channel'
+	owner1 = channel_detail1['owner_members'][0]
+	member1 = channel_detail1['all_members'][0]
+	owner2 = channel_detail1['owner_members'][0]
+	member2 = channel_detail1['all_members'][0]
+	assert owner1['email'] == owner2['email'] == member1['email'] == member2['email'] == 'haha@gmail.com'
+	assert len(channels_list_v1(auth_user_id)) == 2

@@ -2,13 +2,13 @@
 # including channels_list and chennels_listall
 # for 21T1 COMP1531 project
 # Written by Zheng Luo (z5206267@ad.unsw.edu.au) on 02/Mar/2021
+# Written by Lan (channels_create_v1)
 
 
-from .auth import auth_login_v1, auth_register_v1, get_user_by_auth_id
+from src.auth import auth_login_v1, auth_register_v1, get_user_by_auth_id
 from .channel import get_channel_by_channel_id
-from .error import InputError
-from .data_file import Channel, data
-from .other import clear_v1
+from src.error import InputError
+from src.data_file import Channel, data
 
 
 #############################################################################
@@ -36,9 +36,10 @@ def channels_list_v1(auth_user_id):
     # Call return_type_channel(self) in order to get dictionary return
     list_return = []
     for channel in user.part_of_channel:
-        if (channel.is_public == True):
+        if channel.is_public:
             list_return.append(channel.return_type_channel())
     return list_return
+
 
 #############################################################################
 #                                                                           #
@@ -58,7 +59,6 @@ Return Type:{channels}
 """
 
 
-
 def channels_listall_v1(auth_user_id):
     # Pull the data of user from data_file
     user = get_user_by_auth_id(auth_user_id)
@@ -68,8 +68,6 @@ def channels_listall_v1(auth_user_id):
     for channel in user.part_of_channel:
         list_return.append(channel.return_type_channel())
     return list_return
-
-
 
 
 def create_channel_id():

@@ -125,3 +125,10 @@ dmypy.json
 
 # Other
 *.py~
+
+# pycharm folder
+.idea/
+
+# Mac DS_Store
+.DS_Store
+*/.DS_Store
