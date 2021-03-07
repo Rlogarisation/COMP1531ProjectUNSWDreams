@@ -39,7 +39,7 @@ def test_channels_correct_channel():
 	# Initiate a user
 	register1 = auth_register_v1("ZhengRogerLuo@gmail.com", "happysheepQAQ", "Zheng", "Luo")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
+	user1 = auth_user_id1
 	
 	# Create a channel
 	# channels_create_v1(auth_user_id, name, is_public)
@@ -57,7 +57,7 @@ def test_channels_multiple_channels():
 	# Initiate a user
 	register1 = auth_register_v1("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
+	user1 = auth_user_id1
 	# Create multiple channels
 	channel_id1 = channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)['channel_id']
 	channel_id2 = channels_create_v1(auth_user_id1, "BussinessChannel", is_public=True)['channel_id']
@@ -76,15 +76,15 @@ def test_channels_multiple_users():
 	register1 = auth_register_v1("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
 	register2 = auth_register_v1("IHateSemester@gmail.com", "BreakIsTooLong", "Ben", "A")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
+	user1 = auth_user_id1
 	auth_user_id2 = register2['auth_user_id']
-	user2 = get_user_by_auth_id(auth_user_id2)
+	user2 = auth_user_id2
 	# Create a channel
 	channel_id1 = channels_create_v1(auth_user_id1, "mesterChannel", is_public=True)['channel_id']
 	# Obtain the u_id of user,
 	# so we can obtain the u_id for next step.
 	# first input in inviter, third input is invitee.
-	channel_invite_v1(auth_user_id1, channel_id1, user2.u_id)
+	channel_invite_v1(auth_user_id1, channel_id1, user2)
 
 	
 	#channel_invite_v1(auth_user_id1, channel_id1, channel_detail2['owner_members'][0]['u_id'])
@@ -101,7 +101,7 @@ def test_channels_oneUser_multiple_private_channels():
 	# Initiate a user
 	register1 = auth_register_v1("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
+	user1 = auth_user_id1
 	# Create 2 private channels and 2 public channels
 	channel_id1 = channels_create_v1(auth_user_id1, "ChannelAPublic", is_public=True)['channel_id']
 	channel_id2 = channels_create_v1(auth_user_id1, "ChannelBPublic", is_public=True)['channel_id']
@@ -141,7 +141,7 @@ def test_allchannels_correct_channel():
 	# Initiate a user
 	register1 = auth_register_v1("ZhengRogerLuo@gmail.com", "happysheepQAQ", "Zheng", "Luo")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
+	user1 = auth_user_id1
 	# Create a channel
 	# channels_create_v1(auth_user_id, name, is_public)
 	channel_id1 = channels_create_v1(auth_user_id1, "SheepChannel", is_public = True)['channel_id']
@@ -156,7 +156,7 @@ def test_allchannels_multiple_channels():
 	# Initiate a user
 	register1 = auth_register_v1("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
+	user1 = auth_user_id1
 	# Create multiple channels
 	channel_id1 = channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)['channel_id']
 	channel_id2 = channels_create_v1(auth_user_id1, "BussinessChannel", is_public=True)['channel_id']
@@ -174,15 +174,15 @@ def test_allchannels_multiple_users():
 	register1 = auth_register_v1("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
 	register2 = auth_register_v1("IHateSemester@gmail.com", "BreakIsTooLong", "Ben", "A")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
+	user1 = auth_user_id1
 	auth_user_id2 = register2['auth_user_id']
-	user2 = get_user_by_auth_id(auth_user_id2)
+	user2 = auth_user_id2
 	# Create a channel
 	channel_id1 = channels_create_v1(auth_user_id1, "mesterChannel", is_public=True)['channel_id']
 	# Obtain the detail of a channel,
 	# so we can obtain the u_id for next step.
 	# Invite second user into corresponding channel
-	channel_invite_v1(auth_user_id1, channel_id1, user2.u_id)
+	channel_invite_v1(auth_user_id1, channel_id1, user2)
 	# List the channel of first user belongs to
 	channel_user1 = channels_listall_v1(auth_user_id1)
 	# List the channel of second user belongs to
@@ -196,7 +196,7 @@ def test_allchannels_private():
 	# Initiate a user
 	register1 = auth_register_v1("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
+	user1 = auth_user_id1
 	# Create multiple channels
 	# First channel is public, but all others are private,
 	# listall function able to check all of these.
