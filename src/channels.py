@@ -59,7 +59,11 @@ Return Type:{channels}
 def channels_listall_v1(auth_user_id):
     # Pull the data of user from data_file
     user = get_user_by_auth_id(auth_user_id)
-    list_return = dict.fromkeys(data['class_channels'])
+    if user is None:
+        raise AccessError("user does not refer to a vaild user")
+    list_return = []
+    for i in data['class_channels']:
+        list_return.append(i.return_type_channel())
     return list_return
 
     
