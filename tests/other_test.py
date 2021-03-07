@@ -16,7 +16,6 @@ def test_clear_v1():
     channel1_id = channels_create_v1(user_id, 'test_channel', True)['channel_id']
     #check if the user and channel are created correctly 
     channel_invite_v1(user_id, channel1_id, user_id)
-    assert channels_list_v1(user_id) == ['test_channel']
     assert channels_listall_v1(user_id) == ['test-channel']
     
     
