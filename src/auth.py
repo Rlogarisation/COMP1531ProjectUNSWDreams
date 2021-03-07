@@ -2,6 +2,76 @@ import re
 from src.data_file import User, data
 from src.error import InputError
 
+#############################################################################
+#                                                                           #
+#                           Interface function                              #
+#                                                                           #
+#############################################################################
+"""
+Author : Lan Lin
+
+Background
+Given a user's first and last name, email address, and password,
+create a new account for them and return a new `auth_user_id`
+
+Parameters: email, password, name_first, name_last
+Return Type: { auth_user_id }
+
+InputError:
+- Email is not valid
+- Email address is used by another user
+- Password is less than 6 characters
+- The length of name_first is not between 1 and 50
+- The length of name_last is not between 1 and 50
+"""
+
+
+def auth_register_v1(email, password, name_first, name_last):
+    auth_register_check_error(email, password, name_first, name_last)
+
+    u_id = create_uid()
+    auth_user_id = create_auth_user_id(u_id)
+    handle = create_handle(name_first, name_last)
+    role = create_role(u_id)
+
+    user_ = User(u_id, email, password, name_first, name_last, handle, auth_user_id, role)
+    data['class_users'].append(user_)
+
+    return {
+        'auth_user_id': auth_user_id
+    }
+
+
+"""
+Author : Lan Lin
+
+Background
+Given a registered users' email and password and returns their `auth_user_id` value
+
+Parameters: email, password
+Return Type: { auth_user_id }
+
+InputError:
+- Email is not valid
+- Email address does not belong to any user
+- Password is wrong
+"""
+
+
+def auth_login_v1(email, password):
+    auth_login_error_check(email, password)
+
+    user = get_user_by_email(email)
+    return {
+        'auth_user_id': user.auth_user_id
+    }
+
+
+#############################################################################
+#                                                                           #
+#                              Helper function                              #
+#                                                                           #
+#############################################################################
 
 # check if email entered is valid
 def is_email_valid(email):
@@ -115,24 +185,6 @@ def create_role(u_id):
         return 'global member'
 
 
-# Given a user's first and last name, email address, and password,
-# create a new account for them and return a new `auth_user_id`
-def auth_register_v1(email, password, name_first, name_last):
-    auth_register_check_error(email, password, name_first, name_last)
-
-    u_id = create_uid()
-    auth_user_id = create_auth_user_id(u_id)
-    handle = create_handle(name_first, name_last)
-    role = create_role(u_id)
-
-    user_ = User(u_id, email, password, name_first, name_last, handle, auth_user_id, role)
-    data['class_users'].append(user_)
-
-    return {
-        'auth_user_id': auth_user_id
-    }
-
-
 # check the login errors
 # which include invalid email address,
 # the email entered does not belong to a user
@@ -147,14 +199,3 @@ def auth_login_error_check(email, password):
 
     if user.password != password:
         raise InputError('Password is not correct')
-
-
-# Given a registered users' email and password
-# and returns their `auth_user_id` value
-def auth_login_v1(email, password):
-    auth_login_error_check(email, password)
-
-    user = get_user_by_email(email)
-    return {
-        'auth_user_id': user.auth_user_id
-    }

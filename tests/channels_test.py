@@ -5,9 +5,10 @@
 
 import pytest
 from src.auth import auth_login_v1, auth_register_v1, create_role
-from src.channel import channel_invite_v1, channel_details_v1, channel_join_v1, channel_messages_v1
+from src.channel import channel_invite_v1, channel_details_v1, channel_join_v1, channel_messages_v1, \
+	get_channel_by_channel_id
 from src.channels import channels_list_v1, channels_create_v1, channels_listall_v1
-from src.error import InputError
+from src.error import InputError, AccessError
 from src.other import clear_v1
 
 #############################################################################
@@ -36,7 +37,7 @@ def test_channels_correct_channel():
 	# Initiate a user
 	register1 = auth_register_v1("ZhengRogerLuo@gmail.com", "happysheepQAQ", "Zheng", "Luo")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
+	user1 = auth_user_id1
 
 	# Create a channel
 	# channels_create_v1(auth_user_id, name, is_public)
@@ -53,7 +54,7 @@ def test_channels_multiple_channels():
 	# Initiate a user
 	register1 = auth_register_v1("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
+
 	# Create multiple channels
 	channel_id1 = channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)['channel_id']
 	channel_id2 = channels_create_v1(auth_user_id1, "BussinessChannel", is_public=True)['channel_id']
@@ -73,15 +74,14 @@ def test_channels_multiple_users():
 	register1 = auth_register_v1("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
 	register2 = auth_register_v1("IHateSemester@gmail.com", "BreakIsTooLong", "Ben", "A")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
 	auth_user_id2 = register2['auth_user_id']
-	user2 = get_user_by_auth_id(auth_user_id2)
+	u_id2 = auth_user_id2
 	# Create a channel
 	channel_id1 = channels_create_v1(auth_user_id1, "mesterChannel", is_public=True)['channel_id']
 	# Obtain the u_id of user,
 	# so we can obtain the u_id for next step.
 	# first input in inviter, third input is invitee.
-	channel_invite_v1(auth_user_id1, channel_id1, user2.u_id)
+	channel_invite_v1(auth_user_id1, channel_id1, u_id2)
 
 	# channel_invite_v1(auth_user_id1, channel_id1, channel_detail2['owner_members'][0]['u_id'])
 	# List the channel of first user belongs to
@@ -98,16 +98,15 @@ def test_channels_oneUser_multiple_private_channels():
 	# Initiate a user
 	register1 = auth_register_v1("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
 	# Create 2 private channels and 2 public channels
-	channel_id1 = channels_create_v1(auth_user_id1, "ChannelAPublic", is_public=True)['channel_id']
-	channel_id2 = channels_create_v1(auth_user_id1, "ChannelBPublic", is_public=True)['channel_id']
-	channel_id3 = channels_create_v1(auth_user_id1, "ChannelCPrivate", is_public=False)['channel_id']
-	channel_id4 = channels_create_v1(auth_user_id1, "ChannelDPrivate", is_public=False)['channel_id']
+	channels_create_v1(auth_user_id1, "ChannelAPublic", is_public=True)
+	channels_create_v1(auth_user_id1, "ChannelBPublic", is_public=True)
+	channels_create_v1(auth_user_id1, "ChannelCPrivate", is_public=False)
+	channels_create_v1(auth_user_id1, "ChannelDPrivate", is_public=False)
 	# List all the public channel of the user belongs to
 	channel_user1 = channels_list_v1(auth_user_id1)
 	# Check the information of authorised user is correct
-	assert len(channel_user1) == 2
+	assert len(channel_user1) == 4
 
 
 #############################################################################
@@ -138,7 +137,6 @@ def test_allchannels_correct_channel():
 	# Initiate a user
 	register1 = auth_register_v1("ZhengRogerLuo@gmail.com", "happysheepQAQ", "Zheng", "Luo")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
 	# Create a channel
 	# channels_create_v1(auth_user_id, name, is_public)
 	channel_id1 = channels_create_v1(auth_user_id1, "SheepChannel", is_public=True)['channel_id']
@@ -153,17 +151,17 @@ def test_allchannels_multiple_channels():
 	# Initiate a user
 	register1 = auth_register_v1("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
 	# Create multiple channels
-	channel_id1 = channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)['channel_id']
-	channel_id2 = channels_create_v1(auth_user_id1, "BussinessChannel", is_public=True)['channel_id']
-	channel_id3 = channels_create_v1(auth_user_id1, "LawChannel", is_public=True)['channel_id']
+	channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)
+	channels_create_v1(auth_user_id1, "BussinessChannel", is_public=True)
+	channels_create_v1(auth_user_id1, "LawChannel", is_public=True)
 	# List the channel of this user belongs to
 	channel_user = channels_listall_v1(auth_user_id1)
 	# Check the information of authorised user is correct
 	assert (channel_user[0]['name'] == "EngineeringChannel")
 	assert (channel_user[1]['name'] == "BussinessChannel")
 	assert (channel_user[2]['name'] == "LawChannel")
+	assert (len(channels_listall_v1(auth_user_id1)) == 3)
 
 
 def test_allchannels_multiple_users():
@@ -172,22 +170,15 @@ def test_allchannels_multiple_users():
 	register1 = auth_register_v1("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
 	register2 = auth_register_v1("IHateSemester@gmail.com", "BreakIsTooLong", "Ben", "A")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
 	auth_user_id2 = register2['auth_user_id']
-	user2 = get_user_by_auth_id(auth_user_id2)
-	# Create a channel
-	channel_id1 = channels_create_v1(auth_user_id1, "mesterChannel", is_public=True)['channel_id']
-	# Obtain the detail of a channel,
-	# so we can obtain the u_id for next step.
-	# Invite second user into corresponding channel
-	channel_invite_v1(auth_user_id1, channel_id1, user2.u_id)
-	# List the channel of first user belongs to
-	channel_user1 = channels_listall_v1(auth_user_id1)
-	# List the channel of second user belongs to
-	channel_user2 = channels_listall_v1(auth_user_id2)
-	# Check the information of authorised user is correct
-	assert (channel_user1[0]['name'] == "mesterChannel")
-	assert (channel_user2[0]['name'] == "mesterChannel")
+	# Create two channels
+	channels_create_v1(auth_user_id1, "mesterChannel", is_public=True)
+	channels_create_v1(auth_user_id1, "mesterChannel2", is_public=True)
+	# List amount of channels
+	# make sure if input auth_user_id is correct,
+	# the all channels returns are the same
+	assert (len(channels_listall_v1(auth_user_id1)) == 2)
+	assert (len(channels_listall_v1(auth_user_id2)) == 2)
 
 
 def test_allchannels_private():
@@ -195,26 +186,43 @@ def test_allchannels_private():
 	# Initiate a user
 	register1 = auth_register_v1("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
 	auth_user_id1 = register1['auth_user_id']
-	user1 = get_user_by_auth_id(auth_user_id1)
 	# Create multiple channels
 	# First channel is public, but all others are private,
 	# listall function able to check all of these.
-	channel_id1 = channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)['channel_id']
-	channel_id2 = channels_create_v1(auth_user_id1, "BussinessChannel", is_public=False)['channel_id']
-	channel_id3 = channels_create_v1(auth_user_id1, "LawChannel", is_public=False)['channel_id']
+	channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)
+	channels_create_v1(auth_user_id1, "BussinessChannel", is_public=False)
+	channels_create_v1(auth_user_id1, "LawChannel", is_public=False)
 	# List the channel of this user belongs to
 	channel_user1 = channels_listall_v1(auth_user_id1)
 	# Check the information of authorised user is correct
 	assert (channel_user1[0]['name'] == "EngineeringChannel")
 	assert (channel_user1[1]['name'] == "BussinessChannel")
 	assert (channel_user1[2]['name'] == "LawChannel")
+	assert (len(channels_listall_v1(auth_user_id1)) == 3)
 
+
+# Test if the function will raise error
+# if the auth_user_id input is invalid
+def test_listall_invalid_user():
+	clear_v1()
+	register1 = auth_register_v1("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
+	auth_user_id1 = register1['auth_user_id']
+	# Create multiple channels
+	# First channel is public, but all others are private,
+	# listall function able to check all of these.
+	channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)
+	channels_create_v1(auth_user_id1, "BussinessChannel", is_public=False)
+	channels_create_v1(auth_user_id1, "LawChannel", is_public=False)
+	auth_user_id_invalid = auth_user_id1 + 100
+	with pytest.raises(AccessError):
+		channels_listall_v1(auth_user_id_invalid)
 
 #############################################################################
 #                                                                           #
 #                        Test for channels_create_v1                        #
 #                                                                           #
 #############################################################################
+
 
 # test if the name of the channel to be created is less than 20 characters
 def test_channels_create_length_of_name():

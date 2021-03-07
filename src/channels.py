@@ -7,9 +7,8 @@
 
 from src.auth import auth_login_v1, auth_register_v1, get_user_by_auth_id
 from .channel import get_channel_by_channel_id
-from src.error import InputError
+from src.error import InputError, AccessError
 from src.data_file import Channel, data
-
 
 #############################################################################
 #                                                                           #
@@ -19,7 +18,7 @@ from src.data_file import Channel, data
 """
 channels_list():
 
-Provide a list of all channels 
+Provide a list of all channels (both public and private channels)
 (and their associated details) that the authorised user is part of.
 
 Parameters:(auth_user_id)
@@ -29,15 +28,13 @@ Return Type:{channels}
 
 
 def channels_list_v1(auth_user_id):
-
     # Pull the data of user from data_file
     user = get_user_by_auth_id(auth_user_id)
 
     # Call return_type_channel(self) in order to get dictionary return
     list_return = []
     for channel in user.part_of_channel:
-        if channel.is_public:
-            list_return.append(channel.return_type_channel())
+        list_return.append(channel.return_type_channel())
     return list_return
 
 
@@ -49,10 +46,8 @@ def channels_list_v1(auth_user_id):
 """
 channels_listall_v1:
 
-Provide a list of all channels (and their associated details)
-Explaination:
-channel_listall_v1 should list all channels, 
-including those that are private, regardless of who calls it.
+Provide a list of all channels (and their associated details) 
+regardless who calls, or owns it.
 
 Parameters:(auth_user_id)
 Return Type:{channels}
@@ -62,12 +57,28 @@ Return Type:{channels}
 def channels_listall_v1(auth_user_id):
     # Pull the data of user from data_file
     user = get_user_by_auth_id(auth_user_id)
-
-    # Call return_type_channel(self) in order to get dictionary return
+    if user is None:
+        raise AccessError("user does not refer to a vaild user")
     list_return = []
-    for channel in user.part_of_channel:
-        list_return.append(channel.return_type_channel())
+    for i in data['class_channels']:
+        list_return.append(i.return_type_channel())
     return list_return
+
+#############################################################################
+#                                                                           #
+#                           channels_create_v1                             #
+#                                                                           #
+#############################################################################
+
+
+"""
+Author : Lan Lin
+Background :
+Creates a new channel with that name that is either a public or private channel
+
+Parameters: auth_user_id, name, is_public
+Return Type: { channel_id }
+"""
 
 
 def create_channel_id():
