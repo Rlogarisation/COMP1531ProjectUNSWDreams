@@ -3,7 +3,7 @@
 ## Iteration 1
 
 ## Assumptions for auth.py:
-* In iteration 1, we assume that auth_user_id is the same with u_id,
+* In iteration 1, we assume that auth_user_id is the same with u_id,  
 which are both used to identify a unique user.
 * auth_user_id and u_id are integers, like 0, 1, 2, 3, 4......
 For example, the auth_user_id of the first registered user is 0, the auth_user_id of the second user is 1.
