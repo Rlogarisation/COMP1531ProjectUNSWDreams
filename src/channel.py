@@ -11,7 +11,7 @@ from src.auth import get_user_by_auth_id
 #############################################################################
 
 """
-Author : Emir Aditya Zen
+Author: Emir Aditya Zen
 
 Background
 Invites a user (with user id u_id) to join a channel with ID channel_id.

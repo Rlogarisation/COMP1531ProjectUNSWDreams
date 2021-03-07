@@ -2,7 +2,7 @@ from src.data_file import data
 
 
 """
-Author : Lan Lin
+Author: Lan Lin
 
 Background
 Resets the internal data of the application to it's initial state

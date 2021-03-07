@@ -14,7 +14,6 @@ Resets the internal data of the application to it's initial state
 
 Parameters: ()
 Return Type: {}
-
 """
 
 

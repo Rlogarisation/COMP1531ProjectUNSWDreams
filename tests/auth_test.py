@@ -8,7 +8,7 @@ from src.channel import channel_details_v1, channel_invite_v1
 from src.channels import channels_create_v1
 
 """
-Author : Lan Lin
+Author: Lan Lin
 
 Test for auth_register_v1 function implementation
 

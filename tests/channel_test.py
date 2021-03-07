@@ -13,7 +13,7 @@ import pytest
 
 
 """
-Author : Emir Aditya Zen
+Author: Emir Aditya Zen
 
 This file is for testing channel_invite_v1 function implementation
 

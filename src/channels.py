@@ -72,7 +72,7 @@ def channels_listall_v1(auth_user_id):
 
 
 """
-Author : Lan Lin
+Author: Lan Lin
 Background :
 Creates a new channel with that name that is either a public or private channel
 

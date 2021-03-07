@@ -8,7 +8,7 @@ from src.error import InputError
 #                                                                           #
 #############################################################################
 """
-Author : Lan Lin
+Author: Lan Lin
 
 Background
 Given a user's first and last name, email address, and password,
