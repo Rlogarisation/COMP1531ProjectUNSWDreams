@@ -3,6 +3,7 @@ from src.auth import auth_login_v1, auth_register_v1
 from src.channel import channel_invite_v1, channel_details_v1, channel_messages_v1, channel_join_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
 from src.other import clear_v1
+from src.message import message_send_v1
 
 # Imports the possible error output
 from src.error import InputError, AccessError
@@ -334,11 +335,9 @@ def test_auth_missing():
     # create 2 users and author people
     user1 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
     user1 = auth_login_v1("user1@test.com", "user1password")
-    # first_user = get_user_by_auth_id(user1["auth_user_id"])
 
     user2 = auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
     user2 = auth_login_v1("user2@test.com", "user2password")
-    # second_user = get_user_by_auth_id(user2["auth_user_id"])
 
     user3 = auth_register_v1("user3@test.com", "user3password", "ShiTong", "Yuan")
     user3 = auth_login_v1("user3@test.com", "user3password")
@@ -358,11 +357,9 @@ def test_no_msg():
     # create 2 users
     user1 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
     user1 = auth_login_v1("user1@test.com", "user1password")
-    # first_user = get_user_by_auth_id(user1["auth_user_id"])
 
     user2 = auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
     user2 = auth_login_v1("user2@test.com", "user2password")
-    # second_user = get_user_by_auth_id(user2["auth_user_id"])
 
     # create channel for testing
     Testing_channel_id = channels_create_v1(user1["auth_user_id"], "channel_test", True)
@@ -385,7 +382,7 @@ def test_less_than_50_msg():
 
     # send testing message into channel chat
     for i in range(1, 3):
-        msg_send(Testing_channel_id["channel_id"], i, user1["auth_user_id"], "testing message", i)
+        message_send_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], "This is a testing message.")
 
     # 1. return -1 : for no more message after start
     message_stored = channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)["messages"]
@@ -404,9 +401,7 @@ def test_more_than_50_msg():
 
     # send testing message into channel chat
     for i in range(1, 99):
-        msg_send(Testing_channel_id["channel_id"], i, user1["auth_user_id"], "testing message", i)
-
-    check_msg_amount = channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)
+        message_send_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], "This is a testing message.")
 
     # 1. return -1 : for no more message after start
     message_stored = channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)["messages"]
