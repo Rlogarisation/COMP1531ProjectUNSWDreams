@@ -4,11 +4,11 @@
 
 ## Assumptions for auth.py:
 * In iteration 1, we assume that auth_user_id is the same with u_id,  
-which are both used to identify a unique user.
-* auth_user_id and u_id are integers, like 0, 1, 2, 3, 4......
+  which are both used to identify a unique user.
+* auth_user_id and u_id are integers, like 0, 1, 2, 3, 4......  
   For example, the auth_user_id of the first registered user is 0, the auth_user_id of the second user is 1.
-* We assume that a user can only log in once before log out, which means the user will not log in again if the user has 
-already logged in.
+* We assume that a user can only log in once before log out, which means the user will not log in again if the user has  
+  already logged in.
   
 ## Assumptions for channel.py:
 * A registered user needs to log in before he/she does any operations with channel.
