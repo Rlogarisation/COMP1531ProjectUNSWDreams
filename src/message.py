@@ -1,6 +1,5 @@
 from src.data_file import data
 
-
 def message_send_v1(auth_user_id, channel_id, message):
     for i in data["class_channels"]:
         if i.channel_id == channel_id:
