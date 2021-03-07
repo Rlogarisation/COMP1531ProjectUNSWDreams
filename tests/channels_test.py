@@ -141,10 +141,8 @@ def test_allchannels_correct_channel():
 	# Create a channel
 	# channels_create_v1(auth_user_id, name, is_public)
 	channel_id1 = channels_create_v1(auth_user_id1, "SheepChannel", is_public=True)['channel_id']
-	# List the channel of this user belongs to
-	channel_user = channels_listall_v1(auth_user_id1)
-	# Check the information of authorised user is correct
-	assert (channel_user[0]['name'] == "SheepChannel")
+	# List amount of channels
+	assert(len(channels_listall_v1(auth_user_id1)) == 1)
 
 
 def test_allchannels_multiple_channels():
@@ -157,12 +155,8 @@ def test_allchannels_multiple_channels():
 	channel_id1 = channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)['channel_id']
 	channel_id2 = channels_create_v1(auth_user_id1, "BussinessChannel", is_public=True)['channel_id']
 	channel_id3 = channels_create_v1(auth_user_id1, "LawChannel", is_public=True)['channel_id']
-	# List the channel of this user belongs to
-	channel_user = channels_listall_v1(auth_user_id1)
-	# Check the information of authorised user is correct
-	assert (channel_user[0]['name'] == "EngineeringChannel")
-	assert (channel_user[1]['name'] == "BussinessChannel")
-	assert (channel_user[2]['name'] == "LawChannel")
+	# List amount of channels
+	assert(len(channels_listall_v1(auth_user_id1)) == 3)
 
 
 def test_allchannels_multiple_users():
@@ -174,19 +168,11 @@ def test_allchannels_multiple_users():
 	user1 = auth_user_id1
 	auth_user_id2 = register2['auth_user_id']
 	user2 = auth_user_id2
-	# Create a channel
+	# Create two channels
 	channel_id1 = channels_create_v1(auth_user_id1, "mesterChannel", is_public=True)['channel_id']
-	# Obtain the detail of a channel,
-	# so we can obtain the u_id for next step.
-	# Invite second user into corresponding channel
-	channel_invite_v1(auth_user_id1, channel_id1, user2)
-	# List the channel of first user belongs to
-	channel_user1 = channels_listall_v1(auth_user_id1)
-	# List the channel of second user belongs to
-	channel_user2 = channels_listall_v1(auth_user_id2)
-	# Check the information of authorised user is correct
-	assert (channel_user1[0]['name'] == "mesterChannel")
-	assert (channel_user2[0]['name'] == "mesterChannel")
+	channel_id2 = channels_create_v1(auth_user_id1, "mesterChannel2", is_public=True)['channel_id']
+	# List amount of channels
+	assert(len(channels_listall_v1(auth_user_id2)) == 2)
 
 
 def test_allchannels_private():
@@ -201,13 +187,8 @@ def test_allchannels_private():
 	channel_id1 = channels_create_v1(auth_user_id1, "EngineeringChannel", is_public=True)['channel_id']
 	channel_id2 = channels_create_v1(auth_user_id1, "BussinessChannel", is_public=False)['channel_id']
 	channel_id3 = channels_create_v1(auth_user_id1, "LawChannel", is_public=False)['channel_id']
-	# List the channel of this user belongs to
-	channel_user1 = channels_listall_v1(auth_user_id1)
-	# Check the information of authorised user is correct
-	assert (channel_user1[0]['name'] == "EngineeringChannel")
-	assert (channel_user1[1]['name'] == "BussinessChannel")
-	assert (channel_user1[2]['name'] == "LawChannel")
-
+	# List amount of channels
+	assert(len(channels_listall_v1(auth_user_id1)) == 3)
 
 #############################################################################
 #                                                                           #

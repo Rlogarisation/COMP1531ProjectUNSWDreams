@@ -59,12 +59,10 @@ Return Type:{channels}
 def channels_listall_v1(auth_user_id):
     # Pull the data of user from data_file
     user = get_user_by_auth_id(auth_user_id)
-
-    # Call return_type_channel(self) in order to get dictionary return
-    list_return = []
-    for channel in user.part_of_channel:
-        list_return.append(channel.return_type_channel())
+    list_return = dict.fromkeys(data['class_channels'])
     return list_return
+
+    
 
 
 def create_channel_id():
