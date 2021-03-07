@@ -315,19 +315,17 @@ def test_invalid_channel_id():
     # create 2 users
     user1 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
     user1 = auth_login_v1("user1@test.com", "user1password")
-    first_user = get_user_by_auth_id(user1["auth_user_id"])
 
     user2 = auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
     user2 = auth_login_v1("user2@test.com", "user2password")
-    second_user = get_user_by_auth_id(user2["auth_user_id"])
 
     # create channel for testing
-    Testing_channel_id = channels_create_v1(first_user.auth_user_id, "channel_test", True)
-    channel_invite_v1(first_user.auth_user_id, Testing_channel_id["channel_id"], second_user.u_id)
+    Testing_channel_id = channels_create_v1(user1["auth_user_id"], "channel_test", True)
+    channel_invite_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], user2["auth_user_id"])
 
     # testing for channel message function for invalid channel id inputError
     with pytest.raises(InputError):
-        channel_messages_v1(first_user.auth_user_id, Testing_channel_id["channel_id"], 10)
+        channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 10)
 
 
 def test_auth_missing():
@@ -336,18 +334,18 @@ def test_auth_missing():
     # create 2 users and author people
     user1 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
     user1 = auth_login_v1("user1@test.com", "user1password")
-    first_user = get_user_by_auth_id(user1["auth_user_id"])
+    # first_user = get_user_by_auth_id(user1["auth_user_id"])
 
     user2 = auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
     user2 = auth_login_v1("user2@test.com", "user2password")
-    second_user = get_user_by_auth_id(user2["auth_user_id"])
+    # second_user = get_user_by_auth_id(user2["auth_user_id"])
 
     user3 = auth_register_v1("user3@test.com", "user3password", "ShiTong", "Yuan")
     user3 = auth_login_v1("user3@test.com", "user3password")
 
     # create channel by user1 for testing
-    Testing_channel_id = channels_create_v1(first_user.auth_user_id, "channel_test", True)
-    channel_invite_v1(first_user.auth_user_id, Testing_channel_id["channel_id"], second_user.u_id)
+    Testing_channel_id = channels_create_v1(user1["auth_user_id"], "channel_test", True)
+    channel_invite_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], user2["auth_user_id"])
 
     # testing for channel message function for invalid channel id inputError
     with pytest.raises(InputError):
@@ -360,18 +358,18 @@ def test_no_msg():
     # create 2 users
     user1 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
     user1 = auth_login_v1("user1@test.com", "user1password")
-    first_user = get_user_by_auth_id(user1["auth_user_id"])
+    # first_user = get_user_by_auth_id(user1["auth_user_id"])
 
     user2 = auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
     user2 = auth_login_v1("user2@test.com", "user2password")
-    second_user = get_user_by_auth_id(user2["auth_user_id"])
+    # second_user = get_user_by_auth_id(user2["auth_user_id"])
 
     # create channel for testing
-    Testing_channel_id = channels_create_v1(first_user.auth_user_id, "channel_test", True)
-    channel_invite_v1(first_user.auth_user_id, Testing_channel_id["channel_id"], second_user.u_id)
+    Testing_channel_id = channels_create_v1(user1["auth_user_id"], "channel_test", True)
+    channel_invite_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], user2["auth_user_id"])
 
     # 1. return -1 : for no more message after start
-    message_stored = channel_messages_v1(first_user.auth_user_id, Testing_channel_id["channel_id"], 0)["messages"]
+    message_stored = channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)["messages"]
     assert message_stored == [], "test_no_msg failed!!"
 
 
@@ -382,17 +380,12 @@ def test_less_than_50_msg():
     user1 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
     user1 = auth_login_v1("user1@test.com", "user1password")
 
-    user2 = auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
-    user2 = auth_login_v1("user2@test.com", "user2password")
-
     # create channel for testing
     Testing_channel_id = channels_create_v1(user1["auth_user_id"], "channel_test", True)
 
     # send testing message into channel chat
     for i in range(1, 3):
         msg_send(Testing_channel_id["channel_id"], i, user1["auth_user_id"], "testing message", i)
-
-    check_msg_amount = channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)
 
     # 1. return -1 : for no more message after start
     message_stored = channel_messages_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], 0)["messages"]
@@ -405,9 +398,6 @@ def test_more_than_50_msg():
     # create 2 users
     user1 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
     user1 = auth_login_v1("user1@test.com", "user1password")
-
-    user2 = auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
-    user2 = auth_login_v1("user2@test.com", "user2password")
 
     # create channel for testing
     Testing_channel_id = channels_create_v1(user1["auth_user_id"], "channel_test", True)
@@ -456,7 +446,7 @@ def test_channel_join_normal():
     auth_register_v1("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
     owner = auth_login_v1("TheOwner@test.com", "thisispassword")
     assert type(owner) is dict
-    owner_u_id = get_user_by_auth_id(owner["auth_user_id"]).u_id
+    owner_u_id = owner["auth_user_id"]
     owner_auth_user_id = owner["auth_user_id"]
     assert owner_u_id is not None
     assert type(owner_u_id) is int
@@ -466,7 +456,7 @@ def test_channel_join_normal():
     auth_register_v1("TheJoiner@test.com", "joinerpassword", "Roger", "Luo")
     joiner = auth_login_v1("TheJoiner@test.com", "joinerpassword")
     assert type(joiner) is dict
-    joiner_u_id = get_user_by_auth_id(joiner["auth_user_id"]).u_id
+    joiner_u_id = joiner["auth_user_id"]
     joiner_auth_id = joiner["auth_user_id"]
     assert joiner_u_id is not None
     assert type(joiner_u_id) is int
@@ -489,7 +479,7 @@ def test_invalid_channel_id():
     auth_register_v1("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
     owner = auth_login_v1("TheOwner@test.com", "thisispassword")
     assert type(owner) is dict
-    owner_u_id = get_user_by_auth_id(owner["auth_user_id"]).u_id
+    owner_u_id = owner["auth_user_id"]
     owner_auth_user_id = owner["auth_user_id"]
     assert owner_u_id is not None
     assert type(owner_u_id) is int
@@ -499,7 +489,7 @@ def test_invalid_channel_id():
     auth_register_v1("TheJoiner@test.com", "joinerpassword", "Roger", "Luo")
     joiner = auth_login_v1("TheJoiner@test.com", "joinerpassword")
     assert type(joiner) is dict
-    joiner_u_id = get_user_by_auth_id(joiner["auth_user_id"]).u_id
+    joiner_u_id = joiner["auth_user_id"]
     joiner_auth_id = joiner["auth_user_id"]
     assert joiner_u_id is not None
     assert type(joiner_u_id) is int
@@ -524,7 +514,7 @@ def test_join_private_channel():
     auth_register_v1("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
     owner = auth_login_v1("TheOwner@test.com", "thisispassword")
     assert type(owner) is dict
-    owner_u_id = get_user_by_auth_id(owner["auth_user_id"]).u_id
+    owner_u_id = owner["auth_user_id"]
     owner_auth_user_id = owner["auth_user_id"]
     assert owner_u_id is not None
     assert type(owner_u_id) is int
@@ -534,7 +524,7 @@ def test_join_private_channel():
     auth_register_v1("TheJoiner@test.com", "joinerpassword", "Roger", "Luo")
     joiner = auth_login_v1("TheJoiner@test.com", "joinerpassword")
     assert type(joiner) is dict
-    joiner_u_id = get_user_by_auth_id(joiner["auth_user_id"]).u_id
+    joiner_u_id = joiner["auth_user_id"]
     joiner_auth_id = joiner["auth_user_id"]
     assert joiner_u_id is not None
     assert type(joiner_u_id) is int
