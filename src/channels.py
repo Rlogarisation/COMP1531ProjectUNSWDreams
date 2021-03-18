@@ -5,7 +5,8 @@
 # Written by Lan (channels_create_v1)
 
 
-from src.auth import auth_login_v1, auth_register_v1, get_user_by_auth_id
+from src.auth import auth_login_v1, auth_register_v1, get_user_by_auth_id, session_to_token, token_to_session, \
+    get_user_by_token
 from src.error import InputError, AccessError
 from src.data_file import Channel, data
 
@@ -26,10 +27,9 @@ Return Type:{channels}
 """
 
 
-def channels_list_v1(auth_user_id):
+def channels_list_v1(token):
     # Pull the data of user from data_file
-    user = get_user_by_auth_id(auth_user_id)
-
+    user = get_user_by_token(token)
     # Call return_type_channel(self) in order to get dictionary return
     list_return = []
     for channel in user.part_of_channel:
@@ -53,11 +53,11 @@ Return Type:{channels}
 """
 
 
-def channels_listall_v1(auth_user_id):
+def channels_listall_v1(token):
     # Pull the data of user from data_file
-    user = get_user_by_auth_id(auth_user_id)
+    user = get_user_by_token(token)
     if user is None:
-        raise AccessError("user does not refer to a vaild user")
+        raise AccessError(description="user does not refer to a vaild user")
     list_return = []
     for i in data['class_channels']:
         list_return.append(i.return_type_channel())
@@ -85,16 +85,17 @@ def create_channel_id():
     return channel_id
 
 
-def channels_create_v1(auth_user_id, name, is_public):
+def channels_create_v1(token, name, is_public):
     # error check that the name is more than 20 characters
     if len(name) > 20:
-        raise InputError('Error! Name is more than 20 characters')
+        raise InputError(description='Error! Name is more than 20 characters')
     if not isinstance(is_public, bool):
-        raise InputError('is_public has to be bool')
+        raise InputError(description='is_public has to be bool')
     # error check if the owner has registered
-    owner = get_user_by_auth_id(auth_user_id)
+    owner = get_user_by_token(token)
     if owner is None:
-        raise InputError('The owner has not registered')
+        raise InputError(description='The token is invalid, or the owner has not registered')
+
     # get the owner who creates the channel by auth_user_id
     channel_id = create_channel_id()
     channel = Channel(name, channel_id, is_public)

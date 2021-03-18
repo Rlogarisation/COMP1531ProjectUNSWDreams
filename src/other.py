@@ -12,6 +12,7 @@ Resets the internal data of the application to it's initial state
 def clear_v1():
     data['class_users'] = []
     data['class_channels'] = []
+    data['session_num'] = 0
     return {}
 
 
