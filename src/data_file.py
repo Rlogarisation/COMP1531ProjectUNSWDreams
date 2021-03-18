@@ -6,12 +6,10 @@ Written by: Lan Lin
 
 
 class User:
-    def __init__(self, u_id, email, password, name_first, name_last, handle_str, auth_user_id, role):
+    def __init__(self, u_id, email, hashed_password, name_first, name_last, handle_str, auth_user_id, role):
         self.u_id = u_id
         self.email = email
-        self.password = password
-        if not isinstance(self.password, str):
-            raise TypeError("password must be string")
+        self.hashed_password = hashed_password
         self.name_first = name_first
         self.name_last = name_last
         self.handle_str = handle_str
@@ -28,6 +26,7 @@ class User:
         # including the user is a memeber and the user is an owner of the channel
         self.part_of_channel = []
         self.channel_owns = []  # a list of all channels that the user is the owner of the channel
+        self.current_sessions = []  # a list of current sessions of the user
 
     def return_type_user(self):
         """in 6.1.1 Data Types
@@ -89,7 +88,10 @@ data = {
     # a list of class User
     'class_users': [],
     # a list of class Channel
-    'class_channels': []
+    'class_channels': [],
+    # to record the number of sessions
+    'session_num': 0,
+    'secret': 'THIS_IS_SECRET'
 }
 
 """
