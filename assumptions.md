@@ -18,7 +18,7 @@
   the channel.  
 
 ## Assumptions for channels.py:
-* channel_id are non-nenagtive integers, like 0, 1, 2, 3, 4......  
+* channel_id are non-negative integers, like 0, 1, 2, 3, 4......  
   channel_id is a unique id, which is to identify a channel.
 * We assume that is_public for the channel is type of bool. True means public and False means private.  
   
