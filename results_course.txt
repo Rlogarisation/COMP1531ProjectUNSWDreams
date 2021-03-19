@@ -1,0 +1,595 @@
+============================= test session starts ==============================
+platform linux -- Python 3.7.3, pytest-6.1.0, py-1.9.0, pluggy-0.13.1
+rootdir: /tmp_amd/ravel/export/ravel/1/hsmith/automark/tempstore, configfile: pytest.ini
+plugins: hypothesis-5.36.1
+collected 76 items
+
+tests/echo_test.py FF                                                    [  2%]
+tests/auth_tests/auth_login_test.py ...                                  [  6%]
+tests/auth_tests/auth_register_test.py ................................  [ 48%]
+tests/channel_tests/channel_details_test.py ..F.                         [ 53%]
+tests/channel_tests/channel_invite_test.py F..F..                        [ 61%]
+tests/channel_tests/channel_join_test.py F.FF                            [ 67%]
+tests/channel_tests/channel_messages_test.py F.FFF                       [ 73%]
+tests/channels_tests/channels_create_test.py ....F                       [ 80%]
+tests/channels_tests/channels_list_test.py FFFFFFFFFF                    [ 93%]
+tests/channels_tests/channels_listall_test.py FFFF.                      [100%]
+
+=================================== FAILURES ===================================
+__________________________________ test_echo ___________________________________
+
+    def test_echo():
+>       assert echo.echo("1") == "1", "1 == 1"
+E       NameError: name 'echo' is not defined
+
+tests/echo_test.py:7: NameError
+_______________________________ test_echo_except _______________________________
+
+    def test_echo_except():
+        with pytest.raises(InputError):
+>           assert echo.echo("echo")
+E           NameError: name 'echo' is not defined
+
+tests/echo_test.py:14: NameError
+___________________________ test_invalid_channel_id ____________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+
+    @util.resets_workspace
+    def test_invalid_channel_id(user_woody):
+        with pytest.raises(err.InputError):
+            # noinspection PyTypeChecker
+>           channel_details_v1(user_woody.token, None)
+
+tests/channel_tests/channel_details_test.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/channel.py:75: in channel_details_v1
+    channel = get_channel_by_channel_id(channel_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+channel_id = None
+
+    def get_channel_by_channel_id(channel_id):
+        # for channel in data['class_channels']:
+        #     if channel_id == channel.channel_id:
+        #         return channel
+        #     else:
+        #         return None
+    
+>       if channel_id >= len(data["class_channels"]):
+E       TypeError: '>=' not supported between instances of 'NoneType' and 'int'
+
+src/channel.py:240: TypeError
+___________________________ test_invite_global_owner ___________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=1, token=1)
+zergs_private_lair = Channel(name='zergs lair', is_public=False, channel_id=0, owner_members=[1], all_members=[])
+
+    @util.resets_workspace
+    def test_invite_global_owner(user_woody, user_zerg, zergs_private_lair):
+        channel_invite_v1(user_zerg.token, zergs_private_lair.channel_id, user_woody.u_id)
+    
+        ch_deets = channel_details_v1(user_woody.token, zergs_private_lair.channel_id)
+    
+        assert user_woody.u_id in [k['u_id'] for k in ch_deets['all_members']]
+>       assert user_woody.u_id in [k['u_id'] for k in ch_deets['owner_members']]
+E       AssertionError: assert 0 in [1]
+E        +  where 0 = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0).u_id
+
+tests/channel_tests/channel_invite_test.py:26: AssertionError
+___________________________ test_channel_id_invalid ____________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=1, token=1)
+
+    @util.resets_workspace
+    def test_channel_id_invalid(user_woody, user_buzz):
+        with pytest.raises(err.InputError):
+            # noinspection PyTypeChecker
+>           channel_invite_v1(user_woody.token, 'hi', user_buzz.u_id)
+
+tests/channel_tests/channel_invite_test.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/channel.py:38: in channel_invite_v1
+    error_check(channel_id, u_id, auth_user_id)
+src/channel.py:272: in error_check
+    channel_ = get_channel_by_channel_id(channel_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+channel_id = 'hi'
+
+    def get_channel_by_channel_id(channel_id):
+        # for channel in data['class_channels']:
+        #     if channel_id == channel.channel_id:
+        #         return channel
+        #     else:
+        #         return None
+    
+>       if channel_id >= len(data["class_channels"]):
+E       TypeError: '>=' not supported between instances of 'str' and 'int'
+
+src/channel.py:240: TypeError
+____________________ test_global_owner_join_channel_private ____________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+zergs_private_lair = Channel(name='zergs lair', is_public=False, channel_id=0, owner_members=[1], all_members=[])
+
+    @util.resets_workspace
+    def test_global_owner_join_channel_private(user_woody, zergs_private_lair):
+>       channel_join_v1(user_woody.token, zergs_private_lair.channel_id)
+
+tests/channel_tests/channel_join_test.py:13: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+auth_user_id = 0, channel_id = 0
+
+    def channel_join_v1(auth_user_id, channel_id):
+        target_channel = get_channel_by_channel_id(channel_id)
+    
+        if target_channel is None:
+            raise (InputError("channel_join_v1 : invalid channel_id."))
+    
+        if target_channel.is_public is False:
+>           raise (AccessError("channel_join_v1 : channel is PRIVATE."))
+E           src.error.AccessError: channel_join_v1 : channel is PRIVATE.
+
+src/channel.py:198: AccessError
+_________________________ test_join_invalid_channel_id _________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+
+    @util.resets_workspace
+    def test_join_invalid_channel_id(user_woody):
+        with pytest.raises(err.InputError):
+            # noinspection PyTypeChecker
+>           channel_join_v1(user_woody.token, 'hi')
+
+tests/channel_tests/channel_join_test.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/channel.py:192: in channel_join_v1
+    target_channel = get_channel_by_channel_id(channel_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+channel_id = 'hi'
+
+    def get_channel_by_channel_id(channel_id):
+        # for channel in data['class_channels']:
+        #     if channel_id == channel.channel_id:
+        #         return channel
+        #     else:
+        #         return None
+    
+>       if channel_id >= len(data["class_channels"]):
+E       TypeError: '>=' not supported between instances of 'str' and 'int'
+
+src/channel.py:240: TypeError
+____________________________ test_invalidated_token ____________________________
+
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+
+    @util.resets_workspace
+    def test_invalidated_token(woodys_public_toybox):
+        with pytest.raises(err.AccessError):
+>           channel_join_v1(None, woodys_public_toybox.channel_id)
+
+tests/channel_tests/channel_join_test.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+auth_user_id = None, channel_id = 0
+
+    def channel_join_v1(auth_user_id, channel_id):
+        target_channel = get_channel_by_channel_id(channel_id)
+    
+        if target_channel is None:
+            raise (InputError("channel_join_v1 : invalid channel_id."))
+    
+        if target_channel.is_public is False:
+            raise (AccessError("channel_join_v1 : channel is PRIVATE."))
+    
+>       assert type(auth_user_id) is int
+E       AssertionError
+
+src/channel.py:200: AssertionError
+_______________________________ test_no_messages _______________________________
+
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+
+    @util.resets_workspace
+    def test_no_messages(woodys_public_toybox, user_woody):
+        ch_msgs = channel_messages_v1(user_woody.token, woodys_public_toybox.channel_id, 0)
+    
+>       assert ch_msgs['start'] == 0
+E       assert -1 == 0
+
+tests/channel_tests/channel_messages_test.py:15: AssertionError
+__________________ test_access_error_when_user_is_non_member ___________________
+
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=1, token=1)
+
+    @util.resets_workspace
+    def test_access_error_when_user_is_non_member(woodys_public_toybox, user_zerg):
+        with pytest.raises(err.AccessError):
+>           channel_messages_v1(user_zerg.token, woodys_public_toybox.channel_id, 0)
+
+tests/channel_tests/channel_messages_test.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+auth_user_id = 1, channel_id = 0, start = 0
+
+    def channel_messages_v1(auth_user_id, channel_id, start):
+        if auth_user_id == -1:
+            raise (InputError("channel_messages_v1: invalid token."))
+    
+        target_channel = get_channel_by_channel_id(channel_id)
+        if target_channel == None:
+            raise (InputError("channel_messages_v1: invalid channel_id."))
+    
+        # check if target user is in channel's members
+        target_user = get_user_by_auth_id(auth_user_id)
+        target_auth_user_id = target_user.auth_user_id
+        user_inside = False
+        for i in target_channel.all_members:
+            if i.auth_user_id == target_auth_user_id:
+                user_inside = True
+                break
+        if user_inside == False:
+>           raise (InputError("channel_messages_v1 : target user is not in channel"))
+E           src.error.InputError: channel_messages_v1 : target user is not in channel
+
+src/channel.py:154: InputError
+___________________ test_input_error_when_channel_id_invalid ___________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+
+    @util.resets_workspace
+    def test_input_error_when_channel_id_invalid(user_woody):
+        with pytest.raises(err.InputError):
+>           channel_messages_v1(user_woody.token, None, 0)
+
+tests/channel_tests/channel_messages_test.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/channel.py:141: in channel_messages_v1
+    target_channel = get_channel_by_channel_id(channel_id)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+channel_id = None
+
+    def get_channel_by_channel_id(channel_id):
+        # for channel in data['class_channels']:
+        #     if channel_id == channel.channel_id:
+        #         return channel
+        #     else:
+        #         return None
+    
+>       if channel_id >= len(data["class_channels"]):
+E       TypeError: '>=' not supported between instances of 'NoneType' and 'int'
+
+src/channel.py:240: TypeError
+__________________ test_access_error_when_invalid_token_given __________________
+
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+
+    @util.resets_workspace
+    def test_access_error_when_invalid_token_given(woodys_public_toybox):
+        with pytest.raises(err.AccessError):
+>           channel_messages_v1(None, woodys_public_toybox.channel_id, 0)
+
+tests/channel_tests/channel_messages_test.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+auth_user_id = None, channel_id = 0, start = 0
+
+    def channel_messages_v1(auth_user_id, channel_id, start):
+        if auth_user_id == -1:
+            raise (InputError("channel_messages_v1: invalid token."))
+    
+        target_channel = get_channel_by_channel_id(channel_id)
+        if target_channel == None:
+            raise (InputError("channel_messages_v1: invalid channel_id."))
+    
+        # check if target user is in channel's members
+        target_user = get_user_by_auth_id(auth_user_id)
+>       target_auth_user_id = target_user.auth_user_id
+E       AttributeError: 'NoneType' object has no attribute 'auth_user_id'
+
+src/channel.py:147: AttributeError
+____________________________ test_invalidated_token ____________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+
+    @util.resets_workspace
+    def test_invalidated_token(user_woody):
+        # sadly a dirty hack is knowing None is not an int and thus should be invalid
+        # TODO: change when auth_logout is available again
+        with pytest.raises(err.AccessError):
+>           channels_create_v1(None, 'literally anything', True)
+
+tests/channels_tests/channels_create_test.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+auth_user_id = None, name = 'literally anything', is_public = True
+
+    def channels_create_v1(auth_user_id, name, is_public):
+        # error check that the name is more than 20 characters
+        if len(name) > 20:
+            raise InputError('Error! Name is more than 20 characters')
+        if not isinstance(is_public, bool):
+            raise InputError('is_public has to be bool')
+        # error check if the owner has registered
+        owner = get_user_by_auth_id(auth_user_id)
+        if owner is None:
+>           raise InputError('The owner has not registered')
+E           src.error.InputError: The owner has not registered
+
+src/channels.py:97: InputError
+______________________ test_when_member_is_in_no_channels ______________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+
+    @util.resets_workspace
+    def test_when_member_is_in_no_channels(user_woody):
+>       assert channels_list_v1(user_woody.token)['channels'] == []
+E       TypeError: list indices must be integers or slices, not str
+
+tests/channels_tests/channels_list_test.py:13: TypeError
+___________________ test_channel_owner_in_channel[True-andy] ___________________
+
+name = 'andy', is_public = True
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+
+    @pytest.mark.parametrize('name', ['andy'])
+    @pytest.mark.parametrize('is_public', [True, False])
+    @util.resets_workspace
+    def test_channel_owner_in_channel(name, is_public, user_woody):
+        ch = channels_create_v1(user_woody.token, name, is_public)['channel_id']
+    
+        deets = {'channel_id': ch, 'name': name}
+    
+>       assert deets in channels_list_v1(user_woody.token)['channels']
+E       TypeError: list indices must be integers or slices, not str
+
+tests/channels_tests/channels_list_test.py:24: TypeError
+__________________ test_channel_owner_in_channel[False-andy] ___________________
+
+name = 'andy', is_public = False
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+
+    @pytest.mark.parametrize('name', ['andy'])
+    @pytest.mark.parametrize('is_public', [True, False])
+    @util.resets_workspace
+    def test_channel_owner_in_channel(name, is_public, user_woody):
+        ch = channels_create_v1(user_woody.token, name, is_public)['channel_id']
+    
+        deets = {'channel_id': ch, 'name': name}
+    
+>       assert deets in channels_list_v1(user_woody.token)['channels']
+E       TypeError: list indices must be integers or slices, not str
+
+tests/channels_tests/channels_list_test.py:24: TypeError
+__________________ test_channel_member_in_channel[True-andy] ___________________
+
+name = 'andy', is_public = True
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=1, token=1)
+
+    @pytest.mark.parametrize('name', ['andy'])
+    @pytest.mark.parametrize('is_public', [True, False])
+    @util.resets_workspace
+    def test_channel_member_in_channel(name, is_public, user_woody, user_zerg):
+        ch = channels_create_v1(user_woody.token, name, is_public)['channel_id']
+    
+        channel_invite_v1(user_woody.token, ch, user_zerg.u_id)
+    
+        channel_detail = {'channel_id': ch, 'name': name}
+    
+>       assert channel_detail in channels_list_v1(user_zerg.token)['channels']
+E       TypeError: list indices must be integers or slices, not str
+
+tests/channels_tests/channels_list_test.py:37: TypeError
+__________________ test_channel_member_in_channel[False-andy] __________________
+
+name = 'andy', is_public = False
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=1, token=1)
+
+    @pytest.mark.parametrize('name', ['andy'])
+    @pytest.mark.parametrize('is_public', [True, False])
+    @util.resets_workspace
+    def test_channel_member_in_channel(name, is_public, user_woody, user_zerg):
+        ch = channels_create_v1(user_woody.token, name, is_public)['channel_id']
+    
+        channel_invite_v1(user_woody.token, ch, user_zerg.u_id)
+    
+        channel_detail = {'channel_id': ch, 'name': name}
+    
+>       assert channel_detail in channels_list_v1(user_zerg.token)['channels']
+E       TypeError: list indices must be integers or slices, not str
+
+tests/channels_tests/channels_list_test.py:37: TypeError
+_____________ test_user_in_multiple_channels[False-True-ZERG-andy] _____________
+
+name1 = 'andy', name2 = 'ZERG', is_public1 = True, is_public2 = False
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+
+    @pytest.mark.parametrize('name1', ['andy'])
+    @pytest.mark.parametrize('name2', ['ZERG'])
+    @pytest.mark.parametrize('is_public1', [True, False])
+    @pytest.mark.parametrize('is_public2', [False, True])
+    @util.resets_workspace
+    def test_user_in_multiple_channels(name1, name2, is_public1, is_public2, user_woody):
+        ch_1 = channels_create_v1(user_woody.token, name1, is_public1)['channel_id']
+        ch_2 = channels_create_v1(user_woody.token, name2, is_public2)['channel_id']
+    
+        expected_joined = [{'channel_id': ch_1, 'name': name1}, {'channel_id': ch_2, 'name': name2}]
+>       joined = channels_list_v1(user_woody.token)['channels']
+E       TypeError: list indices must be integers or slices, not str
+
+tests/channels_tests/channels_list_test.py:50: TypeError
+____________ test_user_in_multiple_channels[False-False-ZERG-andy] _____________
+
+name1 = 'andy', name2 = 'ZERG', is_public1 = False, is_public2 = False
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+
+    @pytest.mark.parametrize('name1', ['andy'])
+    @pytest.mark.parametrize('name2', ['ZERG'])
+    @pytest.mark.parametrize('is_public1', [True, False])
+    @pytest.mark.parametrize('is_public2', [False, True])
+    @util.resets_workspace
+    def test_user_in_multiple_channels(name1, name2, is_public1, is_public2, user_woody):
+        ch_1 = channels_create_v1(user_woody.token, name1, is_public1)['channel_id']
+        ch_2 = channels_create_v1(user_woody.token, name2, is_public2)['channel_id']
+    
+        expected_joined = [{'channel_id': ch_1, 'name': name1}, {'channel_id': ch_2, 'name': name2}]
+>       joined = channels_list_v1(user_woody.token)['channels']
+E       TypeError: list indices must be integers or slices, not str
+
+tests/channels_tests/channels_list_test.py:50: TypeError
+_____________ test_user_in_multiple_channels[True-True-ZERG-andy] ______________
+
+name1 = 'andy', name2 = 'ZERG', is_public1 = True, is_public2 = True
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+
+    @pytest.mark.parametrize('name1', ['andy'])
+    @pytest.mark.parametrize('name2', ['ZERG'])
+    @pytest.mark.parametrize('is_public1', [True, False])
+    @pytest.mark.parametrize('is_public2', [False, True])
+    @util.resets_workspace
+    def test_user_in_multiple_channels(name1, name2, is_public1, is_public2, user_woody):
+        ch_1 = channels_create_v1(user_woody.token, name1, is_public1)['channel_id']
+        ch_2 = channels_create_v1(user_woody.token, name2, is_public2)['channel_id']
+    
+        expected_joined = [{'channel_id': ch_1, 'name': name1}, {'channel_id': ch_2, 'name': name2}]
+>       joined = channels_list_v1(user_woody.token)['channels']
+E       TypeError: list indices must be integers or slices, not str
+
+tests/channels_tests/channels_list_test.py:50: TypeError
+_____________ test_user_in_multiple_channels[True-False-ZERG-andy] _____________
+
+name1 = 'andy', name2 = 'ZERG', is_public1 = False, is_public2 = True
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+
+    @pytest.mark.parametrize('name1', ['andy'])
+    @pytest.mark.parametrize('name2', ['ZERG'])
+    @pytest.mark.parametrize('is_public1', [True, False])
+    @pytest.mark.parametrize('is_public2', [False, True])
+    @util.resets_workspace
+    def test_user_in_multiple_channels(name1, name2, is_public1, is_public2, user_woody):
+        ch_1 = channels_create_v1(user_woody.token, name1, is_public1)['channel_id']
+        ch_2 = channels_create_v1(user_woody.token, name2, is_public2)['channel_id']
+    
+        expected_joined = [{'channel_id': ch_1, 'name': name1}, {'channel_id': ch_2, 'name': name2}]
+>       joined = channels_list_v1(user_woody.token)['channels']
+E       TypeError: list indices must be integers or slices, not str
+
+tests/channels_tests/channels_list_test.py:50: TypeError
+____________________________ test_invalidated_token ____________________________
+
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+
+    @util.resets_workspace
+    def test_invalidated_token(woodys_public_toybox):
+        with pytest.raises(err.AccessError):
+            # a dirty hack
+            # TODO: fix this for when auth_logout is available again
+>           channels_list_v1(None)
+
+tests/channels_tests/channels_list_test.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+auth_user_id = None
+
+    def channels_list_v1(auth_user_id):
+        # Pull the data of user from data_file
+        user = get_user_by_auth_id(auth_user_id)
+    
+        # Call return_type_channel(self) in order to get dictionary return
+        list_return = []
+>       for channel in user.part_of_channel:
+E       AttributeError: 'NoneType' object has no attribute 'part_of_channel'
+
+src/channels.py:35: AttributeError
+____________________________ test_when_no_channels _____________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+
+    @util.resets_workspace
+    def test_when_no_channels(user_woody):
+>       assert channels_listall_v1(user_woody.token)['channels'] == []
+E       TypeError: list indices must be integers or slices, not str
+
+tests/channels_tests/channels_listall_test.py:12: TypeError
+_____________________ test_when_one_channel_exists_private _____________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=0)
+zergs_private_lair = Channel(name='zergs lair', is_public=False, channel_id=0, owner_members=[1], all_members=[])
+
+    @util.resets_workspace
+    def test_when_one_channel_exists_private(user_woody, zergs_private_lair):
+        channel_detail = {'channel_id': zergs_private_lair.channel_id, 'name': zergs_private_lair.name}
+    
+>       assert channel_detail in channels_listall_v1(user_woody.token)['channels']
+E       TypeError: list indices must be integers or slices, not str
+
+tests/channels_tests/channels_listall_test.py:19: TypeError
+_____________________ test_when_one_channel_exists_public ______________________
+
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=0, token=0)
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[1], all_members=[])
+
+    @util.resets_workspace
+    def test_when_one_channel_exists_public(user_zerg, woodys_public_toybox):
+        channel_detail = {'channel_id': woodys_public_toybox.channel_id, 'name': woodys_public_toybox.name}
+    
+>       assert channel_detail in channels_listall_v1(user_zerg.token)['channels']
+E       TypeError: list indices must be integers or slices, not str
+
+tests/channels_tests/channels_listall_test.py:26: TypeError
+______________________ test_when_multiple_channels_exist _______________________
+
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+zergs_private_lair = Channel(name='zergs lair', is_public=False, channel_id=1, owner_members=[1], all_members=[])
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=2, token=2)
+
+    @util.resets_workspace
+    def test_when_multiple_channels_exist(woodys_public_toybox, zergs_private_lair, user_buzz):
+        expected_chs = [
+            {'channel_id': woodys_public_toybox.channel_id, 'name': woodys_public_toybox.name},
+            {'channel_id': zergs_private_lair.channel_id, 'name': zergs_private_lair.name}
+        ]
+    
+>       chs = channels.channels_listall_v1(user_buzz.token)['channels']
+E       TypeError: list indices must be integers or slices, not str
+
+tests/channels_tests/channels_listall_test.py:36: TypeError
+=========================== short test summary info ============================
+FAILED tests/echo_test.py::test_echo - NameError: name 'echo' is not defined
+FAILED tests/echo_test.py::test_echo_except - NameError: name 'echo' is not d...
+FAILED tests/channel_tests/channel_details_test.py::test_invalid_channel_id
+FAILED tests/channel_tests/channel_invite_test.py::test_invite_global_owner
+FAILED tests/channel_tests/channel_invite_test.py::test_channel_id_invalid - ...
+FAILED tests/channel_tests/channel_join_test.py::test_global_owner_join_channel_private
+FAILED tests/channel_tests/channel_join_test.py::test_join_invalid_channel_id
+FAILED tests/channel_tests/channel_join_test.py::test_invalidated_token - Ass...
+FAILED tests/channel_tests/channel_messages_test.py::test_no_messages - asser...
+FAILED tests/channel_tests/channel_messages_test.py::test_access_error_when_user_is_non_member
+FAILED tests/channel_tests/channel_messages_test.py::test_input_error_when_channel_id_invalid
+FAILED tests/channel_tests/channel_messages_test.py::test_access_error_when_invalid_token_given
+FAILED tests/channels_tests/channels_create_test.py::test_invalidated_token
+FAILED tests/channels_tests/channels_list_test.py::test_when_member_is_in_no_channels
+FAILED tests/channels_tests/channels_list_test.py::test_channel_owner_in_channel[True-andy]
+FAILED tests/channels_tests/channels_list_test.py::test_channel_owner_in_channel[False-andy]
+FAILED tests/channels_tests/channels_list_test.py::test_channel_member_in_channel[True-andy]
+FAILED tests/channels_tests/channels_list_test.py::test_channel_member_in_channel[False-andy]
+FAILED tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[False-True-ZERG-andy]
+FAILED tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[False-False-ZERG-andy]
+FAILED tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[True-True-ZERG-andy]
+FAILED tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[True-False-ZERG-andy]
+FAILED tests/channels_tests/channels_list_test.py::test_invalidated_token - A...
+FAILED tests/channels_tests/channels_listall_test.py::test_when_no_channels
+FAILED tests/channels_tests/channels_listall_test.py::test_when_one_channel_exists_private
+FAILED tests/channels_tests/channels_listall_test.py::test_when_one_channel_exists_public
+FAILED tests/channels_tests/channels_listall_test.py::test_when_multiple_channels_exist
+======================== 27 failed, 49 passed in 0.49s =========================
