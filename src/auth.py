@@ -1,7 +1,7 @@
 import re
 import jwt
 import hashlib
-from src.data_file import User, data
+from src.data_file import User, Permission, data
 from src.error import InputError
 
 #############################################################################
@@ -34,10 +34,10 @@ def auth_register_v1(email, password, name_first, name_last):
     u_id = create_uid()
     auth_user_id = create_auth_user_id(u_id)
     handle = create_handle(name_first, name_last)
-    role = create_role(u_id)
+    permission_id = create_permission(u_id)
     hashed_password = hash_password(password)
 
-    user_ = User(u_id, email, hashed_password, name_first, name_last, handle, auth_user_id, role)
+    user_ = User(u_id, email, hashed_password, name_first, name_last, handle, auth_user_id, permission_id)
     session_id = create_session_id()
     token = session_to_token(session_id)
     user_.current_sessions.append(session_id)
@@ -129,6 +129,16 @@ def get_user_session_by_token(token):
 def get_user_by_auth_id(auth_user_id):
     for user in data['class_users']:
         if user.auth_user_id == auth_user_id:
+            return user
+
+    return None
+
+
+# return the specific user with the auth_user_id
+# the user is a class
+def get_user_by_uid(u_id):
+    for user in data['class_users']:
+        if user.u_id == u_id:
             return user
 
     return None
@@ -239,11 +249,11 @@ def create_handle(name_first, name_last):
         return handle
 
 
-def create_role(u_id):
+def create_permission(u_id):
     if u_id == 0:
-        return 'global owner'
+        return Permission.global_owner
     else:
-        return 'global member'
+        return Permission.global_member
 
 
 # check the login errors

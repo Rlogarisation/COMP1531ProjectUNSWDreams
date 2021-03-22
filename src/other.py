@@ -1,4 +1,4 @@
-from src.data_file import data
+from src.data_file import data, DATA, dump_data
 
 
 """
@@ -12,7 +12,11 @@ Resets the internal data of the application to it's initial state
 def clear_v1():
     data['class_users'] = []
     data['class_channels'] = []
+    data['class_dms'] = []
     data['session_num'] = 0
+    data['message_num'] = 0
+    data['secret'] = 'THIS_IS_SECRET'
+    dump_data(DATA)
     return {}
 
 
