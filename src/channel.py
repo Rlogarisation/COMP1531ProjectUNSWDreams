@@ -1,5 +1,5 @@
 from typing import Dict
-from src.data_file import data
+from src.data_file import data, Permission
 from src.error import InputError, AccessError
 from src.auth import get_user_by_auth_id, session_to_token, token_to_session, get_user_by_token
 
@@ -140,34 +140,39 @@ AccessError:
 """
 
 
-def channel_messages_v1(auth_user_id, channel_id, start):
-    if auth_user_id == -1:
-        raise (InputError(description="channel_messages_v1: invalid token."))
+def channel_messages_v1(token, channel_id, start):
+    target_user = get_user_by_token(token)
+    if target_user is None:
+        raise AccessError(description="user does not refer to a vaild user")
 
     target_channel = get_channel_by_channel_id(channel_id)
-    if target_channel == None:
+    if target_channel is None:
         raise (InputError(description="channel_messages_v1: invalid channel_id."))
 
     # check if target user is in channel's members
-    target_user = get_user_by_auth_id(auth_user_id)
-    target_auth_user_id = target_user.auth_user_id
+    target_u_id = target_user.u_id
     user_inside = False
     for i in target_channel.all_members:
-        if i.auth_user_id == target_auth_user_id:
+        if i.u_id == target_u_id:
             user_inside = True
             break
-    if user_inside == False:
+    if user_inside is False:
         raise (InputError(description="channel_messages_v1 : target user is not in channel"))
 
     num_msgs = len(target_channel.messages)
-    if num_msgs < start:
+    if num_msgs <= start:
         raise (InputError(description="channel_messages_v1 : the start >= total messages."))
 
-    return_msg = []
-    if num_msgs > (start + 50):
-        return_msg = target_channel.messages[start: start + 50]
+    # grab the targeted list of Message Class
+    if num_msgs >= (start + 50):
+        return_msg_class = target_channel.messages[start: start + 50]
     else:
-        return_msg = target_channel.messages[start:]
+        return_msg_class = target_channel.messages[start:]
+
+    # turn Message Class to dictionary
+    return_msg = []
+    for message in return_msg_class:
+        return_msg.append(message.return_type_message())
 
     return {
         "messages": return_msg,
@@ -194,26 +199,19 @@ AccessError:
 """
 
 
-def channel_join_v1(auth_user_id, channel_id):
-    target_channel = get_channel_by_channel_id(channel_id)
+def channel_join_v1(token, channel_id):
+    user = get_user_by_token(token)
+    if user is None:
+        raise AccessError(description="Token passed in is invalid")
 
+    target_channel = get_channel_by_channel_id(channel_id)
     if target_channel is None:
         raise (InputError(description="channel_join_v1 : invalid channel_id."))
 
-    if target_channel.is_public is False:
+    if target_channel.is_public is False and user.permission_id != Permission.global_owner:
         raise (AccessError(description="channel_join_v1 : channel is PRIVATE."))
 
-    assert type(auth_user_id) is int
-    if auth_user_id == -1:
-        raise (InputError(description="channel_join_v1 : invalid auth_user_id"))
-
-    new_member = get_user_by_auth_id(auth_user_id)
-
-    for i in data["class_channels"]:
-        if i.channel_id == channel_id:
-            i.all_members.append(new_member)
-            break
-
+    add_user_into_channel(target_channel, user)
     return {}
 
 
