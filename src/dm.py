@@ -1,7 +1,7 @@
 from typing import Dict
-from src.data_file import data, Permission
+from src.data_file import data, Permission, DM
 from src.error import InputError, AccessError
-from src.auth import get_user_by_auth_id, session_to_token, token_to_session, get_user_by_token
+from src.auth import get_user_by_auth_id, get_user_by_uid, session_to_token, token_to_session, get_user_by_token
 
 
 #############################################################################
@@ -34,7 +34,7 @@ def dm_create_v1(token, u_id_list):
     list_dm_invitee = []
 
     for uid in u_id_list:
-        invitee = get_user_by_u_id(uid)
+        invitee = get_user_by_uid(uid)
         # input error if u_id does not refer to a valid user
         if invitee is None:
             raise InputError(description='The u_id is invalid, u_id does not refer to a vaild user')
@@ -106,7 +106,7 @@ def dm_invite_v1(token, dm_id, u_id):
         raise InputError(description="dm_id does not refer to a valid or exising dm")
 
     # Input error when u_id does not refer to a valid user. 
-    invitee = get_user_by_u_id(u_id)
+    invitee = get_user_by_uid(u_id)
     if invitee is None:
         raise InputError(description="u_id does not refer to a valid or exising user")
 
@@ -274,10 +274,12 @@ N/A
 
 def dm_list_v1(token):
     user = get_user_by_token(token)
-    dms = {}
-    for dm_belongs in user.part_of_dm:
-        dms.append(dm_belongs)
-    return dms
+    list_return = []
+    for DMs in user.part_of_dm:
+        list_return.append(DMs.return_type_dm())
+    return {
+        'dms': list_return
+    }
 
 """
 Author: Zheng Luo
