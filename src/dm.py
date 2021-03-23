@@ -27,10 +27,6 @@ u_id does not refer to a valid user
 
 """
 
-def create_dm_id():
-    dm_id = len(DATA['class_dms'])
-    return dm_id
-
 
 def dm_create_v1(token, u_id_list):
 
@@ -54,7 +50,7 @@ def dm_create_v1(token, u_id_list):
     
 
     dm_name = ", ".join(list_dm_handles)
-    dm_id = create_dm_id()
+    dm_id = len(data['class_dms'])
 
     dm = DM(dm_name , dm_id)
     # Update data
@@ -347,11 +343,12 @@ def dm_messages_v1(token, dm_id, start):
 #############################################################################
 
 def get_dm_by_dm_id(dm_id):
-    if dm_id >= len(DATA['class_dms'])
+    
+    if dm_id >= len(data['class_dms']):
         return None
-    elif DATA['class_dms'][dm_id]:
-        return DATA['class_dms'][dm_id]
-    else 
+    elif data['class_dms'][dm_id]:
+        return data['class_dms'][dm_id]
+    else: 
         return None
 
 
