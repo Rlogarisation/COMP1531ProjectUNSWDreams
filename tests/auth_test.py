@@ -1,5 +1,3 @@
-# by Lan Lin
-
 import pytest
 from src.other import clear_v1
 from src.auth import auth_login_v1, auth_register_v1, auth_logout, get_user_by_token

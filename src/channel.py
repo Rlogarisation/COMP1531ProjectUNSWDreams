@@ -116,6 +116,7 @@ def channel_details_v1(token, channel_id):
 
     return {
         'name': channel.name,
+        'is_public': channel.is_public,
         'owner_members': owner_list,
         'all_members': member_list
     }
@@ -235,13 +236,8 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
 
 
 def get_channel_by_channel_id(channel_id):
-    # for channel in data['class_channels']:
-    #     if channel_id == channel.channel_id:
-    #         return channel
-    #     else:
-    #         return None
 
-    if channel_id >= len(data["class_channels"]):
+    if channel_id >= len(data["class_channels"]) or not isinstance(channel_id, int):
         return None
     elif data["class_channels"][channel_id]:
         return data["class_channels"][channel_id]

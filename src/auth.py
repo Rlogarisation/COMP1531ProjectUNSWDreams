@@ -108,6 +108,8 @@ def is_email_valid(email):
 
 
 def get_user_by_token(token):
+    if token is None:
+        return None
     session_dict = token_to_session(token)
     if session_dict is None:
         return None
@@ -121,6 +123,8 @@ def get_user_by_token(token):
 
 
 def get_user_session_by_token(token):
+    if token is None:
+        return None
     session_dict = token_to_session(token)
     if session_dict is None:
         return None
@@ -137,6 +141,8 @@ def get_user_session_by_token(token):
 # return the specific user with the auth_user_id
 # the user is a class
 def get_user_by_auth_id(auth_user_id):
+    if auth_user_id is None:
+        return None
     for user in data['class_users']:
         if user.auth_user_id == auth_user_id:
             return user
@@ -147,6 +153,8 @@ def get_user_by_auth_id(auth_user_id):
 # return the specific user with the auth_user_id
 # the user is a class
 def get_user_by_uid(u_id):
+    if u_id is None:
+        return None
     for user in data['class_users']:
         if user.u_id == u_id:
             return user
@@ -157,6 +165,8 @@ def get_user_by_uid(u_id):
 # return the specific user with email
 # the user is a class
 def get_user_by_email(email):
+    if email is None:
+        return None
     for user in data['class_users']:
         if user.email == email:
             return user

@@ -34,7 +34,9 @@ def channels_list_v1(token):
     list_return = []
     for channel in user.part_of_channel:
         list_return.append(channel.return_type_channel())
-    return list_return
+    return {
+        'channels': list_return
+    }
 
 
 #############################################################################
@@ -61,7 +63,9 @@ def channels_listall_v1(token):
     list_return = []
     for i in data['class_channels']:
         list_return.append(i.return_type_channel())
-    return list_return
+    return {
+        'channels': list_return
+    }
 
 #############################################################################
 #                                                                           #
