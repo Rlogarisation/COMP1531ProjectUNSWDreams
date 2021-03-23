@@ -82,7 +82,7 @@ def channel_details_v1(token, channel_id):
     sender = get_user_by_token(token)
     if sender is None:
         # the token given is invalid
-        raise InputError(description="token is invalid")
+        raise AccessError(description="token is invalid")
 
     # check if the sender is in the channel
     sender_in_channel = is_user_in_channel(channel_id, sender.auth_user_id)
@@ -282,7 +282,7 @@ def error_check(channel_id, u_id, token):
     sender = get_user_by_token(token)
     if sender is None:
         # the token given is invalid
-        raise InputError(description="token is invalid")
+        raise AccessError(description="token is invalid")
 
     # check if the sender is in the channel
     sender_in_channel = is_user_in_channel(channel_id, sender.auth_user_id)
