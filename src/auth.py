@@ -198,7 +198,7 @@ def create_session_id():
 
 
 def session_to_token(session_id):
-    return jwt.encode({'sessionID': session_id}, data['secret'], algorithm=['HS256'])
+    return jwt.encode({'sessionID': session_id}, data['secret'], algorithm='HS256')
 
 
 def token_to_session(token):

@@ -89,7 +89,10 @@ def test_auth_register_valid_small():
     # test the auth_user_id for different users are different
     auth_user_id1 = register1['auth_user_id']
     auth_user_id2 = register2['auth_user_id']
+    token1 = register1['token']
+    token2 = register2['token']
     assert auth_user_id1 != auth_user_id2
+    assert token1 != token2
 
 
 # test large number of users can register successfully
@@ -115,16 +118,16 @@ def test_auth_register_handle_valid():
     register3 = auth_register_v1('haha2@gmail.com', '123jcqewp2', 'zxcvbnmasdfg', 'hjklqwert')
     register4 = auth_register_v1('haha3@gmail.com', '123jcqewp2', 'zxcvbnmasdfg', 'hjklqwertiowjec')
 
-    auth_user_id1 = register1['auth_user_id']
+    token1 = register1['token']
     user_id2 = register2['auth_user_id']
     user_id3 = register3['auth_user_id']
     user_id4 = register4['auth_user_id']
 
-    channel_id = channels_create_v1(auth_user_id1, 'Zoom', True)['channel_id']
-    channel_invite_v1(auth_user_id1, channel_id, user_id2)
-    channel_invite_v1(auth_user_id1, channel_id, user_id3)
-    channel_invite_v1(auth_user_id1, channel_id, user_id4)
-    channel_members = channel_details_v1(auth_user_id1, channel_id)['all_members']
+    channel_id = channels_create_v1(token1, 'Zoom', True)['channel_id']
+    channel_invite_v1(token1, channel_id, user_id2)
+    channel_invite_v1(token1, channel_id, user_id3)
+    channel_invite_v1(token1, channel_id, user_id4)
+    channel_members = channel_details_v1(token1, channel_id)['all_members']
     member1 = channel_members[0]
     member2 = channel_members[1]
     member3 = channel_members[2]
@@ -201,8 +204,29 @@ def test_auth_login_valid():
 
     # test the auth_user_id returned by login is the same with register
     # test the auth_user_id generated is correct
-    assert register1 == login1
-    assert register2 == login2
-    assert register1['auth_user_id'] == login1['auth_user_id'] == 0
-    assert register2['auth_user_id'] == login2['auth_user_id'] == 1
+    assert register1['auth_user_id'] == login1['auth_user_id']
+    assert register2['auth_user_id'] == login2['auth_user_id']
+    # test that tokens are different
+    assert login1['token'] != register1['token']
+    assert login2['token'] != register2['token']
+
+
+# test for the same user with different sessions
+def test_auth_login_different_sessions():
+    clear_v1()
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+
+    login1 = auth_login_v1('haha@gmail.com', '123123123')
+    login2 = auth_login_v1('haha@gmail.com', '123123123')
+    login3 = auth_login_v1('haha@gmail.com', '123123123')
+    auth_user_id1 = login1['auth_user_id']
+    auth_user_id2 = login2['auth_user_id']
+    auth_user_id3 = login3['auth_user_id']
+    token1 = login1['token']
+    token2 = login2['token']
+    token3 = login3['token']
+    assert auth_user_id1 == auth_user_id2 == auth_user_id3
+    assert token1 != token2 != token3
+
+
 
