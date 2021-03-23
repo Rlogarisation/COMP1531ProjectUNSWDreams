@@ -292,7 +292,6 @@ def test_dm_leave_v1():
             dm_leave_v1(token0, "invalid_dm_id")
         pass
 
-    # FIXME: there is no u_id in dm_leave_v1, 该如何知道是谁离开了Direct Message？
     def test_user_not_in():
         with pytest.raises(AccessError):
             dm_leave_v1(token0, 2)
@@ -350,8 +349,9 @@ def test_dm_messages_v1():
             dm_messages_v1(token0, 1, 999)
         pass
 
-    # FIXME: there is no u_id in dm_leave_v1, 该如何知道是谁不在DM里面？
     def test_user_not_in():
+        with pytest.raises(AccessError):
+            dm_messages_v1(token1, 1, 0)
         pass
     # --------------------------testing---------------------------
     test_invalid_dm_id()
