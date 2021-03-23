@@ -1,7 +1,7 @@
 from typing import Dict
-from src.data_file import data, Permission
+from src.data_file import DATA, DM
 from src.error import InputError, AccessError
-from src.auth import get_user_by_auth_id, session_to_token, token_to_session, get_user_by_token
+from src.auth import get_user_by_auth_id, session_to_token, token_to_session, get_user_by_token, get_user_by_uid
 
 
 #############################################################################
@@ -39,7 +39,7 @@ def dm_create_v1(token, u_id_list):
     list_dm_invitee = []
 
     for uid in u_id_list:
-        invitee = get_user_by_u_id(uid)
+        invitee = get_user_by_uid(uid)
         # input error if u_id does not refer to a valid user
         if invitee is None:
             raise InputError(description='The u_id is invalid, u_id does not refer to a vaild user')
@@ -56,8 +56,8 @@ def dm_create_v1(token, u_id_list):
     dm_id = create_dm_id()
 
     dm = DM(dm_name, dm_id)
-    # Update data
-    data['class_dms'].append(dm)
+    # Update DATA
+    DATA['class_dms'].append(dm)
 
     # Update members and owners inside class DM
     # Note: inviter is also part of member.
@@ -108,7 +108,7 @@ def dm_invite_v1(token, dm_id, u_id):
         raise InputError(description="dm_id does not refer to a valid or exising dm")
 
     # Input error when u_id does not refer to a valid user.
-    invitee = get_user_by_u_id(u_id)
+    invitee = get_user_by_uid(u_id)
     if invitee is None:
         raise InputError(description="u_id does not refer to a valid or exising user")
 
@@ -160,14 +160,14 @@ def dm_remove_v1(token, dm_id):
         raise AccessError(description="The user is not the original DM creator")
 
     # Remove the current dm for all users in User.part_of_channel and dm_owns
-    # Then remove dm in data class
+    # Then remove dm in DATA class
     for member in dm.dm_members:
         member.part_of_dm.remove(dm)
 
     for owner in dm.dm_owners:
         owner.dm_owns.remove(dm)
 
-    data['class_dms'].remove(dm)
+    DATA['class_dms'].remove(dm)
 
     return {
     }
@@ -335,7 +335,7 @@ def dm_messages_v1(token, dm_id, start):
 
     return {
         'messages': return_message,
-        'start': start
+        'start': start,
         'end': end
     }
 
@@ -347,9 +347,9 @@ def dm_messages_v1(token, dm_id, start):
 #############################################################################
 
 def get_dm_by_dm_id(dm_id):
-    if dm_id >= len(DATA['class_dms'])
-    return None
+    if dm_id >= len(DATA['class_dms']):
+        return None
     elif DATA['class_dms'][dm_id]:
         return DATA['class_dms'][dm_id]
-    else
-    return None
+    else:
+        return None
