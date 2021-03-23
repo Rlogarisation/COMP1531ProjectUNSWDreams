@@ -116,7 +116,9 @@ def dm_invite_v1(token, dm_id, u_id):
         raise AccessError(description="The authorised user is not already a member of the DM")
     
     # Expect invitee is not part of member yet
-    if invitee not in dm.dm_members:
+    if invitee in dm.dm_members:
+        raise AccessError(description="The invitee is already a member of the DM")
+    else:
         dm.dm_members.append(invitee)
         invitee.part_of_dm.append(dm)
     
@@ -202,7 +204,8 @@ def dm_leave_v1(token, dm_id):
     leaver = get_user_by_token(token)
     if leaver is None:
         raise AccessError(description="The authorised user is not already a member of the DM")
-    
+    elif leaver not in leaver.part_of_dm:
+        raise AccessError(description="The authorised user is not already a member of the DM")
     
     # Remove member from dm
     dm.dm_members.remove(leaver)
@@ -249,6 +252,8 @@ def dm_details_v1(token, dm_id):
     # Access error when the authorised user is not already a member of the DM.
     user = get_user_by_token(token)
     if user is None:
+        raise AccessError(description="The authorised user is not already a member of the DM")
+    elif user not in user.part_of_dm:
         raise AccessError(description="The authorised user is not already a member of the DM")
 
     return {
@@ -317,6 +322,8 @@ def dm_messages_v1(token, dm_id, start):
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="The authorised user is not already a member of the DM")
+    elif user not in user.part_of_dm:
+        raise AccessError(description="The authorised user is not already a member of the DM")
 
     return_message = []
     counter_start = len(dm.dm_messages) - start
@@ -346,7 +353,7 @@ def dm_messages_v1(token, dm_id, start):
 
 def get_dm_by_dm_id(dm_id):
     
-    if dm_id >= len(data['class_dms']):
+    if not isinstance(dm_id, int) or dm_id >= len(data['class_dms']):
         return None
     elif data['class_dms'][dm_id]:
         return data['class_dms'][dm_id]
