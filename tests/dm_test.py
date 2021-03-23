@@ -1,5 +1,10 @@
+from tests.channel_test import test_invalid_channel_id
 import pytest
-
+from src.data_file import DATA
+from src.error import InputError, AccessError
+from src.dm import dm_create_v1, dm_details_v1, dm_invite_v1, dm_leave_v1, dm_list_v1, dm_messages_v1, dm_remove_v1
+from src.auth import auth_register_v1, auth_login_v1
+from src.other import clear_v1
 #############################################################################
 #                                                                           #
 #                        Test for dm_details_v1                             #
@@ -23,6 +28,32 @@ TEST CASES:
 
 
 def test_dm_details_v1():
+
+    clear_v1()
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+
+    auth_id0 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
+    auth_id1 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
+    auth_id2 = auth_login_v1("user1@test.com", "user1password")["auth_user_id"]
+
+    dm_create_v1("dm0", [0, 1])
+
+    # Case 1: DM ID is not a valid DM
+    def test_invalid_dm():
+        with pytest.raises(InputError):
+            dm_details_v1(0, "invalid_dm_id")
+        pass
+
+    # Case 2: Authorised user is not a member of this DM with dm_id
+    def test_Inaccessible_member():
+        with pytest.raises(AccessError):
+            dm_details_v1(0, [2])
+        pass
+    # --------------------------testing---------------------------
+    test_invalid_dm()
+    test_Inaccessible_member()
     pass
 
 
@@ -46,6 +77,21 @@ TEST CASES:
 
 
 def test_dm_list_v1():
+    clear_v1()
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+
+    auth_id0 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
+    auth_id1 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
+    auth_id2 = auth_login_v1("user1@test.com", "user1password")["auth_user_id"]
+
+    dm_create_v1("dm0", [0, 1])
+    dm_create_v1("dm1", [0, 2])
+    dm_create_v1("dm2", [1, 2])
+
+    assert dm_list_v1(0) == {DATA['class_dms'][0], DATA['class_dms'][1]}
+
     pass
 
 
@@ -70,6 +116,28 @@ TEST CASES:
 
 
 def test_dm_create_v1():
+    clear_v1()
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+
+    auth_id0 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
+    auth_id1 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
+    auth_id2 = auth_login_v1("user1@test.com", "user1password")["auth_user_id"]
+
+    def test_normal_case():
+        dm1 = dm_create_v1("dm1", [0, 1])
+        assert dm1['dm_id'] == 0
+        assert dm1['dm_name'] == DATA['class_dms'][0].dm_name
+        pass
+
+    def test_invalid_u_id():
+        with pytest.raises(InputError):
+            dm_create_v1(0, [0, 4, 5])
+        pass
+    # --------------------------testing---------------------------
+    test_normal_case()
+    test_invalid_u_id()
     pass
 
 
@@ -96,6 +164,31 @@ TEST CASES:
 
 
 def test_dm_remove_v1():
+    clear_v1()
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+
+    auth_id0 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
+    auth_id1 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
+    auth_id2 = auth_login_v1("user1@test.com", "user1password")["auth_user_id"]
+
+    dm_create_v1("dm0", [0, 1])
+    dm_create_v1("dm1", [0, 2])
+    dm_create_v1("dm2", [1, 2])
+
+    def test_invalid_dm_id():
+        with pytest.raises(InputError):
+            dm_remove_v1("dm0", "invalid_dm_id")
+        pass
+
+    def test_not_creator():
+        with pytest.raises(AccessError):
+            dm_remove_v1("dm1", 1)
+        pass
+    # --------------------------testing---------------------------
+    test_invalid_dm_id()
+    test_not_creator()
     pass
 
 
@@ -122,6 +215,37 @@ TEST CASES:
 
 
 def test_dm_invite_v1():
+    clear_v1()
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+
+    auth_id0 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
+    auth_id1 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
+    auth_id2 = auth_login_v1("user1@test.com", "user1password")["auth_user_id"]
+
+    dm_create_v1("dm0", [0, 1])
+    dm_create_v1("dm1", [0, 2])
+    dm_create_v1("dm2", [1, 2])
+
+    def test_invalid_dm_id():
+        with pytest.raises(InputError):
+            dm_invite_v1("dm0", "invalid_dm_id", 2)
+        pass
+
+    def test_invalid_u_id():
+        with pytest.raises(InputError):
+            dm_invite_v1("dm0", 0, "invalid_u_id")
+        pass
+
+    def test_already_user():
+        with pytest.raises(AccessError):
+            dm_invite_v1("dm0", 0, 0)
+        pass
+    # --------------------------testing---------------------------
+    test_invalid_dm_id()
+    test_invalid_u_id()
+    test_already_user()
     pass
 
 
@@ -148,6 +272,30 @@ TEST CASES:
 
 
 def test_dm_leave_v1():
+    clear_v1()
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+
+    auth_id0 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
+    auth_id1 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
+    auth_id2 = auth_login_v1("user1@test.com", "user1password")["auth_user_id"]
+
+    dm_create_v1("dm0", [0, 1])
+    dm_create_v1("dm1", [0, 2])
+    dm_create_v1("dm2", [1, 2])
+
+    def test_invalid_dm_id():
+        with pytest.raises(InputError):
+            dm_leave_v1("dm0", "invalid_dm_id")
+        pass
+
+    # FIXME: there is no u_id in dm_leave_v1, 该如何知道是谁离开了Direct Message？
+    def test_user_not_in():
+        pass
+    # --------------------------testing---------------------------
+    test_invalid_dm_id()
+    test_user_not_in()
     pass
 
 
@@ -175,4 +323,34 @@ TEST CASES:
 
 
 def test_dm_messages_v1():
+    clear_v1()
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+
+    auth_id0 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
+    auth_id1 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
+    auth_id2 = auth_login_v1("user1@test.com", "user1password")["auth_user_id"]
+
+    dm_create_v1("dm0", [0, 1])
+    dm_create_v1("dm1", [0, 2])
+    dm_create_v1("dm2", [1, 2])
+
+    def test_invalid_dm_id():
+        with pytest.raises(InputError):
+            dm_messages_v1(0, "invalid_dm_id", 0)
+        pass
+
+    def test_oversized_start():
+        with pytest.raises(InputError):
+            dm_messages_v1(0, 0, 999)
+        pass
+
+    # FIXME: there is no u_id in dm_leave_v1, 该如何知道是谁不在DM里面？
+    def test_user_not_in():
+        pass
+    # --------------------------testing---------------------------
+    test_invalid_dm_id()
+    test_oversized_start()
+    test_user_not_in()
     pass
