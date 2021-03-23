@@ -31,6 +31,8 @@ class User:
         # a list of all channels that the authorised user is part of
         # including the user is a memeber and the user is an owner of the channel
         self.part_of_channel = []
+        self.part_of_dm = []
+        self.dm_owns = []
         self.channel_owns = []  # a list of all channels that the user is the owner of the channel
         self.current_sessions = []  # a list of current sessions of the user
 
