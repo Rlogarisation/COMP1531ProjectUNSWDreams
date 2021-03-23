@@ -1,6 +1,8 @@
 import re
 import jwt
 import hashlib
+
+from jwt import InvalidSignatureError
 from src.data_file import User, Permission, data
 from src.error import InputError
 
@@ -106,7 +108,11 @@ def is_email_valid(email):
 
 
 def get_user_by_token(token):
-    session_id = token_to_session(token)['sessionID']
+    session_dict = token_to_session(token)
+    if session_dict is None:
+        return None
+
+    session_id = session_dict['sessionID']
     for user in data['class_users']:
         s = set(user.current_sessions)
         if session_id in s:
@@ -115,7 +121,11 @@ def get_user_by_token(token):
 
 
 def get_user_session_by_token(token):
-    session_id = token_to_session(token)['sessionID']
+    session_dict = token_to_session(token)
+    if session_dict is None:
+        return None
+
+    session_id = session_dict['sessionID']
     for user in data['class_users']:
         s = set(user.current_sessions)
         if session_id in s:
@@ -202,7 +212,11 @@ def session_to_token(session_id):
 
 
 def token_to_session(token):
-    return jwt.decode(token, data['secret'], algorithms=['HS256'])
+    try:
+        decode_session = jwt.decode(token, data['secret'], algorithms=['HS256'])
+        return decode_session
+    except InvalidSignatureError:
+        return None
 
 
 def hash_password(password):

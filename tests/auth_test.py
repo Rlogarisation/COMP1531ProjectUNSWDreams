@@ -2,8 +2,8 @@
 
 import pytest
 from src.other import clear_v1
-from src.auth import auth_login_v1, auth_register_v1
-from src.error import InputError
+from src.auth import auth_login_v1, auth_register_v1, auth_logout, get_user_by_token
+from src.error import InputError, AccessError
 from src.channel import channel_details_v1, channel_invite_v1
 from src.channels import channels_create_v1
 
@@ -227,6 +227,44 @@ def test_auth_login_different_sessions():
     token3 = login3['token']
     assert auth_user_id1 == auth_user_id2 == auth_user_id3
     assert token1 != token2 != token3
+#############################################################################
+#                                                                           #
+#                       Test for auth_logout                                #
+#                                                                           #
+#############################################################################
 
+
+def test_auth_logout_invalid_token():
+    clear_v1()
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    token = register1['token']
+    invalid_token = f"{token}123"
+    assert auth_logout(invalid_token) == {'is_success': False}
+
+
+def test_auth_logout_successfully_small():
+    clear_v1()
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    token1 = register1['token']
+    # user1 = get_user_by_token(token1)
+    login2 = auth_login_v1('haha@gmail.com', '123123123')
+    # assert len(user1.current_sessions) == 2
+    token2 = login2['token']
+    assert auth_logout(token1) == {'is_success': True}
+    # assert len(user1.current_sessions) == 1
+    assert auth_logout(token2) == {'is_success': True}
+    # assert len(user1.current_sessions) == 0
+
+
+def test_auth_logout_successfully_large():
+    clear_v1()
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    token_list = []
+    for i in range(20):
+        login = auth_login_v1('haha@gmail.com', '123123123')
+        token_list.append(login['token'])
+    for token in token_list:
+        result = auth_logout(token)
+        assert result == {'is_success': True}
 
 
