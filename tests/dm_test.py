@@ -1,4 +1,3 @@
-from tests.channel_test import test_invalid_channel_id
 import pytest
 from src.data_file import DATA
 from src.error import InputError, AccessError
@@ -39,7 +38,7 @@ def test_dm_details_v1():
     auth_id2 = auth_login_v1("user1@test.com", "user1password")["auth_user_id"]
 
     # user1 create the dm, invite user0 into dm
-    dm_create_v1(token1, 0)
+    dm_create_v1(token1, [0])
 
     # Case 1: DM ID is not a valid DM
     def test_invalid_dm():
@@ -92,7 +91,7 @@ def test_dm_list_v1():
     dm_create_v1(token0, [2])
     dm_create_v1(token1, [2])
 
-    assert dm_list_v1(token0) == {DATA['class_dms'][0], DATA['class_dms'][1]}
+    assert dm_list_v1(token0) == {"dms": [DATA['class_dms'][0], DATA['class_dms'][1]]}
 
     pass
 
