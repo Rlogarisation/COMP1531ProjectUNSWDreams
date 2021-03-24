@@ -1,7 +1,7 @@
 from typing import Dict
-from src.data_file import DATA, DM
+from src.data_file import data, Permission, DM
 from src.error import InputError, AccessError
-from src.auth import get_user_by_auth_id, session_to_token, token_to_session, get_user_by_token, get_user_by_uid
+from src.auth import get_user_by_auth_id, get_user_by_uid, session_to_token, token_to_session, get_user_by_token
 
 
 #############################################################################
@@ -28,11 +28,6 @@ u_id does not refer to a valid user
 """
 
 
-def create_dm_id():
-    dm_id = len(DATA['class_dms'])
-    return dm_id
-
-
 def dm_create_v1(token, u_id_list):
 
     list_dm_handles = []
@@ -53,11 +48,11 @@ def dm_create_v1(token, u_id_list):
         raise InputError(description='The token is invalid, or the inviter has not registered')
 
     dm_name = ", ".join(list_dm_handles)
-    dm_id = create_dm_id()
+    dm_id = len(data['class_dms'])
 
     dm = DM(dm_name, dm_id)
-    # Update DATA
-    DATA['class_dms'].append(dm)
+    # Update data
+    data['class_dms'].append(dm)
 
     # Update members and owners inside class DM
     # Note: inviter is also part of member.
@@ -118,7 +113,9 @@ def dm_invite_v1(token, dm_id, u_id):
         raise AccessError(description="The authorised user is not already a member of the DM")
 
     # Expect invitee is not part of member yet
-    if invitee not in dm.dm_members:
+    if invitee in dm.dm_members:
+        raise AccessError(description="The invitee is already a member of the DM")
+    else:
         dm.dm_members.append(invitee)
         invitee.part_of_dm.append(dm)
 
@@ -160,14 +157,14 @@ def dm_remove_v1(token, dm_id):
         raise AccessError(description="The user is not the original DM creator")
 
     # Remove the current dm for all users in User.part_of_channel and dm_owns
-    # Then remove dm in DATA class
+    # Then remove dm in data class
     for member in dm.dm_members:
         member.part_of_dm.remove(dm)
 
     for owner in dm.dm_owners:
         owner.dm_owns.remove(dm)
 
-    DATA['class_dms'].remove(dm)
+    data['class_dms'].remove(dm)
 
     return {
     }
@@ -203,6 +200,8 @@ def dm_leave_v1(token, dm_id):
     # Access error when the authorised user is not already a member of the DM.
     leaver = get_user_by_token(token)
     if leaver is None:
+        raise AccessError(description="The authorised user is not already a member of the DM")
+    elif leaver not in leaver.part_of_dm:
         raise AccessError(description="The authorised user is not already a member of the DM")
 
     # Remove member from dm
@@ -252,6 +251,8 @@ def dm_details_v1(token, dm_id):
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="The authorised user is not already a member of the DM")
+    elif user not in user.part_of_dm:
+        raise AccessError(description="The authorised user is not already a member of the DM")
 
     return {
         'name': dm.dm_name,
@@ -277,10 +278,12 @@ N/A
 
 def dm_list_v1(token):
     user = get_user_by_token(token)
-    dms = {}
-    for dm_belongs in user.part_of_dm:
-        dms.append(dm_belongs)
-    return dms
+    list_return = []
+    for DMs in user.part_of_dm:
+        list_return.append(DMs.return_type_dm())
+    return {
+        'dms': list_return
+    }
 
 
 """
@@ -320,6 +323,8 @@ def dm_messages_v1(token, dm_id, start):
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="The authorised user is not already a member of the DM")
+    elif user not in user.part_of_dm:
+        raise AccessError(description="The authorised user is not already a member of the DM")
 
     return_message = []
     counter_start = len(dm.dm_messages) - start
@@ -336,7 +341,7 @@ def dm_messages_v1(token, dm_id, start):
     return {
         'messages': return_message,
         'start': start,
-        'end': end
+        'end': end,
     }
 
 
@@ -347,9 +352,10 @@ def dm_messages_v1(token, dm_id, start):
 #############################################################################
 
 def get_dm_by_dm_id(dm_id):
-    if dm_id >= len(DATA['class_dms']):
+
+    if not isinstance(dm_id, int) or dm_id >= len(data['class_dms']):
         return None
-    elif DATA['class_dms'][dm_id]:
-        return DATA['class_dms'][dm_id]
+    elif data['class_dms'][dm_id]:
+        return data['class_dms'][dm_id]
     else:
         return None
