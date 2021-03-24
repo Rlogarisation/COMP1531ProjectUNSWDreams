@@ -98,7 +98,7 @@ def channels_create_v1(token, name, is_public):
     # error check if the owner has registered
     owner = get_user_by_token(token)
     if owner is None:
-        raise InputError(description='The token is invalid, or the owner has not registered')
+        raise AccessError(description='The token is invalid, or the owner has not registered')
 
     # get the owner who creates the channel by auth_user_id
     channel_id = create_channel_id()
