@@ -1,5 +1,4 @@
 import pytest
-from src.data_file import data
 from src.error import InputError, AccessError
 from src.dm import dm_create_v1, dm_details_v1, dm_invite_v1, dm_leave_v1, dm_list_v1, dm_messages_v1, dm_remove_v1
 from src.auth import auth_register_v1, auth_login_v1, get_user_by_token
@@ -91,7 +90,19 @@ def test_dm_list_v1():
     dm_create_v1(token0, [2])
     dm_create_v1(token1, [2])
 
-    assert dm_list_v1(token0) == {"dms": [data['class_dms'][0], data['class_dms'][1]]}
+    user0_involved = dm_list_v1(token0)
+
+    assert user0_involved['dms'][0]['dm_name'] == "TomGreen"
+    assert user0_involved['dms'][0]['dm_id'] == 0
+    assert len(user0_involved['dms'][0]['dm_members']) == 2
+    assert len(user0_involved['dms'][0]['dm_owners']) == 1
+    assert user0_involved['dms'][0]['dm_messages'] == []
+
+    assert user0_involved['dms'][1]['dm_name'] == "RogerLuo"
+    assert user0_involved['dms'][1]['dm_id'] == 1
+    assert len(user0_involved['dms'][1]['dm_members']) == 2
+    assert len(user0_involved['dms'][1]['dm_owners']) == 1
+    assert user0_involved['dms'][1]['dm_messages'] == []
 
     pass
 
@@ -129,7 +140,7 @@ def test_dm_create_v1():
     def test_normal_case():
         dm1 = dm_create_v1(token0, [1])
         assert dm1['dm_id'] == 0
-        assert dm1['dm_name'] == data['class_dms'][0].dm_name
+        assert dm1['dm_name'] == "TomGreen"
         pass
 
     def test_invalid_u_id():
