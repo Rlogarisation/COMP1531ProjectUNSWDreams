@@ -48,7 +48,7 @@ def test_channels_correct_channel():
     channel_list = channels_list_v1(token1)
 
     # Check the information of authorised user is correct
-    assert (channel_list[0]['name'] == 'SheepChannel')
+    assert (channel_list['channels'][0]['name'] == 'SheepChannel')
 
 
 def test_channels_multiple_channels():
@@ -67,9 +67,9 @@ def test_channels_multiple_channels():
     channel_list = channels_list_v1(token1)
 
     # Check the information of authorised user is correct
-    assert (channel_list[0]['name'] == "EngineeringChannel")
-    assert (channel_list[1]['name'] == "BussinessChannel")
-    assert (channel_list[2]['name'] == "LawChannel")
+    assert (channel_list['channels'][0]['name'] == "EngineeringChannel")
+    assert (channel_list['channels'][1]['name'] == "BussinessChannel")
+    assert (channel_list['channels'][2]['name'] == "LawChannel")
 
 
 def test_channels_multiple_users():
@@ -93,8 +93,8 @@ def test_channels_multiple_users():
     channel_user2 = channels_list_v1(token2)
 
     # Check the information of authorised user is correct
-    assert (channel_user1[0]['name'] == "mesterChannel")
-    assert (channel_user2[0]['name'] == "mesterChannel")
+    assert (channel_user1['channels'][0]['name'] == "mesterChannel")
+    assert (channel_user2['channels'][0]['name'] == "mesterChannel")
 
 
 def test_channels_oneUser_multiple_private_channels():
@@ -111,7 +111,7 @@ def test_channels_oneUser_multiple_private_channels():
     # List all the public channel of the user belongs to
     channel_user1 = channels_list_v1(token1)
     # Check the information of authorised user is correct
-    assert len(channel_user1) == 4
+    assert len(channel_user1['channels']) == 4
 
 
 def test_channels_invalidToken():
@@ -187,10 +187,10 @@ def test_allchannels_multiple_channels():
 
     # List all the channels and check
     channel_user = channels_listall_v1(token1)
-    assert channel_user[0]['name'] == "EngineeringChannel"
-    assert channel_user[1]['name'] == "BussinessChannel"
-    assert channel_user[2]['name'] == "LawChannel"
-    assert len(channels_listall_v1(token1)) == 3
+    assert channel_user['channels'][0]['name'] == "EngineeringChannel"
+    assert channel_user['channels'][1]['name'] == "BussinessChannel"
+    assert channel_user['channels'][2]['name'] == "LawChannel"
+    assert len(channels_listall_v1(token1)['channels']) == 3
 
 
 def test_allchannels_multiple_users():
@@ -209,8 +209,8 @@ def test_allchannels_multiple_users():
 
     # List all the channels and check it is correct from 2 user perspective
     # regardless if they are a member or not
-    assert len(channels_listall_v1(token1)) == 2
-    assert len(channels_listall_v1(token2)) == 2
+    assert len(channels_listall_v1(token1)['channels']) == 2
+    assert len(channels_listall_v1(token2)['channels']) == 2
 
 
 def test_allchannels_private():
@@ -227,10 +227,10 @@ def test_allchannels_private():
 
     # List all the channels and check
     channel_user1 = channels_listall_v1(token1)
-    assert channel_user1[0]['name'] == "EngineeringChannel"
-    assert channel_user1[1]['name'] == "BussinessChannel"
-    assert channel_user1[2]['name'] == "LawChannel"
-    assert len(channels_listall_v1(token1)) == 3
+    assert channel_user1['channels'][0]['name'] == "EngineeringChannel"
+    assert channel_user1['channels'][1]['name'] == "BussinessChannel"
+    assert channel_user1['channels'][2]['name'] == "LawChannel"
+    assert len(channels_listall_v1(token1)['channels']) == 3
 
 
 # Test if the function will raise error
@@ -324,7 +324,7 @@ def test_channels_create_valid():
     owner2 = channel_detail1['owner_members'][0]
     member2 = channel_detail1['all_members'][0]
     assert owner1['email'] == owner2['email'] == member1['email'] == member2['email'] == 'haha@gmail.com'
-    assert len(channels_list_v1(token)) == 2
+    assert len(channels_list_v1(token)['channels']) == 2
 
 
 # test if the function is called by invalid token causing access error
