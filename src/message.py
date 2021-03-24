@@ -9,7 +9,6 @@ from src.channel import get_channel_by_channel_id
 #                           Interface function                              #
 #                                                                           #
 #############################################################################
-
 """
 Author: Shi Tong Yuan
 
@@ -104,9 +103,12 @@ def message_edit_v2(token, message_id, message):
     if auth_user.u_id == get_u_id_by_message_id(message_id):
         raise AccessError(description='message_edit_v2 : Message editted by neither auth_user nor owner.')
 
-    # Case 1: if message is empty string, delete it
-
+    # Case 1: if new message is empty string, delete it
+    if message == "":
+        message_remove_v1(token, message_id)
     # Case 2: else edit message
+    else:
+        get_message_by_message_id(message_id).message = message
 
     return {}
 
@@ -152,8 +154,7 @@ def message_remove_v1(token, message_id):
     # TODO:
     delete_message_by_message_id(message_id)
 
-    return {
-    }
+    return {}
 
 
 """
@@ -168,6 +169,9 @@ Parameters: (token, og_message_id, message, channel_id, dm_id)
 Return Type: {shared_message_id}
 HTTP Method: POST
 
+InputError:
+    - (Added) if neither channel_id nor dm_id is -1 or both are -1
+
 AccessError: 
     - the authorised user has not joined the channel or DM they are trying to share the message to
 
@@ -175,8 +179,27 @@ AccessError:
 
 
 def message_share_v1(token, og_message_id, message, channel_id, dm_id):
-    return {
-    }
+    if channel_id == -1 and dm_id != -1:
+        mem_list = get_dm_by_dm_id(dm_id).dm_members
+    elif channel_id != -1 and dm_id == -1:
+        mem_list = get_channel_by_channel_id(channel_id)
+    elif channel_id != -1 and dm_id != -1:
+        raise InputError(description="message_share_v1 : neither channel_id nor dm_id is -1.")
+    elif channel_id == -1 and dm_id == -1:
+        raise InputError(description="message_share_v1 : both channel_id and dm_id is -1.")
+    else:
+        raise InputError(description="message_share_v1 : invalid input.")
+
+    user = get_user_by_token(token)
+    if user not in mem_list:
+        raise AccessError(description="message_share_v1 : user need to be authorized.")
+
+    og_message = get_message_by_message_id(og_message_id)
+    message_added = ''.join([og_message.message, '\n"""\n', message, '\n"""'])
+    # add og_message to new_message
+    new_message = Message(create_message_id(), user.u_id, message_added, datetime.utcnow(), channel_id, dm_id)
+
+    return {new_message.message_id}
 
 
 #############################################################################
@@ -196,17 +219,45 @@ def create_message_id():
 # FIXME: 想要通过message_id得到u_id,需要遍历messages[]，但每个channel的messages都是从0开始，message_id必定有重复
 # TODO: 用create_session_id来，保证每个channel里面的message_id不重复
 def get_u_id_by_message_id(message_id):
-    return 0
+    return get_message_by_message_id(message_id).u_id
 
 
 # TODO: 通过message_id获取目标message
 def get_message_by_message_id(message_id):
-    return None
+    for i in data['class_channels']:
+        for j in i.messages:
+            if j.message_id == message_id:
+                return j
+    for i in data['class_dms']:
+        for j in i.messages:
+            if j.message_id == message_id:
+                return j
+    raise AccessError(description="get_message_by_message_id : can not find target message.")
 
 
 # TODO:通过message_id删除message
 def delete_message_by_message_id(message_id):
-    return None
+    target_msg = get_message_by_message_id(message_id)
+    for i in data['class_channels']:
+        for j in i.message:
+            if j.message_id == target_msg.message_id:
+                i.remove(j)
+                return
+    for i in data['class_dms']:
+        for j in i.message:
+            if j.message_id == target_msg.message_id:
+                i.remove(j)
+                return
+    raise AccessError(description="delete_message_by_message_id : can not find target message.")
+
+
+def get_dm_by_dm_id(dm_id):
+    if dm_id >= len(data["class_dms"]) or not isinstance(dm_id, int):
+        return None
+    elif data["class_channels"][dm_id]:
+        return data["class_channels"][dm_id]
+    else:
+        return None
 
 
 #############################################################################
@@ -214,6 +265,7 @@ def delete_message_by_message_id(message_id):
 #                             History function                              #
 #                                                                           #
 #############################################################################
+
 
 def message_send_v1(auth_user_id, channel_id, message):
     for i in data["class_channels"]:
