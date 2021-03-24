@@ -100,7 +100,6 @@ def message_edit_v2(token, message_id, message):
     if len(message) > 1000:
         raise InputError(description='message_edit_v2 : Message is more than 1000 characters.')
 
-    # FIXME: 参见AccessError里面的FIXME
     # AccessError 1: Message editted by neither auth_user nor owner.
     if auth_user.u_id == get_u_id_by_message_id(message_id):
         raise AccessError(description='message_edit_v2 : Message editted by neither auth_user nor owner.')
@@ -146,7 +145,6 @@ def message_remove_v1(token, message_id):
     if target_message == None:
         raise InputError(description='message_remove_v1 : Message (based on ID) no longer exists.')
 
-    # FIXME: 参见AccessError里面的FIXME
     # AccessError 1: Message removed by neither auth_user nor owner.
     if auth_user.u_id == get_u_id_by_message_id(message_id):
         raise AccessError(description='message_remove_v1 : Message removed by neither auth_user nor owner.')
@@ -189,13 +187,14 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
 
 # generate a new session id
-def create_session_id():
+def create_message_id():
     new_id = data['message_num']
     data['message_num'] = data['message_num'] + 1
     return new_id
 
 
 # FIXME: 想要通过message_id得到u_id,需要遍历messages[]，但每个channel的messages都是从0开始，message_id必定有重复
+# TODO: 用create_session_id来，保证每个channel里面的message_id不重复
 def get_u_id_by_message_id(message_id):
     return 0
 
