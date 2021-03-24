@@ -133,3 +133,9 @@ dmypy.json
 .DS_Store
 */.DS_Store
 /tests/db.p
+
+
+# excluded Hao Ren tests
+HaoRen_itera01_tests
+HaoRen_itera02_tests
+HaoRen_itera03_tests
