@@ -207,3 +207,20 @@ def get_message_by_message_id(message_id):
 # TODO:通过message_id删除message
 def delete_message_by_message_id(message_id):
     return None
+
+
+#############################################################################
+#                                                                           #
+#                             History function                              #
+#                                                                           #
+#############################################################################
+
+def message_send_v1(auth_user_id, channel_id, message):
+    for i in data["class_channels"]:
+        if i.channel_id == channel_id:
+            i.messages.insert(0, message)
+            break
+
+    return {
+        'message_id': 1,
+    }
