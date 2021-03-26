@@ -72,12 +72,13 @@ class Channel:
 
 
 class Message:
-    def __init__(self, message_id, u_id, message, time_created, channel_id):
+    def __init__(self, message_id, u_id, message, time_created, channel_id, dm_id):
         self.message_id = message_id
         self.u_id = u_id
         self.message = message
         self.time_created = time_created
         self.channel_id = channel_id
+        self.dm_id = dm_id
 
     def return_type_message(self):
         """
@@ -101,6 +102,17 @@ class DM:
         self.dm_members = []
         self.dm_owners = []
         self.dm_messages = []
+
+    def return_type_dm(self):
+        return {
+            'start': self.start,
+            'end': self.end,
+            'dm_name': self.dm_name,
+            'dm_id': self.dm_id,
+            'dm_members': self.dm_members,
+            'dm_owners': self.dm_owners,
+            'dm_messages': self.dm_messages,
+        }
 
 
 DATA = {
