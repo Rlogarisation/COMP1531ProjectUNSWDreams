@@ -105,13 +105,8 @@ class DM:
 
     def return_type_dm(self):
         return {
-            'start': self.start,
-            'end': self.end,
-            'dm_name': self.dm_name,
             'dm_id': self.dm_id,
-            'dm_members': self.dm_members,
-            'dm_owners': self.dm_owners,
-            'dm_messages': self.dm_messages,
+            'name': self.dm_name
         }
 
 
