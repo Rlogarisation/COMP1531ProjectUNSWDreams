@@ -161,7 +161,7 @@ def channel_messages_v1(token, channel_id, start):
         raise (InputError(description="channel_messages_v1 : target user is not in channel"))
 
     num_msgs = len(target_channel.messages)
-    if num_msgs <= start:
+    if num_msgs < start:
         raise (InputError(description="channel_messages_v1 : the start >= total messages."))
 
     # grab the targeted list of Message Class
@@ -171,9 +171,10 @@ def channel_messages_v1(token, channel_id, start):
         return_msg_class = target_channel.messages[start:]
 
     # turn Message Class to dictionary
+    print(return_msg_class)
     return_msg = []
     for message in return_msg_class:
-        return_msg.append(message.return_type_message())
+        return_msg.append(message)
 
     return {
         "messages": return_msg,

@@ -460,8 +460,8 @@ def test_no_msg():
     user2 = auth_login_v1("user2@test.com", "user2password")
 
     # create channel for testing
-    Testing_channel_id = channels_create_v1(user1["auth_user_id"], "channel_test", True)
-    channel_invite_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], user2["auth_user_id"])
+    Testing_channel_id = channels_create_v1(user1["token"], "channel_test", True)
+    channel_invite_v1(user1["token"], Testing_channel_id["channel_id"], user2["auth_user_id"])
 
     # 1. return -1 : for no more message after start
     message_stored = channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 0)["messages"]
@@ -476,11 +476,11 @@ def test_less_than_50_msg():
     user1 = auth_login_v1("user1@test.com", "user1password")
 
     # create channel for testing
-    Testing_channel_id = channels_create_v1(user1["auth_user_id"], "channel_test", True)
+    Testing_channel_id = channels_create_v1(user1["token"], "channel_test", True)
 
     # send testing message into channel chat
     for i in range(1, 3):
-        message_send_v1(user1["auth_user_id"], Testing_channel_id["channel_id"], "This is a testing message.")
+        message_send_v1(user1["token"], Testing_channel_id["channel_id"], "This is a testing message.")
 
     # 1. return -1 : for no more message after start
     message_stored = channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 0)["messages"]
