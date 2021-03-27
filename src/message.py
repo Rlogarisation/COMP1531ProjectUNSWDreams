@@ -68,6 +68,57 @@ def message_send_v2(token, channel_id, message):
 """
 Author: Shi Tong Yuan
 
+message/senddm/v1
+
+Background:
+Send a message from authorised_user to the DM specified by dm_id. Note: Each message should have it's own unique ID. I.E. No messages should share an ID with another message, even if that other message is in a different channel or DM.
+
+Parameters: (token, dm_id, message)
+Return Type: { message_id }
+HTTP Method: POST
+
+InputError:
+    - (Added) Invalid token.
+    - Message is more than 1000 characters
+AccessError:
+    - (Added) Invalid channel_id
+    - the authorised user has not joined the channel they are trying to post to
+
+"""
+
+
+def message_senddm_v1(token, dm_id, message):
+    # InputError 1: invalid token.
+    auth_user = get_user_by_token(token)
+    if auth_user == None:
+        raise InputError(description='message_send_v2 : Invalid token.')
+
+    # InputError 1: Message is more than 1000 characters
+    if len(message) > 1000:
+        raise InputError(description='message_send_v2 : Message is more than 1000 characters.')
+
+    # AccessError 1: invalid channel_id
+    channel = get_dm_by_dm_id(dm_id)
+    if type(dm_id) != int or channel == None:
+        raise AccessError(description='message_send_v2 : Invalid channel_id.')
+
+    # AccessError 2: the authorised user has not joined the channel they are trying to post to
+    if auth_user not in channel.all_members:
+        raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
+
+    new_message_id = len(channel.messages)
+    message_created = Message(new_message_id, auth_user.u_id, message, datetime.utcnow(), channel.channel_id)
+
+    channel.messages.append(message_created)
+
+    return {
+        'message_id': new_message_id,
+    }
+
+
+"""
+Author: Shi Tong Yuan
+
 message/edit/v2
 
 Background:
