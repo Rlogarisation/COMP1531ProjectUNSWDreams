@@ -323,6 +323,7 @@ def test_message_share_not_joing_dm():
     u_id_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['u_id']
     u_id_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['u_id']
 
+
     u_id_list = [u_id_0, u_id_1]
     dm_0_id = dm_create_v1(token_0, u_id_list)['dm_id']
     og_message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
