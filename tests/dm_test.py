@@ -51,6 +51,7 @@ def test_dm_details_v1():
         with pytest.raises(AccessError):
             dm_details_v1(token2, 0)
         pass
+
     # --------------------------testing---------------------------
     test_invalid_dm()
     test_Inaccessible_member()
@@ -92,17 +93,11 @@ def test_dm_list_v1():
 
     user0_involved = dm_list_v1(token0)
 
-    assert user0_involved['dms'][0]['dm_name'] == "TomGreen"
+    assert user0_involved['dms'][0]['name'] == "PeterWhite, TomGreen"
     assert user0_involved['dms'][0]['dm_id'] == 0
-    assert len(user0_involved['dms'][0]['dm_members']) == 2
-    assert len(user0_involved['dms'][0]['dm_owners']) == 1
-    assert user0_involved['dms'][0]['dm_messages'] == []
 
-    assert user0_involved['dms'][1]['dm_name'] == "RogerLuo"
+    assert user0_involved['dms'][1]['name'] == "PeterWhite, RogerLuo"
     assert user0_involved['dms'][1]['dm_id'] == 1
-    assert len(user0_involved['dms'][1]['dm_members']) == 2
-    assert len(user0_involved['dms'][1]['dm_owners']) == 1
-    assert user0_involved['dms'][1]['dm_messages'] == []
 
     pass
 
@@ -140,13 +135,14 @@ def test_dm_create_v1():
     def test_normal_case():
         dm1 = dm_create_v1(token0, [1])
         assert dm1['dm_id'] == 0
-        assert dm1['dm_name'] == "TomGreen"
+        assert dm1['dm_name'] == "PeterWhite, TomGreen"
         pass
 
     def test_invalid_u_id():
         with pytest.raises(InputError):
             dm_create_v1(token1, [4, 5])
         pass
+
     # --------------------------testing---------------------------
     test_normal_case()
     test_invalid_u_id()
@@ -198,6 +194,7 @@ def test_dm_remove_v1():
         with pytest.raises(AccessError):
             dm_remove_v1(token1, 1)
         pass
+
     # --------------------------testing---------------------------
     test_invalid_dm_id()
     test_not_creator()
@@ -254,6 +251,7 @@ def test_dm_invite_v1():
         with pytest.raises(AccessError):
             dm_invite_v1(token0, 0, 1)
         pass
+
     # --------------------------testing---------------------------
     test_invalid_dm_id()
     test_invalid_u_id()
@@ -306,6 +304,7 @@ def test_dm_leave_v1():
         with pytest.raises(AccessError):
             dm_leave_v1(token0, 2)
         pass
+
     # --------------------------testing---------------------------
     test_invalid_dm_id()
     test_user_not_in()
@@ -363,6 +362,7 @@ def test_dm_messages_v1():
         with pytest.raises(AccessError):
             dm_messages_v1(token1, 1, 0)
         pass
+
     # --------------------------testing---------------------------
     test_invalid_dm_id()
     test_oversized_start()

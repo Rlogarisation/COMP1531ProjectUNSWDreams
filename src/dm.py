@@ -3,13 +3,11 @@ from src.data_file import data, Permission, DM
 from src.error import InputError, AccessError
 from src.auth import get_user_by_auth_id, get_user_by_uid, session_to_token, token_to_session, get_user_by_token
 
-
 #############################################################################
 #                                                                           #
 #                           Interface function                              #
 #                                                                           #
 #############################################################################
-
 """
 Author: Zheng Luo
 
@@ -29,9 +27,14 @@ u_id does not refer to a valid user
 
 
 def dm_create_v1(token, u_id_list):
-
     list_dm_handles = []
     list_dm_invitee = []
+
+    # input error if token does not refer to a valid token
+    inviter = get_user_by_token(token)
+    if inviter is None:
+        raise AccessError(description='The token is invalid, or the inviter has not registered')
+    list_dm_handles.append(inviter.handle_str)
 
     for uid in u_id_list:
         invitee = get_user_by_uid(uid)
@@ -41,11 +44,6 @@ def dm_create_v1(token, u_id_list):
 
         list_dm_invitee.append(invitee)
         list_dm_handles.append(invitee.handle_str)
-
-    # input error if token does not refer to a valid token
-    inviter = get_user_by_token(token)
-    if inviter is None:
-        raise InputError(description='The token is invalid, or the inviter has not registered')
 
     dm_name = ", ".join(list_dm_handles)
     dm_id = len(data['class_dms'])
@@ -89,7 +87,7 @@ HTTP Method: POST
 InputError when any of: 
           dm_id does not refer to an existing dm.
           u_id does not refer to a valid user. 
-       
+
 AccessError when: 
         the authorised user is already a member of the DM.
 
@@ -136,7 +134,7 @@ HTTP Method: DELETE
 
 InputError when:   
     dm_id does not refer to a valid DM 
-    
+
 AccessError when:  
     the user is not the original DM creator
 
@@ -152,7 +150,7 @@ def dm_remove_v1(token, dm_id):
     # AccessError when the user is not the original DM creator.
     inviter = get_user_by_token(token)
     if inviter is None:
-        raise AccessError(description="The authorised user is not already a member of the DM")
+        raise AccessError(description="The token is not valid")
     elif inviter not in dm.dm_owners:
         raise AccessError(description="The user is not the original DM creator")
 
@@ -166,8 +164,7 @@ def dm_remove_v1(token, dm_id):
 
     data['class_dms'].remove(dm)
 
-    return {
-    }
+    return {}
 
 
 """
@@ -184,7 +181,7 @@ HTTP Method: POST
 
 InputError when any of:
     dm_id is not a valid DM
-      
+
 AccessError when
     Authorised user is not a member of DM with dm_id
 
@@ -200,25 +197,25 @@ def dm_leave_v1(token, dm_id):
     # Access error when the authorised user is not already a member of the DM.
     leaver = get_user_by_token(token)
     if leaver is None:
-        raise AccessError(description="The authorised user is not already a member of the DM")
-    elif leaver not in leaver.part_of_dm:
+        raise AccessError(description="The token is invalid")
+    elif dm not in leaver.part_of_dm:
         raise AccessError(description="The authorised user is not already a member of the DM")
 
     # Remove member from dm
     dm.dm_members.remove(leaver)
     leaver.part_of_dm.remove(dm)
-    # Considering owner leaving dm
+    # Considering the owner leaving dm
     if leaver in dm.dm_owners:
         dm.dm_owners.remove(leaver)
         leaver.dm_owns.remove(dm)
+        # If the leaving owner is the only one owner and there is still member in the dm
         # Then first availble person in member become owner
-        dm_next_owner = dm.dm_members[0]
-        dm.dm_owners.append(dm_next_owner)
-        dm_next_owner.dm_owns(dm)
+        if len(dm.dm_owners) == 0 and len(dm.dm_members) > 0:
+            dm_next_owner = dm.dm_members[0]
+            dm.dm_owners.append(dm_next_owner)
+            dm_next_owner.dm_owns(dm)
 
-    return {
-
-    }
+    return {}
 
 
 """
@@ -235,7 +232,7 @@ HTTP Method: GET
 
 InputError when any of:
     DM ID is not a valid DM
-      
+
 AccessError when
     Authorised user is not a member of this DM with dm_id
 """
@@ -250,13 +247,16 @@ def dm_details_v1(token, dm_id):
     # Access error when the authorised user is not already a member of the DM.
     user = get_user_by_token(token)
     if user is None:
-        raise AccessError(description="The authorised user is not already a member of the DM")
-    elif user not in user.part_of_dm:
+        raise AccessError(description="Token is invalid")
+    elif dm not in user.part_of_dm:
         raise AccessError(description="The authorised user is not already a member of the DM")
 
+    member_list = []
+    for member in dm.dm_members:
+        member_list.append(member.return_type_user())
     return {
         'name': dm.dm_name,
-        'members': dm.dm_members,
+        'members': member_list,
     }
 
 
@@ -278,12 +278,12 @@ N/A
 
 def dm_list_v1(token):
     user = get_user_by_token(token)
+    if user is None:
+        raise AccessError(description="Token is invalid")
     list_return = []
     for DMs in user.part_of_dm:
         list_return.append(DMs.return_type_dm())
-    return {
-        'dms': list_return
-    }
+    return {'dms': list_return}
 
 
 """
@@ -303,7 +303,7 @@ InputError when any of:
     DM ID is not a valid DM
 
     start is greater than the total number of messages in the channel
-      
+
 AccessError when any of:
     Authorised user is not a member of DM with dm_id
 """
@@ -322,20 +322,20 @@ def dm_messages_v1(token, dm_id, start):
     # Access error when Authorised user is not a member of DM with dm_id
     user = get_user_by_token(token)
     if user is None:
-        raise AccessError(description="The authorised user is not already a member of the DM")
-    elif user not in user.part_of_dm:
+        raise AccessError(description="Token is invalid")
+    elif dm not in user.part_of_dm:
         raise AccessError(description="The authorised user is not already a member of the DM")
 
     return_message = []
-    counter_start = len(dm.dm_messages) - start
-    if counter_start - 50 >= 0:
-        counter_end = counter_start - 50
-        end = counter_start + 50
+    counter_start = len(dm.dm_messages) - start - 1
+    if (counter_start + 1) - 50 > 0:
+        counter_end = (counter_start + 1) - 50
+        end = start + 50
     else:
         counter_end = 0
         end = -1
-    while (counter_start >= counter_end):
-        return_message.append(dm.dm_messages[counter_start])
+    while counter_start >= counter_end:
+        return_message.append(dm.dm_messages[counter_start].return_type_message())
         counter_start -= 1
 
     return {
@@ -351,8 +351,8 @@ def dm_messages_v1(token, dm_id, start):
 #                                                                           #
 #############################################################################
 
-def get_dm_by_dm_id(dm_id):
 
+def get_dm_by_dm_id(dm_id):
     if not isinstance(dm_id, int) or dm_id >= len(data['class_dms']):
         return None
     elif data['class_dms'][dm_id]:
