@@ -344,7 +344,7 @@ def dm_messages_v1(token, dm_id, start):
     return {
         'messages': return_message,
         'start': start,
-        'end': end,
+        'end': end
     }
 
 
