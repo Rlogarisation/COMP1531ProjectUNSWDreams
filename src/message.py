@@ -38,8 +38,9 @@ def message_send_v2(token, channel_id, message):
     #         break
 
     # InputError 1: invalid token.
-    auth_user = get_user_by_token(token)
-    if auth_user == None:
+    try:
+        auth_user = get_user_by_token(token)
+    except:
         raise InputError(description='message_send_v2 : Invalid token.')
 
     # InputError 1: Message is more than 1000 characters
@@ -56,7 +57,7 @@ def message_send_v2(token, channel_id, message):
         raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
 
     new_message_id = len(channel.messages)
-    message_created = Message(new_message_id, auth_user.u_id, message, datetime.utcnow(), channel.channel_id)
+    message_created = Message(new_message_id, auth_user.u_id, message, datetime.utcnow(), channel.channel_id, -1)
 
     channel.messages.append(message_created)
 
@@ -89,25 +90,26 @@ AccessError:
 
 def message_senddm_v1(token, dm_id, message):
     # InputError 1: invalid token.
-    auth_user = get_user_by_token(token)
-    if auth_user == None:
+    try:
+        auth_user = get_user_by_token(token)
+    except:
         raise InputError(description='message_send_v2 : Invalid token.')
 
     # InputError 1: Message is more than 1000 characters
     if len(message) > 1000:
         raise InputError(description='message_send_v2 : Message is more than 1000 characters.')
 
-    # AccessError 1: invalid channel_id
-    channel = get_dm_by_dm_id(dm_id)
-    if type(dm_id) != int or channel == None:
+    # AccessError 1: invalid dm_id
+    dm = get_dm_by_dm_id(dm_id)
+    if type(dm_id) != int or dm == None:
         raise AccessError(description='message_send_v2 : Invalid channel_id.')
 
     # AccessError 2: the authorised user has not joined the channel they are trying to post to
-    if auth_user not in channel.all_members:
+    if auth_user not in dm.all_members:
         raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
 
-    new_message_id = len(channel.messages)
-    message_created = Message(new_message_id, auth_user.u_id, message, datetime.utcnow(), channel.channel_id)
+    new_message_id = len(dm.messages)
+    message_created = Message(new_message_id, auth_user.u_id, message, datetime.utcnow(), -1, dm.dm_id)
 
     channel.messages.append(message_created)
 
@@ -142,8 +144,9 @@ AccessError:
 def message_edit_v2(token, message_id, message):
 
     # InputError 1: invalid token.
-    auth_user = get_user_by_token(token)
-    if auth_user == None:
+    try:
+        auth_user = get_user_by_token(token)
+    except:
         raise InputError(description='message_edit_v2 : Invalid token.')
 
     # InputError 1: Message is more than 1000 characters
@@ -189,8 +192,9 @@ AccessError:
 
 def message_remove_v1(token, message_id):
     # InputError 1: invalid token.
-    auth_user = get_user_by_token(token)
-    if auth_user == None:
+    try:
+        auth_user = get_user_by_token(token)
+    except:
         raise InputError(description='message_remove_v1 : Invalid token.')
 
     # InputError 2: Message (based on ID) no longer exists
