@@ -1,8 +1,8 @@
 from typing import Dict
 from src.data_file import data, Permission
 from src.error import InputError, AccessError
-from src.auth import get_user_by_auth_id, session_to_token, token_to_session, get_user_by_token
-
+from src.auth import get_user_by_auth_id, session_to_token, token_to_session, get_user_by_token, auth_register_v1, \
+    auth_login_v1
 
 #############################################################################
 #                                                                           #
@@ -142,45 +142,80 @@ AccessError:
 
 
 def channel_messages_v1(token, channel_id, start):
-    target_user = get_user_by_token(token)
-    if target_user is None:
-        raise AccessError(description="user does not refer to a vaild user")
+    # Input error when channel_id does not refer to an existing channel.
+    channel = get_channel_by_channel_id(channel_id)
+    if channel is None:
+        raise InputError(description="channel_id does not refer to a valid or exising dm")
+    # Input error when start is greater than the total number of messages in the channel
+    if start > len(channel.messages):
+        raise InputError(description="start is greater than the total number of messages in the channel")
 
-    target_channel = get_channel_by_channel_id(channel_id)
-    if target_channel is None:
-        raise (InputError(description="channel_messages_v1: invalid channel_id."))
+    # Access error when Authorised user is not a member of channel with channel_id
+    user = get_user_by_token(token)
+    if user is None:
+        raise AccessError(description="Token is invalid")
+    elif channel not in user.part_of_channel:
+        raise AccessError(description="The authorised user is not already a member of the channel")
 
-    # check if target user is in channel's members
-    target_u_id = target_user.u_id
-    user_inside = False
-    for i in target_channel.all_members:
-        if i.u_id == target_u_id:
-            user_inside = True
-            break
-    if user_inside is False:
-        raise (InputError(description="channel_messages_v1 : target user is not in channel"))
-
-    num_msgs = len(target_channel.messages)
-    if num_msgs < start:
-        raise (InputError(description="channel_messages_v1 : the start >= total messages."))
-
-    # grab the targeted list of Message Class
-    if num_msgs >= (start + 50):
-        return_msg_class = target_channel.messages[start: start + 50]
+    return_message = []
+    counter_start = len(channel.messages) - start - 1
+    if (counter_start + 1) - 50 > 0:
+        counter_end = (counter_start + 1) - 50
+        end = start + 50
     else:
-        return_msg_class = target_channel.messages[start:]
-
-    # turn Message Class to dictionary
-    print(return_msg_class)
-    return_msg = []
-    for message in return_msg_class:
-        return_msg.append(message)
+        counter_end = 0
+        end = -1
+    while counter_start >= counter_end:
+        return_message.append(channel.messages[counter_start].return_type_message())
+        counter_start -= 1
 
     return {
-        "messages": return_msg,
-        "start": target_channel.start,
-        "end": target_channel.end,
+        'messages': return_message,
+        'start': start,
+        'end': end
     }
+
+
+# def channel_messages_v1(token, channel_id, start):
+#     target_user = get_user_by_token(token)
+#     if target_user is None:
+#         raise AccessError(description="user does not refer to a vaild user")
+#
+#     target_channel = get_channel_by_channel_id(channel_id)
+#     if target_channel is None:
+#         raise (InputError(description="channel_messages_v1: invalid channel_id."))
+#
+#     # check if target user is in channel's members
+#     target_u_id = target_user.u_id
+#     user_inside = False
+#     for i in target_channel.all_members:
+#         if i.u_id == target_u_id:
+#             user_inside = True
+#             break
+#     if user_inside is False:
+#         raise (InputError(description="channel_messages_v1 : target user is not in channel"))
+#
+#     num_msgs = len(target_channel.messages)
+#     if num_msgs < start:
+#         raise (InputError(description="channel_messages_v1 : the start >= total messages."))
+#
+#     # grab the targeted list of Message Class
+#     if num_msgs >= (start + 50):
+#         return_msg_class = target_channel.messages[start: start + 50]
+#     else:
+#         return_msg_class = target_channel.messages[start:]
+#
+#     # turn Message Class to dictionary
+#     print(return_msg_class)
+#     return_msg = []
+#     for message in return_msg_class:
+#         return_msg.append(message)
+#
+#     return {
+#         "messages": return_msg,
+#         "start": target_channel.start,
+#         "end": target_channel.end,
+#     }
 
 
 """

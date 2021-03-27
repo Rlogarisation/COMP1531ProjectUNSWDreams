@@ -3,7 +3,7 @@ from src.auth import auth_login_v1, auth_register_v1
 from src.channel import channel_invite_v1, channel_details_v1, channel_messages_v1, channel_join_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
 from src.other import clear_v1
-from src.message import message_send_v1
+from src.message import message_send_v2
 
 # Imports the possible error output
 from src.error import InputError, AccessError
@@ -423,8 +423,8 @@ def test_invalid_channel_id1():
     channel_invite_v1(user1["token"], Testing_channel_id["channel_id"], user2["auth_user_id"])
 
     # testing for channel message function for invalid channel id inputError
-    # with pytest.raises(InputError):
-    #     channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 10)
+    with pytest.raises(InputError):
+        channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 10)
 
 
 def test_auth_missing():
@@ -445,8 +445,8 @@ def test_auth_missing():
     channel_invite_v1(user1["token"], Testing_channel_id["channel_id"], user2["auth_user_id"])
 
     # testing for channel message function for invalid channel id inputError
-    # with pytest.raises(InputError):
-    #     channel_messages_v1(user3["token"], Testing_channel_id["channel_id"], 0)
+    with pytest.raises(AccessError):
+        channel_messages_v1(user3["token"], Testing_channel_id["channel_id"], 0)
 
 
 def test_no_msg():
@@ -480,7 +480,7 @@ def test_less_than_50_msg():
 
     # send testing message into channel chat
     for i in range(1, 3):
-        message_send_v1(user1["token"], Testing_channel_id["channel_id"], "This is a testing message.")
+        message_send_v2(user1["token"], Testing_channel_id["channel_id"], "This is a testing message.")
 
     # 1. return -1 : for no more message after start
     message_stored = channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 0)["messages"]
@@ -491,7 +491,7 @@ def test_more_than_50_msg():
     clear_v1()
 
     # create 2 users
-    user1 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
     user1 = auth_login_v1("user1@test.com", "user1password")
 
     # create channel for testing
@@ -499,7 +499,7 @@ def test_more_than_50_msg():
 
     # send testing message into channel chat
     for i in range(1, 99):
-        message_send_v1(user1["token"], Testing_channel_id["channel_id"], "This is a testing message.")
+        message_send_v2(user1["token"], Testing_channel_id["channel_id"], "This is a testing message.")
 
     # 1. return -1 : for no more message after start
     message_stored = channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 0)["messages"]
@@ -1218,3 +1218,24 @@ AccessError:
 #     assert output["is_public"] == True
 #     assert len(output["all_members"]) == 2
 #     assert len(output["owner_members"]) == 2
+
+
+if __name__ == "__main__":
+    # create 2 users
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+    user1 = auth_login_v1("user1@test.com", "user1password")
+
+    # create channel for testing
+    Testing_channel_id = channels_create_v1(user1["token"], "channel_test", True)
+
+    # send testing message into channel chat
+    for i in range(1, 3):
+        message_send_v2(user1["token"], Testing_channel_id["channel_id"], f"This is a testing message{i}.")
+
+    # 1. return -1 : for no more message after start
+    message_stored = channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 0)["messages"]
+    print(message_stored[0]['message'])
+    print(message_stored[0]['time_created'])
+    print(message_stored[1]['message'])
+    print(message_stored[1]['time_created'])
+    assert len(message_stored) == 2
