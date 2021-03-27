@@ -55,7 +55,7 @@ def test_user_profile_v1_success():
     assert user1['u_id'] == u_id1
     assert user1['name_first'] == "Peter"
     assert user1['name_last'] == "White"
-    assert user1['handle_str'] == "PeterWhite"
+    assert user1['handle_str'] == "peterwhite"
 
 
 # Case 2 - tests for multiple valid function implementation (no errors expected)
@@ -84,12 +84,12 @@ def test_user_profile_v1_successMultiple():
     assert user1['u_id'] == u_id1
     assert user1['name_first'] == "Peter"
     assert user1['name_last'] == "White"
-    assert user1['handle_str'] == "PeterWhite"
+    assert user1['handle_str'] == "peterwhite"
     assert user2['email'] == "test@testexample.com"
     assert user2['u_id'] == u_id2
     assert user2['name_first'] == "Tom"
     assert user2['name_last'] == "Green"
-    assert user2['handle_str'] == "TomGreen"
+    assert user2['handle_str'] == "tomgreen"
 
 
 # Case 3 - tests for input error outcome
@@ -332,7 +332,7 @@ def test_user_profile_setemail_v1_success():
     assert user1['u_id'] == u_id1
     assert user1['name_first'] == "Peter"
     assert user1['name_last'] == "White"
-    assert user1['handle_str'] == "PeterWhite"
+    assert user1['handle_str'] == "peterwhite"
 
 
 # Case 2 - tests for input error due to email
@@ -515,7 +515,7 @@ def test_user_profile_sethandle_v1_inputError_repeatedHandle():
 
     # Test conditions leading to an input error outcome due to repeated handle
     with pytest.raises(InputError):
-        user_profile_sethandle_v1(token1, "TomGreen")
+        user_profile_sethandle_v1(token1, "tomgreen")
 
 
 # Case 5 - tests for access error outcome
@@ -582,7 +582,7 @@ def test_users_all_v1_success():
     assert output[0]['u_id'] == u_id1
     assert output[0]['name_first'] == "Peter"
     assert output[0]['name_last'] == "White"
-    assert output[0]['handle_str'] == "PeterWhite"
+    assert output[0]['handle_str'] == "peterwhite"
 
 
 # Case 2 - tests for valid function implementation (no errors expected) multiple user case
@@ -610,12 +610,12 @@ def test_users_all_v1_successMultiple():
     assert output[0]['u_id'] == u_id1
     assert output[0]['name_first'] == "Peter"
     assert output[0]['name_last'] == "White"
-    assert output[0]['handle_str'] == "PeterWhite"
+    assert output[0]['handle_str'] == "peterwhite"
     assert output[1]['email'] == "test@testexample.com"
     assert output[1]['u_id'] == u_id2
     assert output[1]['name_first'] == "Tom"
     assert output[1]['name_last'] == "Green"
-    assert output[1]['handle_str'] == "TomGreen"
+    assert output[1]['handle_str'] == "tomgreen"
 
 
 # Case 5 - tests for access error outcome
@@ -642,6 +642,15 @@ def test_users_all_v1_accessError():
 #                       Test for admin_user_permission_change               #
 #                                                                           #
 #############################################################################
+"""
+Author: Lan Lin
+Background: Given a User by their user ID, set their permissions 
+to new permissions described by permission_id
+Input Error: 
+1. u_id does not refer to a valid user
+2. permission_id does not refer to a value permission
+Access Error: The authorised user is not an owner
+"""
 
 
 def test_invalid_token():
@@ -721,6 +730,16 @@ def test_admin_change_permission_member():
 #                       Test for admin_user_remove                          #
 #                                                                           #
 #############################################################################
+"""
+Author: Lan Lin
+Background: Given a User by their user ID, remove the user from the Dreams.
+Input Error: 
+1. u_id does not refer to a valid user
+2. The user is currently the only owner
+Access Error: The authorised user is not an owner
+"""
+
+
 def test_admin_user_remove_invalid_uid():
     clear_v1()
     register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')

@@ -241,6 +241,7 @@ def full_name_20(name_first, name_last):
     if len(full_name) > 20:
         full_name = list(full_name)[:20]
         full_name = ''.join(full_name)
+    full_name = full_name.lower()
     return full_name
 
 
