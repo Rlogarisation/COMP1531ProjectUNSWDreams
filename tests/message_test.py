@@ -3,7 +3,7 @@ from src.data_file import data
 from src.dm import dm_create_v1
 from src.error import InputError, AccessError
 from src.channels import channels_create_v1
-from src.auth import auth_register_v1, auth_login_v1,
+from src.auth import auth_register_v1, auth_login_v1
 from src.other import clear_v1
 from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_share_v1
 #############################################################################
@@ -43,6 +43,7 @@ def test_message_send_invalid_token_v1():
     with pytest.raises(InputError):
         message_send_v2('invlaid_token', channel_0_id, 'it works!')
 
+
 def test_message_send_long_message_v1():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
@@ -52,15 +53,18 @@ def test_message_send_long_message_v1():
     with pytest.raises(InputError):
         message_send_v2(token_0, channel_0_id, long_message)
 
+
 def test_message_send_invalid_channel_id_v1():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
 
+    # FIXME: NameError: name 'message_id' is not defined
     assert message_id == message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
-    
+
     with pytest.raises(AccessError):
         message_send_v2(token_0, 'invalid channel_id', 'it not works')
+
 
 def test_message_send_not_join_v1():
     clear_v1()
@@ -69,11 +73,13 @@ def test_message_send_not_join_v1():
 
     token_1 = auth_register_v1("test_email1@email.com", "password", "First1", "Last1")['token']
     invalid_sender = auth_login_v1("test_email1@email.com", "password")
-    
+
     with pytest.raises(AccessError):
         message_send_v2(token_1, channel_0_id, "You can't send msg")
 
+
 def test_message_send_same_message_id():
+    # FIXME: 每次register完了，user还要login
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
@@ -81,21 +87,24 @@ def test_message_send_same_message_id():
 
     token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
     message_1_id = message_send_v2(token_1, channel_0_id, 'Hope it works')['message_id']
-    
+
     assert message_0_id != message_1_id
+
 
 def test_message_send_valid_case():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
+    # FIXME: NameError: name 'auth_register_v2' is not defined
     u_id = auth_register_v2("test_email0@gmail.com", "password", "First", "Last")['u_id']
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
     message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
     all_messages = channel_messages(token_0, channel_0_id, 0)
 
-    assert all_messages['messages'][0]['message'] == 'Hope it works' 
+    assert all_messages['messages'][0]['message'] == 'Hope it works'
     assert all_messages['messages'][0]['message_id'] == message_0_id
     assert all_messages['messages'][0]['auth_user_id'] == u_id
-    
+
+
 #############################################################################
 #                                                                           #
 #                        Test for message_remove_v1                         #
@@ -119,6 +128,8 @@ AccessError when none of the following are true:
     - The authorised user is an owner of this channel (if it was sent to a channel) or the **Dreams**
 
 """
+
+
 def test_message_remove_invalid_token():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
@@ -128,6 +139,7 @@ def test_message_remove_invalid_token():
     with pytest.raises(InputError):
         message_remove_v1('invlaid_token', message_0_id)
 
+
 def test_message_remove_message_not_exist():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
@@ -135,12 +147,13 @@ def test_message_remove_message_not_exist():
     with pytest.raises(InputError):
         message_remove_v1(token_0, -1)
 
+
 def test_message_remove_not_owner_or_authorised_user():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
     token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
     u_id_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['u_id']
-    
+
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
     message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
 
@@ -153,12 +166,11 @@ def test_message_remove_not_owner_or_authorised_user():
 def test_message_remove_valid_case():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
-    
+
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
     message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
 
     assert message_remove_v1(token_0, message_0_id) == {}
-
 
 
 #############################################################################
@@ -190,20 +202,21 @@ AccessError when none of the following are true:
 def test_message_edit_long_message():
     clear_v1()
     token_0 = auth_register_v2("test_email0@gmail.com", "password", "First", "Last")['token']
-    
+
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
     long_message = "m" * 1000
     message_0_id = message_send_v2(token_0, channel_0_id, long_message)
-    
+
     longer_message = "m" * 1001
     with pytest.raises(InputError):
         message_edit_v2(token_0, message_0_id, longer_message)
+
 
 def test_message_edit_deleted_message():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
     u_id_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['u_id']
-    
+
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
 
     message_send_v2(token_0, channel_0_id, 'Hope it works')
@@ -217,7 +230,7 @@ def test_message_edit_not_owner_or_authorised_user():
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
     token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
     u_id_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['u_id']
-    
+
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
     message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
 
@@ -226,11 +239,12 @@ def test_message_edit_not_owner_or_authorised_user():
     with pytest.raises(AccessError):
         message_edit_v2(token_1, message_0_id, 'It works')
 
+
 def test_message_edit_empty_message():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
     u_id_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['u_id']
-    
+
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
     message_0_id = message_send_v2(token_0, channel_0_id, '')['message_id']
     message_edit_v2(token_0, message_0_id, 'It works')
@@ -244,7 +258,7 @@ def test_message_edit_empty_message():
 def test_message_edit_valid_case():
     clear_v1()
     token_0 = auth_register_v2("test_email0@gmail.com", "password", "First", "Last")['token']
-    
+
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
     message_0_id = message_send_v2(token_0, channel_0_id, 'It works')
     u_id = auth_register_v2("test_email0@gmail.com", "password", "First", "Last")['u_id']
@@ -283,15 +297,16 @@ AccessError:
 
 """
 
+
 def test_message_share_not_joing_channel():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
     token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
     u_id_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['u_id']
-    
+
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
     og_message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
-    
+
     all_messages = channel_messages(token_0, channel_0_id, 0)
     message_0 = all_messages['messages'][0]['message']
 
@@ -310,7 +325,7 @@ def test_message_share_not_joing_dm():
     u_id_list = [u_id_0, u_id_1]
     dm_0_id = dm_create_v1(token_0, u_id_list)['dm_id']
     og_message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
-    
+
     all_messages = channel_messages(token_0, channel_0_id, 0)
     message_0 = all_messages['messages'][0]['message']
 
@@ -322,15 +337,16 @@ def test_message_share_channel_dm_id_both():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
     token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
-    
+
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
     og_message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
-    
+
     all_messages = channel_messages(token_0, channel_0_id, 0)
     message_0 = all_messages['messages'][0]['message']
 
     with pytest.raises(InputError):
         message_share_v1(token_1, og_message_0_id, message_0, -1, -1)
+
 
 #dm_id and channel_id are both -1
 def test_message_share_channel_dm_id_both_not():
@@ -339,17 +355,14 @@ def test_message_share_channel_dm_id_both_not():
     token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
     u_id_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['u_id']
     u_id_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['u_id']
-    
+
     u_id_list = [u_id_0, u_id_1]
     dm_0_id = dm_create_v1(token_0, u_id_list)['dm_id']
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
     og_message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
-    
+
     all_messages = channel_messages(token_0, channel_0_id, 0)
     message_0 = all_messages['messages'][0]['message']
 
     with pytest.raises(InputError):
         message_share_v1(token_1, og_message_0_id, message_0, channel_0_id, dm_0_id)
-
-
-
