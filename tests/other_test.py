@@ -39,3 +39,4 @@ def test_clear_v1():
     register = auth_register_v1('user@gmail.com', 'qwe1212', 'shaozhen', 'yan')
     user_id = register['auth_user_id']
     assert channels_listall_v1(user_id) == []
+
