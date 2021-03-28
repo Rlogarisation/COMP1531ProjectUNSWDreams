@@ -1,5 +1,5 @@
 from typing import Dict
-from src.data_file import data, Permission
+from src.data_file import data, Permission, Notification
 from src.error import InputError, AccessError
 from src.auth import get_user_by_auth_id, session_to_token, token_to_session, get_user_by_token, auth_register_v1, \
     auth_login_v1
@@ -36,7 +36,7 @@ def channel_invite_v1(token, channel_id, u_id):
     # In addition, checks for cases of AccessError indicated by authorised user calling
     # channel_invite_v1 function into a channel he is not part in
     error_check(channel_id, u_id, token)
-
+    inviter = get_user_by_token(token)
     # Case 2 no error occurs but user invited is already part of channel
     # Expected outcome is channel_invite_v1 function will just ignore the second
     # invitation call
@@ -47,6 +47,10 @@ def channel_invite_v1(token, channel_id, u_id):
         # Expected outcome is invited user is now a member of the channel specified
         add_user_into_channel(channel, invitee)
 
+    # add notification
+    notification_message = f'added to a channel:"{inviter.handle_str} added you to {channel.name}"'
+    notification = Notification(channel.channel_id, -1, notification_message)
+    invitee.notifications.append(notification)
     return {}
 
 

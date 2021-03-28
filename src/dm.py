@@ -1,5 +1,5 @@
 from typing import Dict
-from src.data_file import data, Permission, DM
+from src.data_file import data, Permission, DM, Notification
 from src.error import InputError, AccessError
 from src.auth import get_user_by_auth_id, get_user_by_uid, session_to_token, token_to_session, get_user_by_token
 
@@ -46,6 +46,7 @@ def dm_create_v1(token, u_id_list):
         list_dm_invitee.append(invitee)
         list_dm_handles.append(invitee.handle_str)
 
+    list_dm_handles.sort()
     dm_name = ", ".join(list_dm_handles)
     dm_id = len(data['class_dms'])
 
@@ -60,6 +61,10 @@ def dm_create_v1(token, u_id_list):
     for invitee in list_dm_invitee:
         dm.dm_members.append(invitee)
         invitee.part_of_dm.append(dm)
+        # add notification
+        notification_message = f'added to a DM:"{inviter.handle_str} added you to {dm.dm_name}"'
+        notification = Notification(-1, dm.dm_id, notification_message)
+        invitee.notifications.append(notification)
 
     dm.dm_members.append(inviter)
     inviter.part_of_dm.append(dm)
@@ -117,6 +122,10 @@ def dm_invite_v1(token, dm_id, u_id):
     else:
         dm.dm_members.append(invitee)
         invitee.part_of_dm.append(dm)
+        # add notification
+        notification_message = f'added to a DM:"{inviter.handle_str} added you to {dm.dm_name}"'
+        notification = Notification(-1, dm.dm_id, notification_message)
+        invitee.notifications.append(notification)
 
     return {}
 
