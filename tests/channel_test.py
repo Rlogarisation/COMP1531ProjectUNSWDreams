@@ -1,6 +1,7 @@
 # Imports the necessary function implementations
 from src.auth import auth_login_v1, auth_register_v1
-from src.channel import channel_invite_v1, channel_details_v1, channel_messages_v1, channel_join_v1, channel_addowner_v1, channel_removeowner_v1
+from src.channel import channel_invite_v1, channel_details_v1, channel_messages_v1, channel_join_v1, \
+    channel_addowner_v1, channel_removeowner_v1, channel_leave_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
 from src.other import clear_v1
 from src.message import message_send_v1
@@ -21,7 +22,6 @@ Invites a user (with user id u_id) to join a channel with ID channel_id.
 Once invited the user is added to the channel immediately
 
 HTTP Method: POST
-
 Parameters: (token, channel_id, u_id)
 Return Type: {}
 
@@ -34,86 +34,75 @@ AccessError:
 - The function is called with an invalid token
 """
 
-
 #############################################################################
 #                                                                           #
 #                       Test for channel_invite_v1                          #
 #                                                                           #
 #############################################################################
 
-# Case 1 - tests for valid function implementation (no errors expected)
-#          expected outcome is user gets invited to a channel and gets added to it
-# Occurs when channel is valid and user is valid whilst having not been invited before
+# Case 1 - tests for valid function implementation
+#          expected outcome is user gets directly added to channel
+# Occurs when channel, inviter, and invitee is valid and this is the first invitation
 def test_channel_invite_v1_success():
-    # Clears data and registers and logins user_1 and user_2
+    # Clears data and registers user1 and user2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    u_id2 = dict_user2["auth_user_id"]
 
-    # Create Channel_1 made by user_1 and get its id
-    create_channel1 = channels_create_v1(token1, "channelone", True)
-    channel_1_id = create_channel1["channel_id"]
+    # Create channel made by user1 and get its id
+    channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
 
     # Calls invite function for testing
-    # Expected output is user_2 joins the Channel_1
+    # Expected output is user2 joins the Channel_1
     channel_invite_v1(token1, channel_1_id, u_id2)
 
-    # Hence checks that Channel_1 exists, has 2 members, and the members are
-    # user_1 and user_2
+    # Hence checks that channel exists, has 2 members (user1 and user2)
     channel_info = channel_details_v1(token1, channel_1_id)
     channel_members = channel_info['all_members']
     channel_owners = channel_info['owner_members']
-    user1 = channel_members[0]
-    user2 = channel_members[1]
-    owner1 = channel_owners[0]
-    assert user1['email'] == 'haha@gmail.com'
-    assert user2['email'] == 'test@testexample.com'
-    assert owner1['email'] == 'haha@gmail.com'
+    assert channel_members[0]['email'] == 'haha@gmail.com'
+    assert channel_members[1]['email'] == 'test@testexample.com'
+    assert channel_owners[0]['email'] == 'haha@gmail.com'
     assert len(channel_members) == 2
     assert len(channel_owners) == 1
 
 
 # Case 2 - tests for repeated invite instances
-#          expected outcome is recognizes user invited is already in the channel and does nothing
-# Occurs when channel is valid and user is already inside the channel
+#          expected outcome is second invite does nothing
+# Occurs when channel, inviter, and invitee is valid but are all in the channel already
 def test_channel_invite_v1_repeated():
-    # Clears data and registers and logins user_1 and user_2
+    # Clears data and registers user1 and user2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    u_id2 = dict_user2["auth_user_id"]
 
-    # Create Channel_1 made by user_1 and get its id
-    create_channel1 = channels_create_v1(token1, "channelone", True)
-    channel_1_id = create_channel1["channel_id"]
+    # Create channel made by user1 and get its id
+    channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
 
     # Calls invite function twice targeting the same user for testing repetition
-    # Expected output is user_2 joins the Channel_1 once
+    # Expected output is user2 joins the channel once
     channel_invite_v1(token1, channel_1_id, u_id2)
     channel_invite_v1(token1, channel_1_id, u_id2)
 
-    # Hence checks that Channel_1 exists, has 2 members, and the members are
-    # user_1 and user_2
+    # Hence checks that channel exists, has 2 members (user1 and user2)
     channel_info = channel_details_v1(token1, channel_1_id)
     channel_members = channel_info['all_members']
     channel_owners = channel_info['owner_members']
-    user1 = channel_members[0]
-    user2 = channel_members[1]
-    owner1 = channel_owners[0]
-    assert user1['email'] == 'haha@gmail.com'
-    assert user2['email'] == 'test@testexample.com'
-    assert owner1['email'] == 'haha@gmail.com'
+    assert channel_members[0]['email'] == 'haha@gmail.com'
+    assert channel_members[1]['email'] == 'test@testexample.com'
+    assert channel_owners[0]['email'] == 'haha@gmail.com'
     assert len(channel_members) == 2
     assert len(channel_owners) == 1
 
@@ -122,24 +111,22 @@ def test_channel_invite_v1_repeated():
 #          expected outcome is input error
 # Occurs when channel_id does not refer to a valid channel.
 def test_channel_invite_v1_inputErrorChannel():
-    # Clears data and registers and logins user_1 and user_2
+    # Clears data and registers user1 and user2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    u_id2 = dict_user2["auth_user_id"]
 
-    # Create Channel_1 made by user_1 and get its id
+    # Create channel made by user1 and get its id
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
 
-    # Made an invalid channel id for testing
+    # Made invalid channel id and test for input error when it is used
     channel_1_invalid_id = channel_1_id + 300
-
-    # Test conditions leading to an input error outcome due to invalid channel_id
     with pytest.raises(InputError):
         channel_invite_v1(token1, channel_1_invalid_id, u_id2)
 
@@ -148,50 +135,48 @@ def test_channel_invite_v1_inputErrorChannel():
 #          expected outcome is input error
 # Occurs when u_id does not refer to a valid user.
 def test_channel_invite_v1_inputErrorUser():
-    # Clears data and registers and logins user_1 and user_2
+    # Clears data and registers user1 and user2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    u_id2 = dict_user2["auth_user_id"]
 
-    # Create Channel_1 made by user_1 and get its id
+    # Create channel made by user1 and get its id
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
 
-    # Made an invalid user id for user 2
+    # Made invalid user id and test for input error when it is used
     u_invalid_id2 = u_id2 + 300
-
-    # Test conditions leading to an input error outcome due to invalid u_id
     with pytest.raises(InputError):
         channel_invite_v1(token1, channel_1_id, u_invalid_id2)
 
 
 # Case 5 - tests for access error due to inviter not part of channel
 #          expected outcome is access error
-# Occurs when the authorised user is not already a member of the channel
+# Occurs when the authorised user calling the function is not a member of the channel
 def test_channel_invite_v1_accessError():
-    # Clears data and registers and logins user_1, user_2, and user_3
+    # Clears data and registers user1, user2, and user3
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
     auth_register_v1("hah2@gmail.com", "9uisbxh83h", "Tom", "Green")
 
     # login the three registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token_id_dict3 = auth_login_v1("hah2@gmail.com", "9uisbxh83h")
-    token1 = token_id_dict1["token"]
-    token2 = token_id_dict2["token"]
-    u_id3 = token_id_dict3["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    dict_user3 = auth_login_v1("hah2@gmail.com", "9uisbxh83h")
+    token1 = dict_user1["token"]
+    token2 = dict_user2["token"]
+    u_id3 = dict_user3["auth_user_id"]
 
-    # Create Channel_1 made by user_1 and get its id
+    # Create channel made by user1 and get its id
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
 
-    # Test conditions leading to an access error outcome
+    # Test for access error due to unauthorised user calling the function
     with pytest.raises(AccessError):
         channel_invite_v1(token2, channel_1_id, u_id3)
 
@@ -200,24 +185,22 @@ def test_channel_invite_v1_accessError():
 #          expected outcome is access error
 # Occurs when channel_invite is called when token used is invalid
 def test_channel_invite_v1_accessError_token():
-    # Clears data and registers and logins user_1 and user_2
+    # Clears data and registers user1 and user2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    u_id2 = dict_user2["auth_user_id"]
 
-    # Create Channel_1 made by user_1 and get its id
+    # Create channel made by user1 and get its id
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
 
-    # Made an invalid token for user 1
+    # Made invalid token and test for access error when it is used
     invalid_token = token1 + "rkbgesorgbv#$%"
-
-    # Test conditions leading to an access error outcome
     with pytest.raises(AccessError):
         channel_invite_v1(invalid_token, channel_1_id, u_id2)
 
@@ -231,6 +214,7 @@ Background
 Given a Channel with ID channel_id that the authorised user
 is part of, provide basic details about the channel
 
+HTTP Method: GET
 Parameters: (token, channel_id)
 Return Type: {name, is_public, owner_members, all_members}
 
@@ -242,31 +226,29 @@ AccessError:
 - The function is called with an invalid token
 """
 
-
 #############################################################################
 #                                                                           #
-#                       Test for channel_detail_v1                           #
+#                       Test for channel_detail_v1                          #
 #                                                                           #
 #############################################################################
 
-# Case 1 - tests for valid function implementation with a single group member
+# Case 1 - tests for valid function implementation with a single member channel
 #          expected outcome is output of {name, is_public, owner_members, all_members}
-# Occurs when channel is valid and there is only 1 member in that group
-def test_channel_details_v1_success1():
-    # Clears data and registers and logins user_1
+# Occurs when channel is valid and there is only 1 member in that channel
+def test_channel_details_v1_successSingle():
+    # Clears data and registers user1
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
 
     # login the registered user
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token1 = token_id_dict1["token"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    token1 = dict_user1["token"]
 
-    # Create Channel_1 made by user_1 and get its id
+    # Create channel made by user1 and get its id
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
 
-    # Calls details function for testing
+    # Calls details function and tests output
     output = channel_details_v1(token1, channel_1_id)
-
     assert output["all_members"][0]["name_first"] == 'Peter'
     assert output["owner_members"][0]["name_first"] == 'Peter'
     assert output["name"] == "channelone"
@@ -275,28 +257,27 @@ def test_channel_details_v1_success1():
     assert len(output["owner_members"]) == 1
 
 
-# Case 2 - tests for valid function implementation with multiple group member
+# Case 2 - tests for valid function implementation with multiple member channel
 #          expected outcome is output of {name, is_public, owner_members, all_members}
-# Occurs when channel is valid and there are multiple members in that group
-def test_channel_details_v1_success2():
-    # Clears data and registers and logins user_1
+# Occurs when channel is valid and there are multiple members in that channel
+def test_channel_details_v1_successMultiple():
+    # Clears data and registers user1 and user2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    u_id2 = dict_user2["auth_user_id"]
 
-    # Create Channel_1 made by user_1 and get its id
+    # Create channel made by user1, get its id, and adds user2
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
     channel_invite_v1(token1, channel_1_id, u_id2)
 
-    # Calls details function for testing
+    # Calls details function and tests output
     output = channel_details_v1(token1, channel_1_id)
-
     assert output["all_members"][0]["name_first"] == 'Peter'
     assert output["all_members"][1]["name_first"] == 'Tom'
     assert output["owner_members"][0]["name_first"] == 'Peter'
@@ -310,67 +291,63 @@ def test_channel_details_v1_success2():
 #          expected outcome is input error
 # Occurs when channel_id does not refer to a valid channel.
 def test_channel_details_v1_inputError():
-    # Clears data and registers and logins user_1
+    # Clears data and registers user1
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
 
     # login the registered user
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token1 = token_id_dict1["token"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    token1 = dict_user1["token"]
 
-    # Create Channel_1 made by user_1 and get its id
+    # Create channel made by user1 and get its id
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
 
-    # Made an invalid channel id for testing
+    # Made invalid channel id and test for input error when it is used
     channel_1_invalidid = channel_1_id + 300
-
-    # Conditions leads to an input error outcome and tests for it
     with pytest.raises(InputError):
         channel_details_v1(token1, channel_1_invalidid)
 
 
-# Case 4 - tests for access error due to inviter not part of channel
+# Case 4 - tests for access error due to caller not part of channel
 #          expected outcome is access error
-# Occurs when the authorised user is not already a member of the channel
+# Occurs when the authorised user calling the function is not a member of the channel
 def test_channel_details_v1_accessError():
-    # Clears data and registers and logins user_1 and user_2
+    # Clears data and registers user1 and user2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    token2 = token_id_dict2["token"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    token2 = dict_user2["token"]
 
-    # Create Channel_1 made by user_1 and get its id
+    # Create channel made by user1 and get its id
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
 
-    # Test conditions leading to an access error outcome
+    # Test for access error due to unauthorised user calling the function
     with pytest.raises(AccessError):
         channel_details_v1(token2, channel_1_id)
 
 
 # Case 5 - tests for access error due to invalid token
 #          expected outcome is access error
-# Occurs when channel_invite is called when token used is invalid
+# Occurs when channel_details is called when token used is invalid
 def test_channel_details_v1_accessErrortoken():
-    # Clears data and registers and logins user_1
+    # Clears data and registers user1
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
 
     # login the registered user
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token1 = token_id_dict1["token"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    token1 = dict_user1["token"]
 
-    # Create Channel_1 made by user_1 and get its id
+    # Create channel made by user1 and get its id
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
 
-    # Made an invalid token for user 1
+    # Made invalid token and test for access error when it is used
     invalid_token = token1 + "rkbgesorgbv#$%"
-
-    # Conditions leads to an access error outcome and tests for it
     with pytest.raises(AccessError):
         channel_details_v1(invalid_token, channel_1_id)
 
@@ -389,6 +366,7 @@ function returns a new index "end" which is the value of "start + 50", or, if
 this function has returned the least recent messages in the channel, 
 returns -1 in "end" to indicate there are no more messages to load after this return.
 
+HTTP Method: GET
 Parameters: (token, channel_id, start)
 Return Type: {messages, start, end}
 
@@ -400,7 +378,6 @@ AccessError:
 - Authorised user is not a member of channel with channel_id
 - The function is called with an invalid token
 """
-
 
 #############################################################################
 #                                                                           #
@@ -515,6 +492,7 @@ This file is for testing channel_join_v1 function implementation
 Background
 Given a channel_id of a channel that the authorised user can join, adds them to that channel
 
+HTTP Method: POST
 Parameters: (token, channel_id)
 Return Type: {}
 
@@ -526,7 +504,6 @@ AccessError:
 - The function is called with an invalid token
 """
 
-
 #############################################################################
 #                                                                           #
 #                         Test for channel_join_v1                          #
@@ -534,10 +511,10 @@ AccessError:
 #############################################################################
 
 # Case 1 - tests for valid function implementation
-#          expected outcome is joiner joins the channel with output {}
-# Occurs when token and channel id is valid, plus channel is public
+#          expected outcome is user joins the channel with output {}
+# Occurs when token and channel id is valid, plus channel joined is public
 def test_channel_join_normal():
-    # Clears data and registers and logins owner and joiner
+    # Clears data and registers channel owner and joiner
     clear_v1()
     auth_register_v1("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
     auth_register_v1("TheJoiner@test.com", "joinerpassword", "Roger", "Luo")
@@ -571,12 +548,11 @@ def test_channel_join_normal():
     assert channel_id is not None
     assert type(channel_id["channel_id"]) is int
 
-    # Test for correctly executed
+    # Test for correct execution
     assert channel_join_v1(token_joiner, channel_id["channel_id"]) == {}
 
-    # Calls details function for checking that joiner joins the channel
+    # Calls details function to check that joiner has joined the channel
     output = channel_details_v1(token_owner, channel_id["channel_id"])
-
     assert output["all_members"][0]["name_first"] == 'ShiTong'
     assert output["all_members"][1]["name_first"] == 'Roger'
     assert output["owner_members"][0]["name_first"] == 'ShiTong'
@@ -589,7 +565,7 @@ def test_channel_join_normal():
 # Case 2 - tests for input error due to invalid channel
 #          expected outcome is input error
 # Occurs when channel id used is invalid
-def test_invalid_channel_id2():
+def test_invalid_channel_id():
     # Clears data and registers and logins owner and joiner
     clear_v1()
     auth_register_v1("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
@@ -780,6 +756,7 @@ This file is for testing channel_addowner_v1 function implementation
 Background
 Make user with user id u_id an owner of this channel
 
+HTTP Method: POST
 Parameters: (token, channel_id, u_id)
 Return Type: {}
 
@@ -792,7 +769,6 @@ AccessError:
 - The function is called with an invalid token
 """
 
-
 #############################################################################
 #                                                                           #
 #                      Test for channel_addowner_v1                         #
@@ -803,28 +779,27 @@ AccessError:
 #          expected outcome is user becomes owner and output is {}
 # Occurs when channel and token is valid, user calling function is authorised
 def test_channel_addowner_v1_success():
-    # Clears data and registers and logins user_1
+    # Clears data and registers user1 and user2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    u_id2 = dict_user2["auth_user_id"]
 
-    # Create Channel_1 made by user_1, get its id, and invite user2
+    # Create channel made by user1, get its id, and invite user2
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
     channel_invite_v1(token1, channel_1_id, u_id2)
 
     # Calls addowner function for testing
-    # Expected output is user_2 becomes owner
+    # Expected output is user2 becomes owner
     channel_addowner_v1(token1, channel_1_id, u_id2)
 
-    # Calls details function for testing
+    # Calls details function for checking user2 has become an owner
     output = channel_details_v1(token1, channel_1_id)
-
     assert output["all_members"][0]["name_first"] == 'Peter'
     assert output["all_members"][1]["name_first"] == 'Tom'
     assert output["owner_members"][0]["name_first"] == 'Peter'
@@ -839,49 +814,47 @@ def test_channel_addowner_v1_success():
 #          expected outcome is input error
 # Occurs when channel id used is invalid
 def test_channel_addowner_v1_inputErrorChannel():
-    # Clears data and registers and logins user_1 and user_2
+    # Clears data and registers user1 and user2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    u_id2 = dict_user2["auth_user_id"]
 
-    # Create Channel_1 made by user_1, get its id, and invite user2
+    # Create channel made by user1, get its id, and invite user2
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
     channel_invite_v1(token1, channel_1_id, u_id2)
 
-    # Made an invalid channel id for testing
+    # Made invalid channel id and test for input error when it is used
     channel_1_invalidid = channel_1_id + 300
-
-    # Conditions leads to an input error outcome and tests for it
     with pytest.raises(InputError):
         channel_addowner_v1(token1, channel_1_invalidid, u_id2)
 
 
-# Case 3 - tests for input error due to function called for an owner
+# Case 3 - tests for input error due to function called for an existing owner
 #          expected outcome is input error
 # Occurs when add owner function is called to an existing owner
 def test_channel_addowner_v1_inputErrorOwner():
-    # Clears data and registers and logins user_1 and user_2
+    # Clears data and registers user1 and user2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    u_id2 = dict_user2["auth_user_id"]
 
-    # Create Channel_1 made by user_1, get its id, and invite user2
+    # Create channel made by user1, get its id, and invite user2
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
     channel_invite_v1(token1, channel_1_id, u_id2)
 
-    # Conditions leads to an input error outcome and tests for it
+    # Test for input error when calling function on existing owner
     channel_addowner_v1(token1, channel_1_id, u_id2)
     with pytest.raises(InputError):
         channel_addowner_v1(token1, channel_1_id, u_id2)
@@ -889,29 +862,29 @@ def test_channel_addowner_v1_inputErrorOwner():
 
 # Case 4 - tests for access error due to non authorised user
 #          expected outcome is input error
-# Occurs when add owner function is by a member of channel who is not a global owner
+# Occurs when add owner function is called by a member of channel who is not a global owner
 def test_channel_addowner_v1_accessError():
-    # Clears data and registers and logins user_1, user_2, and user_3
+    # Clears data and registers user1, user2, and user3
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
     auth_register_v1("hah2@gmail.com", "9uisbxh83h", "Tom", "Green")
 
     # login the three registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token_id_dict3 = auth_login_v1("hah2@gmail.com", "9uisbxh83h")
-    token1 = token_id_dict1["token"]
-    token2 = token_id_dict2["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
-    u_id3 = token_id_dict3["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    dict_user3 = auth_login_v1("hah2@gmail.com", "9uisbxh83h")
+    token1 = dict_user1["token"]
+    token2 = dict_user2["token"]
+    u_id2 = dict_user2["auth_user_id"]
+    u_id3 = dict_user3["auth_user_id"]
 
-    # Create Channel_1 made by user_1, get its id, and invite user2
+    # Create channel made by user1, get its id, and invite user2 and user3
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
     channel_invite_v1(token1, channel_1_id, u_id2)
     channel_invite_v1(token1, channel_1_id, u_id3)
 
-    # Conditions leads to an access error outcome and tests for it
+    # Test for acccess error when calling function by unauthorised user
     with pytest.raises(AccessError):
         channel_addowner_v1(token2, channel_1_id, u_id3)
 
@@ -920,25 +893,23 @@ def test_channel_addowner_v1_accessError():
 #          expected outcome is access error
 # Occurs when add owner function is called using invalid token
 def test_channel_addowner_v1_accessErrorToken():
-    # Clears data and registers and logins user_1, user_2, and user_3
+    # Clears data and registers user1 and user2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the three registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    u_id2 = dict_user2["auth_user_id"]
 
-    # Create Channel_1 made by user_1, get its id, and invite user_2
+    # Create channel made by user1, get its id, and invite user_2
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
     channel_invite_v1(token1, channel_1_id, u_id2)
 
-    # Made an invalid token for joiner
+    # Made invalid token and test for access error when it is used
     invalid_token = token1 + "rkbgesorgbv#$%"
-
-    # Conditions leads to an access error outcome and tests for it
     with pytest.raises(AccessError):
         channel_addowner_v1(invalid_token, channel_1_id, u_id2)
 
@@ -947,31 +918,30 @@ def test_channel_addowner_v1_accessErrorToken():
 #          expected outcome is user with u_id becomes owner
 # Occurs when add owner function is called by global owner
 def test_channel_addowner_v1_globalOwner():
-    # Clears data and registers and logins user_1, user_2, and user_3
+    # Clears data and registers user1, user2, and user3
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
     auth_register_v1("hah2@gmail.com", "9uisbxh83h", "Tom", "Green")
 
     # login the three registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token_id_dict3 = auth_login_v1("hah2@gmail.com", "9uisbxh83h")
-    token1 = token_id_dict1["token"]
-    token2 = token_id_dict2["token"]
-    u_id3 = token_id_dict3["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    dict_user3 = auth_login_v1("hah2@gmail.com", "9uisbxh83h")
+    token1 = dict_user1["token"]
+    token2 = dict_user2["token"]
+    u_id3 = dict_user3["auth_user_id"]
 
-    # Create Channel_1 made by user_2, get its id, and invite user_3
+    # Create channel made by user2, get its id, and invite user3
     channel_1_id = channels_create_v1(token2, "channelone", True)["channel_id"]
     channel_invite_v1(token2, channel_1_id, u_id3)
 
     # Calls addowner function for testing by global owner
-    # Expected output is user_3 becomes owner
+    # Expected output is user3 becomes owner of channel
     channel_addowner_v1(token1, channel_1_id, u_id3)
 
-    # Calls details function for testing
+    # Calls details function for checking user3 has become an owner
     output = channel_details_v1(token2, channel_1_id)
-
     assert output["all_members"][0]["name_first"] == 'Tom'
     assert output["all_members"][1]["name_first"] == 'Tom'
     assert output["owner_members"][0]["name_first"] == 'Tom'
@@ -990,6 +960,7 @@ This file is for testing channel_removeowner_v1 function implementation
 Background
 Remove user with user id u_id an owner of this channel
 
+HTTP Method: POST
 Parameters: (token, channel_id, u_id)
 Return Type: {}
 
@@ -1003,7 +974,6 @@ AccessError:
 - The function is called with an invalid token
 """
 
-
 #############################################################################
 #                                                                           #
 #                    Test for channel_removeowner_v1                        #
@@ -1011,21 +981,21 @@ AccessError:
 #############################################################################
 
 # Case 1 - tests for valid function implementation
-#          expected outcome is user becomes member and output is {}
+#          expected outcome is owner becomes member and output is {}
 # Occurs when channel and token is valid, user calling function is authorised
 def test_channel_removeowner_v1_success():
-    # Clears data and registers and logins user_1
+    # Clears data and registers user1 and user2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    u_id2 = dict_user2["auth_user_id"]
 
-    # Create Channel_1 made by user_1, get its id, and invite user2
+    # Create channel made by user1, get its id, and invite user2
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
     channel_invite_v1(token1, channel_1_id, u_id2)
 
@@ -1034,9 +1004,8 @@ def test_channel_removeowner_v1_success():
     channel_addowner_v1(token1, channel_1_id, u_id2)
     channel_removeowner_v1(token1, channel_1_id, u_id2)
 
-    # Calls details function for testing
+    # Calls details function for checking user2 is a member
     output = channel_details_v1(token1, channel_1_id)
-
     assert output["all_members"][0]["name_first"] == 'Peter'
     assert output["all_members"][1]["name_first"] == 'Tom'
     assert output["owner_members"][0]["name_first"] == 'Peter'
@@ -1050,26 +1019,24 @@ def test_channel_removeowner_v1_success():
 #          expected outcome is input error
 # Occurs when channel id used is invalid
 def test_channel_removeowner_v1_inputErrorChannel():
-    # Clears data and registers and logins user_1 and user_2
+    # Clears data and registers user1 and user2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    u_id2 = dict_user2["auth_user_id"]
 
-    # Create Channel_1 made by user_1, get its id, and invite user2 and make him owner
+    # Create channel made by user1, get its id, and invite user2 and make him owner
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
     channel_invite_v1(token1, channel_1_id, u_id2)
     channel_addowner_v1(token1, channel_1_id, u_id2)
 
-    # Made an invalid channel id for testing
+    # Made invalid channel id and test for input error when it is used
     channel_1_invalidid = channel_1_id + 300
-
-    # Conditions leads to an input error outcome and tests for it
     with pytest.raises(InputError):
         channel_removeowner_v1(token1, channel_1_invalidid, u_id2)
 
@@ -1078,77 +1045,77 @@ def test_channel_removeowner_v1_inputErrorChannel():
 #          expected outcome is input error
 # Occurs when remove owner function is called to an existing member
 def test_channel_removeowner_v1_inputErrorMember():
-    # Clears data and registers and logins user_1 and user_2
+    # Clears data and registers user1 and user2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    u_id2 = dict_user2["auth_user_id"]
 
-    # Create Channel_1 made by user_1, get its id, and invite user2
+    # Create channel made by user1, get its id
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
     channel_invite_v1(token1, channel_1_id, u_id2)
 
-    # Conditions leads to an input error outcome and tests for it
+    # Tests for input error when function is called for a member
     with pytest.raises(InputError):
         channel_removeowner_v1(token1, channel_1_id, u_id2)
 
 
-# Case 4 - tests for input error due to function called for single owner
+# Case 4 - tests for input error due to function called for sole owner
 #          expected outcome is input error
-# Occurs when remove owner function is called to a channel with single owner
+# Occurs when remove owner function is called to the sole owner of the channel
 def test_channel_removeowner_v1_inputErrorOnlyOwner():
-    # Clears data and registers and logins user_1 and user_2
+    # Clears data and registers user1 and user2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    token2 = token_id_dict2["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    token2 = dict_user2["token"]
+    u_id2 = dict_user2["auth_user_id"]
 
-    # Create Channel_1 made by user_2, get its id
+    # Create channel made by user2, get its id
     channel_1_id = channels_create_v1(token2, "channelone", True)["channel_id"]
 
-    # Conditions leads to an input error outcome and tests for it
+    # Tests for input error when function is called to the sole owner of the channel
     with pytest.raises(InputError):
         channel_removeowner_v1(token1, channel_1_id, u_id2)
 
 
 # Case 5 - tests for access error due to non authorised user
-#          expected outcome is input error
-# Occurs when remove owner function is by a member of channel who is not a global owner
+#          expected outcome is access error
+# Occurs when remove owner function is called by a member of channel who is not a global owner
 def test_channel_removeowner_v1_accessError():
-    # Clears data and registers and logins user_1, user_2, and user_3
+    # Clears data and registers user1, user2, and user3
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
     auth_register_v1("hah2@gmail.com", "9uisbxh83h", "Tom", "Green")
 
     # login the three registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token_id_dict3 = auth_login_v1("hah2@gmail.com", "9uisbxh83h")
-    token1 = token_id_dict1["token"]
-    token2 = token_id_dict2["token"]
-    token3 = token_id_dict3["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
-    u_id3 = token_id_dict3["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    dict_user3 = auth_login_v1("hah2@gmail.com", "9uisbxh83h")
+    token1 = dict_user1["token"]
+    token2 = dict_user2["token"]
+    token3 = dict_user3["token"]
+    u_id2 = dict_user2["auth_user_id"]
+    u_id3 = dict_user3["auth_user_id"]
 
-    # Create Channel_1 made by user_1, get its id, and invite user2
+    # Create channel made by user1, get its id, and invite user2 and user3 making user2 an owner
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
     channel_invite_v1(token1, channel_1_id, u_id2)
     channel_invite_v1(token1, channel_1_id, u_id3)
     channel_addowner_v1(token1, channel_1_id, u_id2)
 
-    # Conditions leads to an access error outcome and tests for it
+    # Tests for access error due to unauthorised user calling the function
     with pytest.raises(AccessError):
         channel_removeowner_v1(token3, channel_1_id, u_id2)
 
@@ -1157,60 +1124,57 @@ def test_channel_removeowner_v1_accessError():
 #          expected outcome is access error
 # Occurs when remove owner function is called using invalid token
 def test_channel_removeowner_v1_accessErrorToken():
-    # Clears data and registers and logins user_1, user_2, and user_3
+    # Clears data and registers user1, user2, and user3
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the three registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token1 = token_id_dict1["token"]
-    u_id2 = token_id_dict2["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    u_id2 = dict_user2["auth_user_id"]
 
-    # Create Channel_1 made by user_1, get its id, and invite user_2
+    # Create channel made by user1, get its id, and invite user_2 making him an owner
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
     channel_invite_v1(token1, channel_1_id, u_id2)
     channel_addowner_v1(token1, channel_1_id, u_id2)
 
-    # Made an invalid token for joiner
+    # Made invalid token and test for access error when it is used
     invalid_token = token1 + "rkbgesorgbv#$%"
-
-    # Conditions leads to an access error outcome and tests for it
     with pytest.raises(AccessError):
         channel_removeowner_v1(invalid_token, channel_1_id, u_id2)
 
 
 # Case 7 - tests for global owner exception
-#          expected outcome is user with u_id becomes owner
+#          expected outcome is user with u_id becomes member
 # Occurs when remove owner function is called by global owner
 def test_channel_removeowner_v1_globalOwner():
-    # Clears data and registers and logins user_1, user_2, and user_3
+    # Clears data and registers user1, user2, and user3
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
     auth_register_v1("hah2@gmail.com", "9uisbxh83h", "Tom", "Green")
 
     # login the three registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token_id_dict3 = auth_login_v1("hah2@gmail.com", "9uisbxh83h")
-    token1 = token_id_dict1["token"]
-    token2 = token_id_dict2["token"]
-    u_id3 = token_id_dict3["auth_user_id"]
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    dict_user3 = auth_login_v1("hah2@gmail.com", "9uisbxh83h")
+    token1 = dict_user1["token"]
+    token2 = dict_user2["token"]
+    u_id3 = dict_user3["auth_user_id"]
 
-    # Create Channel_1 made by user_2, get its id, and invite user_3
+    # Create channel made by user2, get its id, and invite user3
     channel_1_id = channels_create_v1(token2, "channelone", True)["channel_id"]
     channel_invite_v1(token2, channel_1_id, u_id3)
 
-    # Calls addowner function for testing by global owner
-    # Expected output is user_3 becomes owner and back to member
-    channel_addowner_v1(token2, channel_1_id, u_id3)
-    channel_removeowner_v1(token2, channel_1_id, u_id3)
+    # Calls remove owner function for testing by global owner
+    # Expected output is user3 becomes owner and back to member
+    channel_addowner_v1(token1, channel_1_id, u_id3)
+    channel_removeowner_v1(token1, channel_1_id, u_id3)
 
-    # Calls details function for testing
+    # Calls details function for checking that user3 is a member
     output = channel_details_v1(token2, channel_1_id)
-
     assert output["all_members"][0]["name_first"] == 'Tom'
     assert output["all_members"][1]["name_first"] == 'Tom'
     assert output["owner_members"][0]["name_first"] == 'Tom'
@@ -1219,6 +1183,142 @@ def test_channel_removeowner_v1_globalOwner():
     assert len(output["all_members"]) == 2
     assert len(output["owner_members"]) == 1
 
+
+"""
+Author : Emir Aditya Zen
+
+This file is for testing channel_leave_v1 function implementation
+
+Background
+Given a channel ID, the user removed as a member of this channel.
+Their messages should remain in the channel
+
+HTTP Method: POST
+Parameters: (token, channel_id)
+Return Type: {}
+
+InputError:
+- channel_id does not refer to a valid channel.
+
+AccessError:
+- The authorised user is not a member of channel with channel_id
+- Function is called with an invalid token
+"""
+
+#############################################################################
+#                                                                           #
+#                       Test for channel_leave_v1                           #
+#                                                                           #
+#############################################################################
+
+# Case 1 - tests for valid function implementation
+#          expected outcome is user leaves channel with output {}
+# Occurs when channel and token is valid, user calling function is inside channel
+def test_channel_leave_v1_success():
+    # Clears data and registers user1 and user2
+    clear_v1()
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+
+    # login the two registered users
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    token2 = dict_user2["token"]
+    u_id2 = dict_user2["auth_user_id"]
+
+    # Create channel made by user1, get its id, and invite user2
+    channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
+    channel_invite_v1(token1, channel_1_id, u_id2)
+
+    # Calls channel_leave for testing
+    # Expected output is user2 leaves channel
+    channel_leave_v1(token2,channel_1_id)
+
+    # Calls details function for checking user 2 is not a channel member
+    output = channel_details_v1(token1, channel_1_id)
+    assert output["all_members"][0]["name_first"] == 'Peter'
+    assert output["owner_members"][0]["name_first"] == 'Peter'
+    assert output["name"] == "channelone"
+    assert output["is_public"] == True
+    assert len(output["all_members"]) == 1
+    assert len(output["owner_members"]) == 1
+
+
+# Case 2 - tests for input error due to invalid channel
+#          expected outcome is input error
+# Occurs when channel id used is invalid
+def test_channel_leave_v1_inputErrorChannel():
+    # Clears data and registers user1 and user2
+    clear_v1()
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+
+    # login the two registered users
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    token2 = dict_user2["token"]
+    u_id2 = dict_user2["auth_user_id"]
+
+    # Create channel made by user1, get its id and invites user2
+    channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
+    channel_invite_v1(token1, channel_1_id, u_id2)
+
+    # Made invalid channel id and test for input error when it is used
+    channel_1_invalidid = channel_1_id + 300
+    with pytest.raises(InputError):
+        channel_leave_v1(token2, channel_1_invalidid)
+
+
+# Case 3 - tests for access error due to user not in channel
+#          expected outcome is access error
+# Occurs when channel_leave is called by a user not in the specified channel
+def test_channel_leave_v1_accessError():
+    # Clears data and registers user1 and user2
+    clear_v1()
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+
+    # login the two registered users
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    token2 = dict_user2["token"]
+    u_id2 = dict_user2["auth_user_id"]
+
+    # Create channel made by user1, get its id
+    channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
+
+    # Tests for access error when function is called by a non member
+    with pytest.raises(AccessError):
+        channel_leave_v1(token2, channel_1_id)
+
+    
+# Case 4 - tests for access error due to invalid token
+#          expected outcome is access error
+# Occurs when channel_leave is called with an invalid token
+def test_channel_leave_v1_accessErrorToken():
+    # Clears data and registers user1 and user2
+    clear_v1()
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+
+    # login the two registered users
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    token2 = dict_user2["token"]
+    u_id2 = dict_user2["auth_user_id"]
+
+    # Create channel made by user1, get its id
+    channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
+    channel_invite_v1(token1, channel_1_id, u_id2)
+
+    # Made invalid token and test for access error when it is used
+    invalid_token = token2 + "rkbgesorgbv#$%"
+    with pytest.raises(AccessError):
+        channel_leave_v1(invalid_token, channel_1_id)
 
 if __name__ == "__main__":
     # create 2 users
