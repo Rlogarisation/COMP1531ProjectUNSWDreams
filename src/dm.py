@@ -223,7 +223,7 @@ def dm_leave_v1(token, dm_id):
         if len(dm.dm_owners) == 0 and len(dm.dm_members) > 0:
             dm_next_owner = dm.dm_members[0]
             dm.dm_owners.append(dm_next_owner)
-            dm_next_owner.dm_owns(dm)
+            dm_next_owner.dm_owns.append(dm)
 
     return {}
 

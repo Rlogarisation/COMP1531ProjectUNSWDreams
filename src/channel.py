@@ -297,8 +297,7 @@ def channel_leave_v1(token, channel_id):
 
     # Case 3 succesfull function calling
     # Expected outcome is user leaves channel
-    if channel is not None and user is not None and is_user_in_channel(channel_id, u_id) is not None:
-        user_leaves_channel(channel, user, u_id, channel_id)
+    user_leaves_channel(channel, user, u_id, channel_id)
     return {}
 
 
@@ -496,6 +495,12 @@ def add_user_into_owner_channel(channel, owner):
 def remove_user_from_owner_channel(channel, owner):
     owner.channel_owns.remove(channel)
     channel.owner_members.remove(owner)
+    # If the leaving owner is the only one owner and there is still member in the dm
+    # Then first availble person in member become owner
+    if len(channel.owner_members) == 0 and len(channel.all_members) > 0:
+        next_owner = channel.all_members[0]
+        channel.owner_members.append(next_owner)
+        next_owner.channel_owns.append(channel)
 
 
 def user_leaves_channel(channel, user, u_id, channel_id):
