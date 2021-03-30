@@ -9,6 +9,10 @@ from src.auth import auth_register_v1, auth_login_v1, auth_logout
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1, \
     users_all, admin_user_remove, admin_userpermission_change
 from src.other import clear_v1, search_v1, notification_get_v1
+from src.channel import channel_invite_v1, channel_details_v1, channel_messages_v1, channel_join_v1, channel_leave_v1, \
+    channel_addowner_v1, channel_removeowner_v1
+from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
+from src.message import message_send_v2, message_senddm_v1, message_edit_v2, message_remove_v1, message_share_v1
 
 
 def defaultHandler(err):
@@ -41,7 +45,7 @@ def echo():
     })
 #############################################################################
 #                                                                           #
-#                           Server for auth.py                              #
+#                           Server for auth.py by Lan Lin                   #
 #                                                                           #
 #############################################################################
 
@@ -74,7 +78,7 @@ def auth_logout_v1():
     return dumps(result)
 #############################################################################
 #                                                                           #
-#                           Server for user.py                              #
+#                           Server for user.py by Lan Lin                   #
 #                                                                           #
 #############################################################################
 
@@ -82,7 +86,7 @@ def auth_logout_v1():
 @APP.route("/user/profile/v2", methods=['GET'])
 def user_profile_v2():
     token = request.args.get('token')
-    u_id = request.args.get('u_id')
+    u_id = int(request.args.get('u_id'))
     result = user_profile_v1(token, u_id)
     dump_data(data)
     return dumps(result)
@@ -134,6 +138,11 @@ def admin_userpermission_change_v1():
     result = admin_userpermission_change(info['token'], info['u_id'], info['permission_id'])
     dump_data(data)
     return dumps(result)
+#############################################################################
+#                                                                           #
+#                           Server for other.py by Lan Lin                  #
+#                                                                           #
+#############################################################################
 
 
 @APP.route("/clear/v1", methods=['DELETE'])
@@ -141,12 +150,113 @@ def clear():
     result = clear_v1()
     dump_data(data)
     return dumps(result)
+#############################################################################
+#                                                                           #
+#                           Server for channel.py by Lan Lin                #
+#                                                                           #
+#############################################################################
+
+
+@APP.route("/channel/invite/v2", methods=['POST'])
+def channel_invite():
+    info = request.get_json()
+    result = channel_invite_v1(info['token'], info['channel_id'], info['u_id'])
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/channel/details/v2", methods=['GET'])
+def channel_details():
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+    result = channel_details_v1(token, channel_id)
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/channel/join/v2", methods=['POST'])
+def channel_join():
+    info = request.get_json()
+    result = channel_join_v1(info['token'], info['channel_id'])
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/channel/addowner/v1", methods=['POST'])
+def channel_addowner():
+    info = request.get_json()
+    result = channel_addowner_v1(info['token'], info['channel_id'], info['u_id'])
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/channel/removeowner/v1", methods=['POST'])
+def channel_remove_owner():
+    info = request.get_json()
+    result = channel_removeowner_v1(info['token'], info['channel_id'], info['u_id'])
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/channel/leave/v1", methods=['POST'])
+def channel_leave():
+    info = request.get_json()
+    result = channel_leave_v1(info['token'], info['channel_id'])
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/channel/messages/v2", methods=['GET'])
+def channel_message():
+    token = request.args.get("token")
+    channel_id = int(request.args.get("channel_id"))
+    start = int(request.args.get("start"))
+    result = channel_messages_v1(token, channel_id, start)
+    dump_data(data)
+    return dumps(result)
+#############################################################################
+#                                                                           #
+#                           Server for channels.py by Lan Lin               #
+#                                                                           #
+#############################################################################
+
+
+@APP.route("/channels/create/v2", methods=['POST'])
+def channels_create():
+    info = request.get_json()
+    result = channels_create_v1(info['token'], info['name'], info['is_public'])
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/channels/list/v2", methods=['GET'])
+def channel_list():
+    token = request.args.get('token')
+    result = channels_list_v1(token)
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/channels/listall/v2", methods=['GET'])
+def channel_listall():
+    token = request.args.get('token')
+    result = channels_listall_v1(token)
+    dump_data(data)
+    return dumps(result)
 
 #############################################################################
 #                                                                           #
-#                           Server for other.py                             #
+#                           Server for message.py                           #
 #                                                                           #
 #############################################################################
+
+
+@APP.route("/message/send/v2", methods=['POST'])
+def message_send():
+    info = request.get_json()
+    result = message_send_v2(info['token'], info['channel_id'], info['message'])
+    dump_data(data)
+    return dumps(result)
 
 
 if __name__ == "__main__":
