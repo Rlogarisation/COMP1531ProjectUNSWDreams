@@ -237,6 +237,8 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
 
 
 def get_channel_by_channel_id(channel_id):
+    if type(channel_id) != int:
+        return InputError(description="get_channel_by_channel_id : channel_id need to be int!")
 
     if channel_id >= len(data["class_channels"]) or not isinstance(channel_id, int):
         return None
