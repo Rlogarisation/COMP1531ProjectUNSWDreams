@@ -30,7 +30,7 @@ InputError:
 """
 
 
-def auth_register_v1(email, password, name_first, name_last):
+def auth_register_v2(email, password, name_first, name_last):
     auth_register_check_error(email, password, name_first, name_last)
 
     u_id = create_uid()
