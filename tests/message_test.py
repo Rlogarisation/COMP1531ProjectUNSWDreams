@@ -1,4 +1,4 @@
-from src.channel import channel_invite_v2, channel_messages_v2
+from src.channel import channel_invite_v1, channel_messages_v2
 import pytest
 from src.dm import dm_create_v1
 from src.error import InputError, AccessError
@@ -162,7 +162,7 @@ def test_message_remove_not_owner_or_authorised_user():
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
     message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
 
-    channel_invite_v2(token_0, channel_0_id, u_id_1)
+    channel_invite_v1(token_0, channel_0_id, u_id_1)
 
     with pytest.raises(AccessError):
         message_remove_v1(token_1, message_0_id)
@@ -242,7 +242,7 @@ def test_message_edit_not_owner_or_authorised_user():
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
     message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
 
-    channel_invite_v2(token_0, channel_0_id, u_id_1)
+    channel_invite_v1(token_0, channel_0_id, u_id_1)
 
     with pytest.raises(AccessError):
         message_edit_v2(token_1, message_0_id, 'It works')
