@@ -370,3 +370,12 @@ def get_dm_by_dm_id(dm_id):
         return data['class_dms'][dm_id]
     else:
         return None
+
+
+# check if the user is an owner of channel
+def is_user_owner_dm(dm_id, u_id):
+    dm = get_dm_by_dm_id(dm_id)
+    for owner in dm.dm_owners:
+        if u_id == u_id:
+            return owner
+    return None

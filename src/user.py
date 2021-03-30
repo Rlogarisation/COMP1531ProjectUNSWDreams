@@ -14,9 +14,11 @@ def user_profile_v1(token, u_id):
     if user is None:
         raise AccessError(description="Token passed in is invalid")
 
-    user = get_user_by_uid(u_id)
-    if user is None:
+    user_ = get_user_by_uid(u_id)
+    if user_ is None:
         raise InputError(description="User with u_id is not a valid user")
+    if user is not user_:
+        raise InputError(description="Token and u_id are from different users")
 
     result = user.return_type_user()
     return {

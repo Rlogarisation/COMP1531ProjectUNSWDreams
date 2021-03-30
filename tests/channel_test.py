@@ -1380,6 +1380,7 @@ if __name__ == "__main__":
 
 # if __name__ == "__main__":
 #     # create 2 users
+#     clear_v1()
 #     auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
 #     user1 = auth_login_v1("user1@test.com", "user1password")
 #
