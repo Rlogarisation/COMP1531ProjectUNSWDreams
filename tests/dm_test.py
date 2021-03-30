@@ -1,10 +1,4 @@
-'''
-[DISCUSS]
-Why import this?
-'''
-# from tests.channel_test import test_invalid_channel_id
 import pytest
-from src.data_file import data
 from src.error import InputError, AccessError
 from src.dm import dm_create_v1, dm_details_v1, dm_invite_v1, dm_leave_v1, dm_list_v1, dm_messages_v1, dm_remove_v1
 from src.auth import auth_register_v1, auth_login_v1, get_user_by_token
@@ -57,6 +51,7 @@ def test_dm_details_v1():
         with pytest.raises(AccessError):
             dm_details_v1(token2, 0)
         pass
+
     # --------------------------testing---------------------------
     test_invalid_dm()
     test_Inaccessible_member()
@@ -96,15 +91,13 @@ def test_dm_list_v1():
     dm_create_v1(token0, [2])
     dm_create_v1(token1, [2])
 
-    '''
-    [DISCUSS]
-    Returns the list of DMs that the user is a member of.
-    In my opinion it should be: 
-    dm_list_v1(token0) == {
-        'dms': [bla, bla, bla, bla]
-    }
-    '''
-    assert dm_list_v1(token0) == {data['class_dms'][0], data['class_dms'][1]}
+    user0_involved = dm_list_v1(token0)
+
+    assert user0_involved['dms'][0]['name'] == "peterwhite, tomgreen"
+    assert user0_involved['dms'][0]['dm_id'] == 0
+
+    assert user0_involved['dms'][1]['name'] == "peterwhite, rogerluo"
+    assert user0_involved['dms'][1]['dm_id'] == 1
 
     pass
 
@@ -142,13 +135,14 @@ def test_dm_create_v1():
     def test_normal_case():
         dm1 = dm_create_v1(token0, [1])
         assert dm1['dm_id'] == 0
-        assert dm1['dm_name'] == data['class_dms'][0].dm_name
+        assert dm1['dm_name'] == "peterwhite, tomgreen"
         pass
 
     def test_invalid_u_id():
         with pytest.raises(InputError):
             dm_create_v1(token1, [4, 5])
         pass
+
     # --------------------------testing---------------------------
     test_normal_case()
     test_invalid_u_id()
@@ -200,6 +194,7 @@ def test_dm_remove_v1():
         with pytest.raises(AccessError):
             dm_remove_v1(token1, 1)
         pass
+
     # --------------------------testing---------------------------
     test_invalid_dm_id()
     test_not_creator()
@@ -256,6 +251,7 @@ def test_dm_invite_v1():
         with pytest.raises(AccessError):
             dm_invite_v1(token0, 0, 1)
         pass
+
     # --------------------------testing---------------------------
     test_invalid_dm_id()
     test_invalid_u_id()
@@ -304,11 +300,11 @@ def test_dm_leave_v1():
             dm_leave_v1(token0, "invalid_dm_id")
         pass
 
-    # FIXME: there is no u_id in dm_leave_v1, 该如何知道是谁离开了Direct Message？
     def test_user_not_in():
         with pytest.raises(AccessError):
             dm_leave_v1(token0, 2)
         pass
+
     # --------------------------testing---------------------------
     test_invalid_dm_id()
     test_user_not_in()
@@ -362,9 +358,11 @@ def test_dm_messages_v1():
             dm_messages_v1(token0, 1, 999)
         pass
 
-    # FIXME: there is no u_id in dm_leave_v1, 该如何知道是谁不在DM里面？
     def test_user_not_in():
+        with pytest.raises(AccessError):
+            dm_messages_v1(token1, 1, 0)
         pass
+
     # --------------------------testing---------------------------
     test_invalid_dm_id()
     test_oversized_start()
