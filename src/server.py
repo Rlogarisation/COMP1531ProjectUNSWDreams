@@ -144,6 +144,74 @@ def clear():
 
 #############################################################################
 #                                                                           #
+#                           Server for dm.py                                #
+#                                                                           #
+#############################################################################
+
+@APP.route("/dm/create/v1", methods=['POST'])
+def http_dm_create_v1():
+    info = request.get_json()
+    token = info['token']
+    u_id_list = info['u_id_list']
+    result = dm_create_v1(token, u_id_list)
+    dump_data(data)
+    return dumps(result)
+
+@APP.route("/dm/invite/v1", methods=['POST'])
+def http_dm_invite_v1():
+    info = request.get_json()
+    token = info['token']
+    dm_id = info['dm_id']
+    u_id = info['u_id']
+    result = dm_invite_v1(token, dm_id, u_id)
+    dump_data(data)
+    return dumps(result)
+
+@APP.route("/dm/remove/v1", methods=['DELETE'])
+def http_dm_remove_v1():
+    info = request.get_json()
+    token = info['token']
+    dm_id = info['dm_id']
+    result = dm_remove_v1(token, dm_id)
+    dump_data(data)
+    return dumps(result)
+
+@APP.route("/dm/leave/v1", methods=['POST'])
+def http_dm_leave_v1():
+    info = request.get_json()
+    token = info['token']
+    dm_id = info['dm_id']
+    result = dm_leave_v1(token, dm_id)
+    dump_data(data)
+    return dumps(result)
+
+@APP.route("/dm/details/v1", methods=['GET'])
+def http_dm_detail_v1():
+    token = request.args.get('token')
+    dm_id = int(request.args.get('dm_id'))
+    result = dm_details_v1(token, dm_id)
+    dump_data(data)
+    return dumps(result)
+
+@APP.route("/dm/list/v1", methods=['GET'])
+def http_dm_list_v1():
+    token = request.args.get('token')
+    result = dm_list_v1(token)
+    dump_data(data)
+    return dumps(result)
+
+@APP.route("/dm/messages/v1", methods=['GET'])
+def http_dm_messages_v1():
+    token = request.args.get('token')
+    dm_id = int(request.args.get('dm_id'))
+    start = int(request.args.get('start'))
+    result = dm_messages_v1(token, dm_id, start)
+    dump_data(data)
+    return dumps(result)
+
+
+#############################################################################
+#                                                                           #
 #                           Server for other.py                             #
 #                                                                           #
 #############################################################################
