@@ -34,11 +34,6 @@ AccessError:
 
 
 def message_send_v2(token, channel_id, message):
-    # for i in data["class_channels"]:
-    #     if i.channel_id == channel_id:
-    #         i.messages.insert(0, message)
-    #         break
-
     # InputError 1: invalid token.
     auth_user = get_user_by_token(token)
     if auth_user is None:
@@ -271,7 +266,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     if channel_id == -1 and dm_id != -1:
         mem_list = get_dm_by_dm_id(dm_id).dm_members
     elif channel_id != -1 and dm_id == -1:
-        mem_list = get_channel_by_channel_id(channel_id)
+        mem_list = get_channel_by_channel_id(channel_id).all_members
     elif channel_id != -1 and dm_id != -1:
         raise InputError(description="message_share_v1 : neither channel_id nor dm_id is -1.")
     elif channel_id == -1 and dm_id == -1:
@@ -284,12 +279,20 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         raise AccessError(description="message_share_v1 : user need to be authorized.")
 
     og_message = get_message_by_message_id(og_message_id)
-    message_added = ''.join([og_message.message, '\n"""\n', message, '\n"""'])
+    message_added = ''.join([og_message.message, '\n', '"""', '\n', message, '\n', '"""'])
     # add og_message to new_message
     created_time = datetime.utcnow().isoformat()
     new_message = Message(create_message_id(), user.u_id, message_added, created_time, channel_id, dm_id)
 
-    return {new_message.message_id}
+    # send shared message to the channel or dm
+    if channel_id != -1:
+        message_send_v2(token, channel_id, new_message.message)
+    if dm_id != -1:
+        message_senddm_v1(token, dm_id, new_message.message)
+
+    return {
+        'shared_message_id': new_message.message_id
+    }
 
 
 #############################################################################

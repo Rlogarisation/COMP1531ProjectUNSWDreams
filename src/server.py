@@ -259,5 +259,37 @@ def message_send():
     return dumps(result)
 
 
+@APP.route("/message/senddm/v1", methods=['POST'])
+def message_senddm():
+    info = request.get_json()
+    result = message_senddm_v1(info['token'], info['dm_id'], info['message'])
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/message/edit/v2", methods=['PUT'])
+def message_edit():
+    info = request.get_json()
+    result = message_edit_v2(info['token'], info['message_id'], info['message'])
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/message/remove/v1", methods=['DELETE'])
+def message_remove():
+    info = request.get_json()
+    result = message_remove_v1(info['token'], info['message_id'])
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/message/share/v1", methods=['POST'])
+def message_share():
+    info = request.get_json()
+    result = message_share_v1(info['token'], info['og_message_id'], info['message'], info['channel_id'], info['dm_id'])
+    dump_data(data)
+    return dumps(result)
+
+
 if __name__ == "__main__":
     APP.run(port=config.port)  # Do not edit this port
