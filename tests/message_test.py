@@ -1,12 +1,12 @@
 from src.channel import channel_invite_v1, channel_messages_v1
 import pytest
 from src.data_file import data
-from src.dm import dm_create_v1
+from src.dm import dm_create_v1, dm_messages_v1
 from src.error import InputError, AccessError
 from src.channels import channels_create_v1
 from src.auth import auth_register_v2, auth_login_v1
 from src.other import clear_v1
-from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_share_v1
+from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_share_v1, message_senddm_v1
 #############################################################################
 #                                                                           #
 #                        Test for message_send_v2                           #
@@ -89,10 +89,9 @@ def test_message_send_same_message_id():
 
     token_1 = auth_register_v2("test_email1@gmail.com", "password", "First1", "Last1")['token']
     auth_login_v1("test_email1@gmail.com", "password")
-    # FixMe: 这边user1没有在channel_0里面，所以他不会有权限send message到channel， 我message.py里面在这边raise了accesserror
-    message_1_id = message_send_v2(token_1, channel_0_id, 'Hope it works')['message_id']
 
-    assert message_0_id != message_1_id
+    with pytest.raises(AccessError):
+        message_1_id = message_send_v2(token_1, channel_0_id, 'Hope it works')['message_id']
 
 
 def test_message_send_valid_case():
@@ -158,7 +157,7 @@ def test_message_remove_not_owner_or_authorised_user():
     clear_v1()
     token_0 = auth_register_v2("test_email0@gmail.com", "password", "First0", "Last0")['token']
     token_1 = auth_register_v2("test_email1@gmail.com", "password", "First1", "Last1")['token']
-    auth_login_v1("test_email0@gmail.com", "password")
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
     u_id_1 = auth_login_v1("test_email1@gmail.com", "password")['auth_user_id']
 
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
@@ -260,9 +259,9 @@ def test_message_edit_empty_message():
     message_edit_v2(token_0, message_0_id, 'It works')
     all_messages = channel_messages_v1(token_0, channel_0_id, 0)
 
-    assert all_messages['messages'][0]['message'] == 'It works'
-    assert all_messages['messages'][0]['message_id'] == message_0_id
-    assert all_messages['messages'][0]['u_id'] == u_id_0
+    assert all_messages['messages'][0].message == 'It works'
+    assert all_messages['messages'][0].message_id == message_0_id
+    assert all_messages['messages'][0].u_id == u_id_0
 
 
 def test_message_edit_valid_case():
@@ -271,14 +270,14 @@ def test_message_edit_valid_case():
     u_id = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
 
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
-    message_0_id = message_send_v2(token_0, channel_0_id, 'It works')
+    message_0_id = message_send_v2(token_0, channel_0_id, 'It works')['message_id']
 
     message_edit_v2(token_0, message_0_id, 'It really works')
     all_messages = channel_messages_v1(token_0, channel_0_id, 0)
 
-    assert all_messages['messages'][0]['message'] == 'It really works'
-    assert all_messages['messages'][0]['message_id'] == message_0_id
-    assert all_messages['messages'][0]['u_id'] == u_id
+    assert all_messages['messages'][0].message == 'It really works'
+    assert all_messages['messages'][0].message_id == message_0_id
+    assert all_messages['messages'][0].u_id == u_id
 
 
 #############################################################################
@@ -337,9 +336,9 @@ def test_message_share_not_joing_dm():
 
     u_id_list = [u_id_0, u_id_1]
     dm_0_id = dm_create_v1(token_0, u_id_list)['dm_id']
-    og_message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
+    og_message_0_id = message_senddm_v1(token_0, dm_0_id, 'Hope it works')['message_id']
 
-    all_messages = channel_messages_v1(token_0, channel_0_id, 0)
+    all_messages = dm_messages_v1(token_0, dm_0_id, 0)
     message_0 = all_messages['messages'][0]['message']
 
     with pytest.raises(AccessError):

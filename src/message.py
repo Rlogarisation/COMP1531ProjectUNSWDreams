@@ -105,13 +105,13 @@ def message_senddm_v1(token, dm_id, message):
         raise AccessError(description='message_send_v2 : Invalid channel_id.')
 
     # AccessError 2: the authorised user has not joined the channel they are trying to post to
-    if auth_user not in dm.all_members:
+    if auth_user not in dm.dm_members:
         raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
 
-    new_message_id = len(dm.messages)
+    new_message_id = len(dm.dm_messages)
     message_created = Message(new_message_id, auth_user.u_id, message, datetime.utcnow(), -1, dm.dm_id)
 
-    channel.messages.append(message_created)
+    dm.dm_messages.append(message_created)
 
     return {
         'message_id': new_message_id,
@@ -154,7 +154,7 @@ def message_edit_v2(token, message_id, message):
         raise InputError(description='message_edit_v2 : Message is more than 1000 characters.')
 
     # AccessError 1: Message editted by neither auth_user nor owner.
-    if auth_user.u_id == get_u_id_by_message_id(message_id):
+    if auth_user.u_id != get_u_id_by_message_id(message_id):
         raise AccessError(description='message_edit_v2 : Message editted by neither auth_user nor owner.')
 
     # Case 1: if new message is empty string, delete it
@@ -203,7 +203,7 @@ def message_remove_v1(token, message_id):
         raise InputError(description='message_remove_v1 : Message (based on ID) no longer exists.')
 
     # AccessError 1: Message removed by neither auth_user nor owner.
-    if auth_user.u_id == get_u_id_by_message_id(message_id):
+    if auth_user.u_id != get_u_id_by_message_id(message_id):
         raise AccessError(description='message_remove_v1 : Message removed by neither auth_user nor owner.')
 
     # TODO:
@@ -237,7 +237,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     if channel_id == -1 and dm_id != -1:
         mem_list = get_dm_by_dm_id(dm_id).dm_members
     elif channel_id != -1 and dm_id == -1:
-        mem_list = get_channel_by_channel_id(channel_id)
+        mem_list = get_channel_by_channel_id(channel_id).all_members
     elif channel_id != -1 and dm_id != -1:
         raise InputError(description="message_share_v1 : neither channel_id nor dm_id is -1.")
     elif channel_id == -1 and dm_id == -1:
@@ -308,9 +308,9 @@ def delete_message_by_message_id(message_id):
 
 def get_dm_by_dm_id(dm_id):
     if dm_id >= len(data["class_dms"]) or not isinstance(dm_id, int):
-        return None
-    elif data["class_channels"][dm_id]:
-        return data["class_channels"][dm_id]
+        return InputError(description="get_dm_by_dm_id : input dm_id is not valid.")
+    elif data["class_dms"][dm_id]:
+        return data["class_dms"][dm_id]
     else:
         return None
 
