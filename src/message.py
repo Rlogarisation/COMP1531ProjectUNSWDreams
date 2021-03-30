@@ -287,21 +287,21 @@ def get_message_by_message_id(message_id):
         for j in i.messages:
             if j.message_id == message_id:
                 return j
-    raise AccessError(description="get_message_by_message_id : can not find target message.")
+    raise InputError(description="get_message_by_message_id : can not find target message.")
 
 
 # TODO:通过message_id删除message
 def delete_message_by_message_id(message_id):
     target_msg = get_message_by_message_id(message_id)
     for i in data['class_channels']:
-        for j in i.message:
+        for j in i.messages:
             if j.message_id == target_msg.message_id:
-                i.remove(j)
+                i.messages.remove(j)
                 return
     for i in data['class_dms']:
-        for j in i.message:
+        for j in i.messages:
             if j.message_id == target_msg.message_id:
-                i.remove(j)
+                i.messages.remove(j)
                 return
     raise AccessError(description="delete_message_by_message_id : can not find target message.")
 
