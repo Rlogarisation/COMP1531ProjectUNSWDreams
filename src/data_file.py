@@ -1,3 +1,4 @@
+import pickle
 """
 Define different classes: User, Channel, Message
 Define data structure: data
@@ -5,29 +6,36 @@ Written by: Lan Lin
 """
 
 
+class Permission:
+    global_owner = 1
+    global_member = 2
+
+
 class User:
-    def __init__(self, u_id, email, password, name_first, name_last, handle_str, auth_user_id, role):
+    def __init__(self, u_id, email, hashed_password, name_first, name_last, handle_str, auth_user_id, permission_id):
         self.u_id = u_id
         self.email = email
-        self.password = password
-        if not isinstance(self.password, str):
-            raise TypeError("password must be string")
+        self.hashed_password = hashed_password
         self.name_first = name_first
         self.name_last = name_last
         self.handle_str = handle_str
         self.auth_user_id = auth_user_id
-        self.role = role
+        self.permission_id = permission_id
         # The one who registers the first will be the global owner
         # The users who register afterward will be a global member
         # The role does not indicate the 'owner' or
         # a 'member' of a channel in this part
-        if self.role not in ['global owner', 'global member']:
-            raise Exception("role must be 'owner' or 'member")
+        # if self.role not in ['global owner', 'global member']:
+        #     raise Exception("role must be 'owner' or 'member")
 
         # a list of all channels that the authorised user is part of
         # including the user is a memeber and the user is an owner of the channel
         self.part_of_channel = []
+        self.part_of_dm = []
+        self.dm_owns = []
         self.channel_owns = []  # a list of all channels that the user is the owner of the channel
+        self.current_sessions = []  # a list of current sessions of the user
+        self.notifications = []
 
     def return_type_user(self):
         """in 6.1.1 Data Types
@@ -65,12 +73,13 @@ class Channel:
 
 
 class Message:
-    def __init__(self, message_id, u_id, message, time_created, channel_id):
+    def __init__(self, message_id, u_id, message, time_created, channel_id, dm_id):
         self.message_id = message_id
         self.u_id = u_id
         self.message = message
         self.time_created = time_created
         self.channel_id = channel_id
+        self.dm_id = dm_id
 
     def return_type_message(self):
         """
@@ -85,29 +94,67 @@ class Message:
         }
 
 
-data = {
+class DM:
+    def __init__(self, dm_name, dm_id):
+        self.start = -1
+        self.end = -1
+        self.dm_name = dm_name
+        self.dm_id = dm_id
+        self.dm_members = []
+        self.dm_owners = []
+        self.dm_messages = []
+
+    def return_type_dm(self):
+        return {
+            'dm_id': self.dm_id,
+            'name': self.dm_name
+        }
+
+
+class Notification:
+    def __init__(self, channel_id, dm_id, notification_message):
+        self.channel_id = channel_id
+        self.dm_id = dm_id
+        self.notification_message = notification_message
+
+    def return_type_notification(self):
+        return {
+            'channel_id': self.channel_id,
+            'dm_id': self.dm_id,
+            'notification_message': self.notification_message
+        }
+
+
+DATA = {
     # a list of class User
     'class_users': [],
     # a list of class Channel
-    'class_channels': []
+    'class_channels': [],
+    # a list of class DM
+    'class_dms': [],
+    # to record the number of sessions
+    'session_num': 0,
+    # to record the number of messages
+    'message_num': 0,
+    'secret': 'THIS_IS_SECRET'
 }
 
-"""
-Methods to use class
-"""
-if __name__ == '__main__':
-    # Method 1: directly give paramaters, be careful about the sequence and type of inputs
-    try:
-        user1 = User(1, '123@gmail.com', '123ifks3', 'Hayden', 'Smith', 'handle', '1234', 'owners')
-        print(f"The uid of the user1 is {user1.u_id}")
-        print(f"The role of the user1 is {user1.name_last}")
-    except Exception as e:
-        print(f"Error! {e}")
 
-    # Method 2:
-    channel1 = Channel(name='Channel of Hayden', channel_id=1, is_public=True)
-    print(f"is_public of channel1 is {channel1.is_public}")
+def load_data():
+    global DATA
     try:
-        channel2 = Channel(name='Channel of Andrew', channel_id=2, is_public='Yes')
-    except TypeError as e:
-        print(f"Error! {e}")
+        with open("db.p", "rb") as FILE:
+            dt = pickle.load(FILE)
+            return dt
+    except FileNotFoundError:
+        with open("db.p", "wb") as FILE:
+            pickle.dump(DATA, FILE)
+            return DATA
+
+
+def dump_data(dt):
+    with open("db.p", "wb") as FILE:
+        pickle.dump(dt, FILE)
+
+
+data = load_data()
