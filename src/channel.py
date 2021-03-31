@@ -417,7 +417,7 @@ def channel_removeowner_v1(token, channel_id, u_id):
 
 def get_channel_by_channel_id(channel_id):
 
-    if channel_id >= len(data["class_channels"]) or not isinstance(channel_id, int):
+    if (not isinstance(channel_id, int)) or channel_id >= len(data["class_channels"]):
         return None
     elif data["class_channels"][channel_id]:
         return data["class_channels"][channel_id]
