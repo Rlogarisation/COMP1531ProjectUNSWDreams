@@ -780,5 +780,6 @@ def test_admin_user_remove_successfully():
     assert user_profile2['user']['email'] == 'test@testexample.com'
     admin_user_remove(token1, uid2)
     user_profile2 = user_profile_v1(token2, uid2)
-    assert user_profile2['user']['name_first'] == 'Removed user'
-    assert user_profile2['user']['name_last'] == 'Removed user'
+    name_first = user_profile2['user']['name_first']
+    name_last = user_profile2['user']['name_last']
+    assert f'{name_first} {name_last}' == 'Removed user'
