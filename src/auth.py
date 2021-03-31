@@ -2,7 +2,7 @@ import re
 import jwt
 import hashlib
 
-from jwt import InvalidSignatureError
+from jwt import InvalidSignatureError, InvalidTokenError
 from src.data_file import User, Permission, data
 from src.error import InputError
 
@@ -225,7 +225,7 @@ def token_to_session(token):
     try:
         decode_session = jwt.decode(token, data['secret'], algorithms=['HS256'])
         return decode_session
-    except InvalidSignatureError:
+    except:
         return None
 
 

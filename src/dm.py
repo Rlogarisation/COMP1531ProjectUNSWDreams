@@ -364,7 +364,7 @@ def dm_messages_v1(token, dm_id, start):
 #############################################################################
 
 def get_dm_by_dm_id(dm_id):
-    if not isinstance(dm_id, int) or dm_id >= len(data['class_dms']):
+    if (not isinstance(dm_id, int)) or dm_id >= len(data['class_dms']):
         return None
     elif data['class_dms'][dm_id]:
         return data['class_dms'][dm_id]
