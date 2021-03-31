@@ -46,7 +46,7 @@ def message_send_v2(token, channel_id, message):
     # AccessError 1: invalid channel_id
     channel = get_channel_by_channel_id(channel_id)
     if type(channel_id) != int or channel is None:
-        raise AccessError(description='message_send_v2 : Invalid channel_id.')
+        raise InputError(description='message_send_v2 : Invalid channel_id.')
 
     # AccessError 2: the authorised user has not joined the channel they are trying to post to
     if auth_user not in channel.all_members:
@@ -97,10 +97,10 @@ def message_senddm_v1(token, dm_id, message):
     # AccessError 1: invalid dm_id
     dm = get_dm_by_dm_id(dm_id)
     if type(dm_id) != int or dm is None:
-        raise AccessError(description='message_send_v2 : Invalid channel_id.')
+        raise InputError(description='message_send_v2 : Invalid dm_id.')
 
     # AccessError 2: the authorised user has not joined the channel they are trying to post to
-    if auth_user not in dm.all_members:
+    if auth_user not in dm.dm_members:
         raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
 
     new_message_id = create_message_id()
@@ -139,9 +139,8 @@ AccessError:
 
 def message_edit_v2(token, message_id, message):
     # InputError 1: invalid token.
-    try:
-        auth_user = get_user_by_token(token)
-    except:
+    auth_user = get_user_by_token(token)
+    if auth_user is None:
         raise AccessError(description='message_edit_v2 : Invalid token.')
 
     # InputError 1: Message is more than 1000 characters
@@ -201,9 +200,8 @@ AccessError:
 
 def message_remove_v1(token, message_id):
     # InputError 1: invalid token.
-    try:
-        auth_user = get_user_by_token(token)
-    except:
+    auth_user = get_user_by_token(token)
+    if auth_user is None:
         raise AccessError(description='message_remove_v1 : Invalid token.')
 
     # InputError 2: Message (based on ID) no longer exists
@@ -275,6 +273,8 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         raise InputError(description="message_share_v1 : invalid input.")
 
     user = get_user_by_token(token)
+    if user is None:
+        raise AccessError(description="Token is invalid")
     if user not in mem_list:
         raise AccessError(description="message_share_v1 : user need to be authorized.")
 
@@ -339,6 +339,7 @@ def get_channel_dm_by_message_id(message_id):
                 return [i, 1]
     return None
 
+
 # TODO:通过message_id删除message
 def delete_message_by_message_id(message_id):
     target_msg = get_message_by_message_id(message_id)
@@ -354,28 +355,3 @@ def delete_message_by_message_id(message_id):
                 return
     raise AccessError(description="delete_message_by_message_id : can not find target message.")
 
-
-def get_dm_by_dm_id(dm_id):
-    if dm_id >= len(data["class_dms"]) or not isinstance(dm_id, int):
-        return None
-    elif data["class_channels"][dm_id]:
-        return data["class_channels"][dm_id]
-    else:
-        return None
-
-#############################################################################
-#                                                                           #
-#                             History function                              #
-#                                                                           #
-#############################################################################
-
-
-# def message_send_v1(auth_user_id, channel_id, message):
-#     for i in data["class_channels"]:
-#         if i.channel_id == channel_id:
-#             i.messages.insert(0, message)
-#             break
-#
-#     return {
-#         'message_id': 1,
-#     }
