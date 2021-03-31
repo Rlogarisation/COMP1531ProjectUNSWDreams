@@ -13,6 +13,7 @@ from src.channel import channel_invite_v1, channel_details_v1, channel_messages_
     channel_addowner_v1, channel_removeowner_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.message import message_send_v2, message_senddm_v1, message_edit_v2, message_remove_v1, message_share_v1
+from src.dm import dm_create_v1, dm_invite_v1, dm_remove_v1, dm_leave_v1, dm_details_v1, dm_list_v1, dm_messages_v1
 
 
 def defaultHandler(err):
@@ -246,7 +247,7 @@ def channel_listall():
 
 #############################################################################
 #                                                                           #
-#                           Server for message.py                           #
+#                           Server for message.py by Lan Lin                #
 #                                                                           #
 #############################################################################
 
@@ -287,6 +288,80 @@ def message_remove():
 def message_share():
     info = request.get_json()
     result = message_share_v1(info['token'], info['og_message_id'], info['message'], info['channel_id'], info['dm_id'])
+    dump_data(data)
+    return dumps(result)
+
+
+#############################################################################
+#                                                                           #
+#                           Server for dm.py by Zheng Luo                   #
+#                                                                           #
+#############################################################################
+
+@APP.route("/dm/create/v1", methods=['POST'])
+def http_dm_create_v1():
+    info = request.get_json()
+    token = info['token']
+    u_id_list = info['u_id_list']
+    result = dm_create_v1(token, u_id_list)
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/dm/invite/v1", methods=['POST'])
+def http_dm_invite_v1():
+    info = request.get_json()
+    token = info['token']
+    dm_id = info['dm_id']
+    u_id = info['u_id']
+    result = dm_invite_v1(token, dm_id, u_id)
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/dm/remove/v1", methods=['DELETE'])
+def http_dm_remove_v1():
+    info = request.get_json()
+    token = info['token']
+    dm_id = info['dm_id']
+    result = dm_remove_v1(token, dm_id)
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/dm/leave/v1", methods=['POST'])
+def http_dm_leave_v1():
+    info = request.get_json()
+    token = info['token']
+    dm_id = info['dm_id']
+    result = dm_leave_v1(token, dm_id)
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/dm/details/v1", methods=['GET'])
+def http_dm_detail_v1():
+    token = request.args.get('token')
+    dm_id = int(request.args.get('dm_id'))
+    result = dm_details_v1(token, dm_id)
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/dm/list/v1", methods=['GET'])
+def http_dm_list_v1():
+    token = request.args.get('token')
+    result = dm_list_v1(token)
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/dm/messages/v1", methods=['GET'])
+def http_dm_messages_v1():
+    token = request.args.get('token')
+    dm_id = int(request.args.get('dm_id'))
+    start = int(request.args.get('start'))
+    result = dm_messages_v1(token, dm_id, start)
     dump_data(data)
     return dumps(result)
 
