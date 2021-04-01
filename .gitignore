@@ -132,3 +132,5 @@ dmypy.json
 # Mac DS_Store
 .DS_Store
 */.DS_Store
+/tests/db.p
+/db.p

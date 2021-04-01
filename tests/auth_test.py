@@ -264,3 +264,4 @@ def test_auth_logout_successfully_large():
     for token in token_list:
         result = auth_logout(token)
         assert result == {'is_success': True}
+
