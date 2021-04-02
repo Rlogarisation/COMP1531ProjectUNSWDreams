@@ -162,3 +162,4 @@ def count_dream_owner():
         if user.permission_id == Permission.global_owner:
             count += 1
     return count
+

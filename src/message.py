@@ -1,10 +1,4 @@
 from datetime import timezone, datetime
-<<<<<<< HEAD
-from src.data_file import data, Message
-from src.error import InputError, AccessError
-from src.auth import get_user_by_token
-from src.channel import get_channel_by_channel_id
-=======
 import json
 import re
 from src.data_file import data, Message, Permission
@@ -13,7 +7,6 @@ from src.auth import get_user_by_token, get_user_by_handle
 from src.channel import get_channel_by_channel_id, is_user_owner_channel, is_user_in_channel
 from src.dm import is_user_owner_dm, get_dm_by_dm_id, is_user_in_dm
 from src.other import Notification
->>>>>>> master
 
 #############################################################################
 #                                                                           #
@@ -72,6 +65,7 @@ def message_send_v2(token, channel_id, message):
     return {
         'message_id': new_message_id,
     }
+
 
 """
 Author: Shi Tong Yuan
@@ -144,58 +138,7 @@ InputError:
     - (Added) Invalid token.
     - Length of message is over 1000 characters message_id refers to a deleted message
 AccessError:
-    - Message with message_id was sent by the authorised user making this request
-    - The authorised user is an owner of this channel (if it was sent to a channel) or the **Dreams**
-
-"""
-
-
-def message_senddm_v1(token, dm_id, message):
-    # InputError 1: invalid token.
-    try:
-        auth_user = get_user_by_token(token)
-    except:
-        raise InputError(description='message_send_v2 : Invalid token.')
-
-    # InputError 1: Message is more than 1000 characters
-    if len(message) > 1000:
-        raise InputError(description='message_send_v2 : Message is more than 1000 characters.')
-
-    # AccessError 1: invalid dm_id
-    dm = get_dm_by_dm_id(dm_id)
-    if type(dm_id) != int or dm == None:
-        raise AccessError(description='message_send_v2 : Invalid channel_id.')
-
-    # AccessError 2: the authorised user has not joined the channel they are trying to post to
-    if auth_user not in dm.dm_members:
-        raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
-
-    new_message_id = len(dm.dm_messages)
-    message_created = Message(new_message_id, auth_user.u_id, message, datetime.utcnow(), -1, dm.dm_id)
-
-    dm.dm_messages.append(message_created)
-
-    return {
-        'message_id': new_message_id,
-    }
-
-
-"""
-Author: Shi Tong Yuan
-
-message/edit/v2
-
-Background:
-Given a message, update its text with new text. If the new message is an empty string, the message is deleted.
-
-Parameters: (token, message_id, message)
-Return Type: {}
-HTTP Method: PUT
-
-InputError:
-    - (Added) Invalid token.
-    - Length of message is over 1000 characters message_id refers to a deleted message
-AccessError:
+    # FIXME: 这边意思是写反了么？为什么要非auth_user和owner能修改，不应该是只有auth_user和owner能改么？
     - Message with message_id was sent by the authorised user making this request
     - The authorised user is an owner of this channel (if it was sent to a channel) or the **Dreams**
 
@@ -203,20 +146,32 @@ AccessError:
 
 
 def message_edit_v2(token, message_id, message):
-
     # InputError 1: invalid token.
-    try:
-        auth_user = get_user_by_token(token)
-    except:
-        raise InputError(description='message_edit_v2 : Invalid token.')
+    auth_user = get_user_by_token(token)
+    if auth_user is None:
+        raise AccessError(description='message_edit_v2 : Invalid token.')
 
     # InputError 1: Message is more than 1000 characters
     if len(message) > 1000:
         raise InputError(description='message_edit_v2 : Message is more than 1000 characters.')
 
-    # AccessError 1: Message editted by neither auth_user nor owner.
-    if auth_user.u_id != get_u_id_by_message_id(message_id):
-        raise AccessError(description='message_edit_v2 : Message editted by neither auth_user nor owner.')
+    # if cannot find the channel or dm
+    channel_dm = get_channel_dm_by_message_id(message_id)
+    check_owner = None
+    if channel_dm is None:
+        raise InputError(description="The message is not in any channel or dm")
+    if channel_dm[1] == 0:
+        channel = channel_dm[0]
+        check_owner = is_user_owner_channel(channel.channel_id, auth_user.u_id)
+    if channel_dm[1] == 1:
+        dm = channel_dm[0]
+        check_owner = is_user_owner_dm(dm.dm_id, auth_user.u_id)
+
+    # AccessError 1: Message editted by neither auth_user nor owner nor global owner.
+    if auth_user.u_id != get_u_id_by_message_id(message_id) and check_owner is None and \
+            auth_user.permission_id != Permission.global_owner:
+        raise AccessError(description='message_edit_v2 : Message editted by neither auth_user nor owner '
+                                      'nor global_owner.')
 
     # Case 1: if new message is empty string, delete it
     if message == "":
@@ -224,6 +179,11 @@ def message_edit_v2(token, message_id, message):
     # Case 2: else edit message
     else:
         get_message_by_message_id(message_id).message = message
+        # check and tag user
+        if channel_dm[1] == 0:
+            tagging_user(message, channel_dm[0].channel_id, -1, auth_user)
+        if channel_dm[1] == 1:
+            tagging_user(message, -1, channel_dm[0].dm_id, auth_user)
 
     return {}
 
@@ -244,6 +204,7 @@ InputError:
     - (Added) Invalid token.
     - Message (based on ID) no longer exists
 AccessError:
+    # FIXME: 这边意思是写反了么？为什么要非auth_user和owner能remove，不应该是只有auth_user和owner能remove么？
     - Message with message_id was sent by the authorised user making this request
     - The authorised user is an owner of this channel (if it was sent to a channel) or the **Dreams**
 
@@ -252,22 +213,41 @@ AccessError:
 
 def message_remove_v1(token, message_id):
     # InputError 1: invalid token.
-    try:
-        auth_user = get_user_by_token(token)
-    except:
-        raise InputError(description='message_remove_v1 : Invalid token.')
+    auth_user = get_user_by_token(token)
+    if auth_user is None:
+        raise AccessError(description='message_remove_v1 : Invalid token.')
 
     # InputError 2: Message (based on ID) no longer exists
     target_message = get_message_by_message_id(message_id)
-    if target_message == None:
+    if target_message is None:
         raise InputError(description='message_remove_v1 : Message (based on ID) no longer exists.')
 
-    # AccessError 1: Message removed by neither auth_user nor owner.
-    if auth_user.u_id != get_u_id_by_message_id(message_id):
-        raise AccessError(description='message_remove_v1 : Message removed by neither auth_user nor owner.')
+    # if cannot find the channel or dm
+    channel_dm = get_channel_dm_by_message_id(message_id)
+    check_owner = None
+    if channel_dm is None:
+        raise InputError(description="The message is not in any channel or dm")
+    # if the message is in a channel
+    if channel_dm[1] == 0:
+        channel = channel_dm[0]
+        # check if the authorised user is the owner of the channel
+        check_owner = is_user_owner_channel(channel.channel_id, auth_user.u_id)
+    # if the message is in a dm
+    if channel_dm[1] == 1:
+        dm = channel_dm[0]
+        # check if the authorised user is the owner of the dm
+        check_owner = is_user_owner_dm(dm.dm_id, auth_user.u_id)
 
-    # TODO:
-    delete_message_by_message_id(message_id)
+    # AccessError 1: Message editted by neither auth_user nor owner nor global owner.
+    if auth_user.u_id != get_u_id_by_message_id(message_id) and check_owner is None and \
+            auth_user.permission_id != Permission.global_owner:
+        raise AccessError(description='message_edit_v2 : Message editted by neither auth_user nor owner '
+                                      'nor global_owner.')
+    # delete_message_by_message_id(message_id)
+    if channel_dm[1] == 0:
+        channel_dm[0].messages.remove(target_message)
+    if channel_dm[1] == 1:
+        channel_dm[0].dm_messages.remove(target_message)
 
     return {}
 
@@ -306,15 +286,28 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         raise InputError(description="message_share_v1 : invalid input.")
 
     user = get_user_by_token(token)
+    if user is None:
+        raise AccessError(description="Token is invalid")
     if user not in mem_list:
         raise AccessError(description="message_share_v1 : user need to be authorized.")
 
     og_message = get_message_by_message_id(og_message_id)
-    message_added = ''.join([og_message.message, '\n"""\n', message, '\n"""'])
+    message_added = ''.join([message, '\n', '"""', '\n', og_message.message, '\n', '"""'])
     # add og_message to new_message
-    new_message = Message(create_message_id(), user.u_id, message_added, datetime.utcnow(), channel_id, dm_id)
+    created_time = datetime.utcnow().isoformat()
+    new_message = Message(create_message_id(), user.u_id, message_added, created_time, channel_id, dm_id)
 
-    return {new_message.message_id}
+    # send shared message to the channel or dm
+    if channel_id != -1:
+        message_send_v2(token, channel_id, new_message.message)
+        tagging_user(new_message.message, channel_id, -1, user)
+    if dm_id != -1:
+        message_senddm_v1(token, dm_id, new_message.message)
+        tagging_user(new_message.message, -1, dm_id, user)
+
+    return {
+        'shared_message_id': new_message.message_id
+    }
 
 
 #############################################################################
@@ -330,9 +323,14 @@ def create_message_id():
     data['message_num'] = data['message_num'] + 1
     return new_id
 
+
+# FIXME: 想要通过message_id得到u_id,需要遍历messages[]，但每个channel的messages都是从0开始，message_id必定有重复
+# TODO: 用create_session_id来，保证每个channel里面的message_id不重复
 def get_u_id_by_message_id(message_id):
     return get_message_by_message_id(message_id).u_id
 
+
+# TODO: 通过message_id获取目标message
 def get_message_by_message_id(message_id):
     for i in data['class_channels']:
         for j in i.messages:
@@ -356,6 +354,8 @@ def get_channel_dm_by_message_id(message_id):
                 return [i, 1]
     return None
 
+
+# TODO:通过message_id删除message
 def delete_message_by_message_id(message_id):
     target_msg = get_message_by_message_id(message_id)
     for i in data['class_channels']:

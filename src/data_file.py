@@ -42,7 +42,13 @@ class User:
             (outputs only) named exactly user
             Dictionary containing u_id, email, name_first, name_last, handle_str
         """
-        return {'u_id': self.u_id, 'email': self.email, 'name_first': self.name_first, 'name_last': self.name_last, 'handle_str': self.handle_str}
+        return {
+            'u_id': self.u_id,
+            'email': self.email,
+            'name_first': self.name_first,
+            'name_last': self.name_last,
+            'handle_str': self.handle_str
+        }
 
 
 class Channel:
@@ -60,7 +66,10 @@ class Channel:
 
     def return_type_channel(self):
         """dictionary contains types { channel_id, name }"""
-        return {'channel_id': self.channel_id, 'name': self.name}
+        return {
+            'channel_id': self.channel_id,
+            'name': self.name
+        }
 
 
 class Message:
@@ -77,7 +86,12 @@ class Message:
         dictionary contains types
         { message_id, u_id, message, time_created }
         """
-        return {'message_id': self.message_id, 'u_id': self.u_id, 'message': self.message, 'time_created': self.time_created}
+        return {
+            'message_id': self.message_id,
+            'u_id': self.u_id,
+            'message': self.message,
+            'time_created': self.time_created
+        }
 
 
 class DM:

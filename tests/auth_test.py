@@ -1,6 +1,6 @@
 import pytest
 from src.other import clear_v1
-from src.auth import auth_login_v1, auth_register_v2, auth_logout, get_user_by_token
+from src.auth import auth_login_v1, auth_register_v1, auth_logout, get_user_by_token
 from src.error import InputError, AccessError
 from src.channel import channel_details_v1, channel_invite_v1
 from src.channels import channels_create_v1
@@ -8,7 +8,7 @@ from src.channels import channels_create_v1
 """
 Author: Lan Lin
 
-Test for auth_register_v2 function implementation
+Test for auth_register_v1 function implementation
 
 Tests content:
 1. The email is invalid
@@ -22,7 +22,7 @@ Tests content:
 """
 #############################################################################
 #                                                                           #
-#                       Test for auth_register_v2                           #
+#                       Test for auth_register_v1                           #
 #                                                                           #
 #############################################################################
 
@@ -31,24 +31,24 @@ Tests content:
 def test_auth_register_invalid_email():
     clear_v1()
     with pytest.raises(InputError):
-        auth_register_v2('123.com', '12345ufd', 'Lan', 'Lin')
-        auth_register_v2('abc@@@.com', '0823hdskhji', 'Langley', 'Lin')
+        auth_register_v1('123.com', '12345ufd', 'Lan', 'Lin')
+        auth_register_v1('abc@@@.com', '0823hdskhji', 'Langley', 'Lin')
 
 
 # test email address is already being used by another user
 def test_auth_register_duplicate_email():
     clear_v1()
-    auth_register_v2('haha1@gmail.com', 'shkdlch', 'Peter', 'White')
+    auth_register_v1('haha1@gmail.com', 'shkdlch', 'Peter', 'White')
     with pytest.raises(InputError):
-        auth_register_v2('haha1@gmail.com', '0w9epodu', 'Tom', 'White')
+        auth_register_v1('haha1@gmail.com', '0w9epodu', 'Tom', 'White')
 
 
 # test for password entered is less than 6 characters long
 def test_auth_register_pwd_length():
     clear_v1()
     with pytest.raises(InputError):
-        auth_register_v2('haha@gmail.com', '123', 'Tom', 'White')
-        auth_register_v2('haha2@gmail.com', 'ab#', 'Peter', 'White')
+        auth_register_v1('haha@gmail.com', '123', 'Tom', 'White')
+        auth_register_v1('haha2@gmail.com', 'ab#', 'Peter', 'White')
 
 
 # name_first is not between 1 and 50 characters inclusively in length
@@ -56,8 +56,8 @@ def test_auth_register_firstName_length():
     clear_v1()
     name = 'a' * 51
     with pytest.raises(InputError):
-        auth_register_v2('haha@gmail.com', '123iwuiused', '', 'White')
-        auth_register_v2('haha2@gmail.com', 'iwsdrjcio', name, 'White')
+        auth_register_v1('haha@gmail.com', '123iwuiused', '', 'White')
+        auth_register_v1('haha2@gmail.com', 'iwsdrjcio', name, 'White')
 
 
 # name_last is not between 1 and 50 characters inclusively in length
@@ -65,16 +65,16 @@ def test_auth_register_lastName_length():
     clear_v1()
     name = 'a' * 51
     with pytest.raises(InputError):
-        auth_register_v2('haha@gmail.com', '123kjsldfiew', 'Peter', '')
-        auth_register_v2('haha2@gmail.com', 'iwsdcio3', 'Tom', name)
+        auth_register_v1('haha@gmail.com', '123kjsldfiew', 'Peter', '')
+        auth_register_v1('haha2@gmail.com', 'iwsdcio3', 'Tom', name)
 
 
 # test several users can successfully register
 def test_auth_register_valid_small():
     clear_v1()
     # register two users with valid inputs
-    register1 = auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
-    register2 = auth_register_v2('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
 
     # test a dictionary is return
     assert isinstance(register1, dict)
@@ -98,7 +98,7 @@ def test_auth_register_valid_large():
     clear_v1()
     id_list = []
     for index in range(50):
-        person = auth_register_v2('example'+str(index)+'@testexample.com', 'abcuief98dh', 'Tom', 'Green')
+        person = auth_register_v1('example'+str(index)+'@testexample.com', 'abcuief98dh', 'Tom', 'Green')
         # check the auth_user_id generated is correct
         assert person['auth_user_id'] == index
         id_list.append(person['auth_user_id'])
@@ -111,10 +111,10 @@ def test_auth_register_valid_large():
 # test if a valid handle is generated
 def test_auth_register_handle_valid():
     clear_v1()
-    register1 = auth_register_v2('haha@gmail.com', '123123123', 'zxcvbnmasdfg', 'hjklqwe')
-    register2 = auth_register_v2('test@testexample.com', 'wp01^#123', 'zxcvbnmasdfg', 'hjklqwert')
-    register3 = auth_register_v2('haha2@gmail.com', '123jcqewp2', 'zxcvbnmasdfg', 'hjklqwert')
-    register4 = auth_register_v2('haha3@gmail.com', '123jcqewp2', 'zxcvbnmasdfg', 'hjklqwertiowjec')
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'zxcvbnmasdfg', 'hjklqwe')
+    register2 = auth_register_v1('test@testexample.com', 'wp01^#123', 'zxcvbnmasdfg', 'hjklqwert')
+    register3 = auth_register_v1('haha2@gmail.com', '123jcqewp2', 'zxcvbnmasdfg', 'hjklqwert')
+    register4 = auth_register_v1('haha3@gmail.com', '123jcqewp2', 'zxcvbnmasdfg', 'hjklqwertiowjec')
 
     token1 = register1['token']
     user_id2 = register2['auth_user_id']
@@ -174,7 +174,7 @@ def test_auth_login_invalid_email():
 def test_auth_login_not_registered_email():
     clear_v1()
     # register a user
-    auth_register_v2('haha@gmail.com', '123123123', 'Tom', 'Green')
+    auth_register_v1('haha@gmail.com', '123123123', 'Tom', 'Green')
     # login the user with not registered email
     # will give error
     with pytest.raises(InputError):
@@ -184,7 +184,7 @@ def test_auth_login_not_registered_email():
 # test for password is not correct
 def test_auth_login_wrong_password():
     clear_v1()
-    auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'Green')
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'Green')
     with pytest.raises(InputError):
         auth_login_v1('haha@gmail.com', 'jfqowei0-23opj')
 
@@ -193,8 +193,8 @@ def test_auth_login_wrong_password():
 def test_auth_login_valid():
     clear_v1()
     # register two users with valid inputs
-    register1 = auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
-    register2 = auth_register_v2('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
 
     # login the two registered users
     login1 = auth_login_v1('haha@gmail.com', '123123123')
@@ -212,7 +212,7 @@ def test_auth_login_valid():
 # test for the same user with different sessions
 def test_auth_login_different_sessions():
     clear_v1()
-    auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
 
     login1 = auth_login_v1('haha@gmail.com', '123123123')
     login2 = auth_login_v1('haha@gmail.com', '123123123')
@@ -234,7 +234,7 @@ def test_auth_login_different_sessions():
 
 def test_auth_logout_invalid_token():
     clear_v1()
-    register1 = auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
     token = register1['token']
     invalid_token = f"{token}123"
     assert auth_logout(invalid_token) == {'is_success': False}
@@ -242,7 +242,7 @@ def test_auth_logout_invalid_token():
 
 def test_auth_logout_successfully_small():
     clear_v1()
-    register1 = auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
     token1 = register1['token']
     # user1 = get_user_by_token(token1)
     login2 = auth_login_v1('haha@gmail.com', '123123123')
@@ -256,7 +256,7 @@ def test_auth_logout_successfully_small():
 
 def test_auth_logout_successfully_large():
     clear_v1()
-    auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
     token_list = []
     for _i in range(20):
         login = auth_login_v1(f'haha@gmail.com', '123123123')

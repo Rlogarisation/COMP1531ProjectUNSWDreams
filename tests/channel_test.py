@@ -1,6 +1,7 @@
 # Imports the necessary function implementations
-from src.auth import auth_login_v1, auth_register_v2
-from src.channel import channel_invite_v1, channel_details_v1, channel_messages_v1, channel_join_v1
+from src.auth import auth_login_v1, auth_register_v1
+from src.channel import channel_invite_v1, channel_details_v1, channel_messages_v1, channel_join_v1, \
+    channel_addowner_v1, channel_removeowner_v1, channel_leave_v1
 from src.channels import channels_list_v1, channels_listall_v1, channels_create_v1
 from src.other import clear_v1
 from src.message import message_send_v2
@@ -47,8 +48,8 @@ AccessError:
 def test_channel_invite_v1_success():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -85,8 +86,8 @@ def test_channel_invite_v1_success():
 def test_channel_invite_v1_repeated():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -124,8 +125,8 @@ def test_channel_invite_v1_repeated():
 def test_channel_invite_v1_inputErrorChannel():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -150,8 +151,8 @@ def test_channel_invite_v1_inputErrorChannel():
 def test_channel_invite_v1_inputErrorUser():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -176,9 +177,9 @@ def test_channel_invite_v1_inputErrorUser():
 def test_channel_invite_v1_accessError():
     # Clears data and registers and logins user_1, user_2, and user_3
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
-    auth_register_v2("hah2@gmail.com", "9uisbxh83h", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("hah2@gmail.com", "9uisbxh83h", "Tom", "Green")
 
     # login the three registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -202,33 +203,8 @@ def test_channel_invite_v1_accessError():
 def test_channel_invite_v1_accessError_token():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
-
-    # login the three registered users
-    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
-    token_id_dict3 = auth_login_v1("hah2@gmail.com", "9uisbxh83h")
-    token1 = token_id_dict1["token"]
-    token2 = token_id_dict2["token"]
-    u_id3 = token_id_dict3["auth_user_id"]
-
-    # Create Channel_1 made by user_1 and get its id
-    channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
-
-    # Test conditions leading to an access error outcome
-    with pytest.raises(AccessError):
-        channel_invite_v1(token2, channel_1_id, u_id3)
-
-
-# Case 6 - tests for access error due to invalid token
-#          expected outcome is access error
-# Occurs when channel_invite is called when token used is invalid
-def test_channel_invite_v1_accessError_token():
-    # Clears data and registers and logins user_1 and user_2
-    clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -280,7 +256,7 @@ AccessError:
 def test_channel_details_v1_success1():
     # Clears data and registers and logins user_1
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
 
     # login the registered user
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -306,8 +282,8 @@ def test_channel_details_v1_success1():
 def test_channel_details_v1_success2():
     # Clears data and registers and logins user_1
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -337,7 +313,7 @@ def test_channel_details_v1_success2():
 def test_channel_details_v1_inputError():
     # Clears data and registers and logins user_1
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
 
     # login the registered user
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -360,8 +336,8 @@ def test_channel_details_v1_inputError():
 def test_channel_details_v1_accessError():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -383,7 +359,7 @@ def test_channel_details_v1_accessError():
 def test_channel_details_v1_accessErrortoken():
     # Clears data and registers and logins user_1
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
 
     # login the registered user
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -437,10 +413,10 @@ def test_invalid_channel_id1():
     clear_v1()
 
     # create 2 users
-    user1 = auth_register_v2("user1@test.com", "user1password", "Roger", "Luo")
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
     user1 = auth_login_v1("user1@test.com", "user1password")
 
-    user2 = auth_register_v2("user2@test.com", "user2password", "Lan", "Lin")
+    auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
     user2 = auth_login_v1("user2@test.com", "user2password")
 
     # create channel for testing
@@ -456,13 +432,13 @@ def test_auth_missing():
     clear_v1()
 
     # create 2 users and author people
-    auth_register_v2("user1@test.com", "user1password", "Roger", "Luo")
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
     user1 = auth_login_v1("user1@test.com", "user1password")
 
-    auth_register_v2("user2@test.com", "user2password", "Lan", "Lin")
+    auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
     user2 = auth_login_v1("user2@test.com", "user2password")
 
-    auth_register_v2("user3@test.com", "user3password", "ShiTong", "Yuan")
+    auth_register_v1("user3@test.com", "user3password", "ShiTong", "Yuan")
     user3 = auth_login_v1("user3@test.com", "user3password")
 
     # create channel by user1 for testing
@@ -478,10 +454,10 @@ def test_no_msg():
     clear_v1()
 
     # create 2 users
-    user1 = auth_register_v2("user1@test.com", "user1password", "Roger", "Luo")
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
     user1 = auth_login_v1("user1@test.com", "user1password")
 
-    user2 = auth_register_v2("user2@test.com", "user2password", "Lan", "Lin")
+    auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
     user2 = auth_login_v1("user2@test.com", "user2password")
 
     # create channel for testing
@@ -497,7 +473,7 @@ def test_less_than_50_msg():
     clear_v1()
 
     # create 2 users
-    user1 = auth_register_v2("user1@test.com", "user1password", "Roger", "Luo")
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
     user1 = auth_login_v1("user1@test.com", "user1password")
 
     # create channel for testing
@@ -516,7 +492,7 @@ def test_more_than_50_msg():
     clear_v1()
 
     # create 2 users
-    user1 = auth_register_v2("user1@test.com", "user1password", "Roger", "Luo")
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
     user1 = auth_login_v1("user1@test.com", "user1password")
 
     # create channel for testing
@@ -564,8 +540,8 @@ AccessError:
 def test_channel_join_normal():
     # Clears data and registers and logins owner and joiner
     clear_v1()
-    auth_register_v2("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
-    auth_register_v2("TheJoiner@test.com", "joinerpassword", "Roger", "Luo")
+    auth_register_v1("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
+    auth_register_v1("TheJoiner@test.com", "joinerpassword", "Roger", "Luo")
 
     # login the two registered users
     owner = auth_login_v1("TheOwner@test.com", "thisispassword")
@@ -606,7 +582,7 @@ def test_channel_join_normal():
     assert output["all_members"][1]["name_first"] == 'Roger'
     assert output["owner_members"][0]["name_first"] == 'ShiTong'
     assert output["name"] == "Testing Channel"
-    assert output["is_public"] == True
+    assert output["is_public"] is True
     assert len(output["all_members"]) == 2
     assert len(output["owner_members"]) == 1
 
@@ -617,8 +593,8 @@ def test_channel_join_normal():
 def test_invalid_channel_id2():
     # Clears data and registers and logins owner and joiner
     clear_v1()
-    auth_register_v2("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
-    auth_register_v2("TheJoiner@test.com", "joinerpassword", "Roger", "Luo")
+    auth_register_v1("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
+    auth_register_v1("TheJoiner@test.com", "joinerpassword", "Roger", "Luo")
 
     # login the two registered users
     owner = auth_login_v1("TheOwner@test.com", "thisispassword")
@@ -661,8 +637,8 @@ def test_invalid_channel_id2():
 def test_join_private_channel():
     # Clears data and registers and logins owner and joiner
     clear_v1()
-    auth_register_v2("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
-    auth_register_v2("TheJoiner@test.com", "joinerpassword", "Roger", "Luo")
+    auth_register_v1("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
+    auth_register_v1("TheJoiner@test.com", "joinerpassword", "Roger", "Luo")
 
     # login the two registered users
     owner = auth_login_v1("TheOwner@test.com", "thisispassword")
@@ -704,8 +680,8 @@ def test_join_private_channel():
 def test_join_global_owner():
     # Clears data and registers and logins global owner and owner
     clear_v1()
-    auth_register_v2("TheGlobalOwner@test.com", "thisispassword", "ShiTong", "Yuan")
-    auth_register_v2("TheOwner@test.com", "ownerpassword", "Roger", "Luo")
+    auth_register_v1("TheGlobalOwner@test.com", "thisispassword", "ShiTong", "Yuan")
+    auth_register_v1("TheOwner@test.com", "ownerpassword", "Roger", "Luo")
 
     # login the two registered users
     global_owner = auth_login_v1("TheGlobalOwner@test.com", "thisispassword")
@@ -757,8 +733,8 @@ def test_join_global_owner():
 def test_join_invalid_token():
     # Clears data and registers and logins owner and joiner
     clear_v1()
-    auth_register_v2("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
-    auth_register_v2("TheJoiner@test.com", "joinerpassword", "Roger", "Luo")
+    auth_register_v1("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
+    auth_register_v1("TheJoiner@test.com", "joinerpassword", "Roger", "Luo")
 
     # login the two registered users
     owner = auth_login_v1("TheOwner@test.com", "thisispassword")
@@ -830,8 +806,8 @@ AccessError:
 def test_channel_addowner_v1_success():
     # Clears data and registers and logins user_1
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -866,8 +842,8 @@ def test_channel_addowner_v1_success():
 def test_channel_addowner_v1_inputErrorChannel():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -893,8 +869,8 @@ def test_channel_addowner_v1_inputErrorChannel():
 def test_channel_addowner_v1_inputErrorOwner():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -918,9 +894,9 @@ def test_channel_addowner_v1_inputErrorOwner():
 def test_channel_addowner_v1_accessError():
     # Clears data and registers and logins user_1, user_2, and user_3
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
-    auth_register_v2("hah2@gmail.com", "9uisbxh83h", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("hah2@gmail.com", "9uisbxh83h", "Tom", "Green")
 
     # login the three registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -947,8 +923,8 @@ def test_channel_addowner_v1_accessError():
 def test_channel_addowner_v1_accessErrorToken():
     # Clears data and registers and logins user_1, user_2, and user_3
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the three registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -974,9 +950,9 @@ def test_channel_addowner_v1_accessErrorToken():
 def test_channel_addowner_v1_globalOwner():
     # Clears data and registers and logins user_1, user_2, and user_3
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
-    auth_register_v2("hah2@gmail.com", "9uisbxh83h", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("hah2@gmail.com", "9uisbxh83h", "Tom", "Green")
 
     # login the three registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -1041,8 +1017,8 @@ AccessError:
 def test_channel_removeowner_v1_success():
     # Clears data and registers and logins user_1
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -1077,8 +1053,8 @@ def test_channel_removeowner_v1_success():
 def test_channel_removeowner_v1_inputErrorChannel():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -1105,8 +1081,8 @@ def test_channel_removeowner_v1_inputErrorChannel():
 def test_channel_removeowner_v1_inputErrorMember():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -1129,8 +1105,8 @@ def test_channel_removeowner_v1_inputErrorMember():
 def test_channel_removeowner_v1_inputErrorOnlyOwner():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -1153,9 +1129,9 @@ def test_channel_removeowner_v1_inputErrorOnlyOwner():
 def test_channel_addowner_v1_accessError1():
     # Clears data and registers and logins user_1, user_2, and user_3
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
-    auth_register_v2("hah2@gmail.com", "9uisbxh83h", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("hah2@gmail.com", "9uisbxh83h", "Tom", "Green")
 
     # login the three registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -1182,8 +1158,8 @@ def test_channel_addowner_v1_accessError1():
 def test_channel_addowner_v1_accessErrorToken1():
     # Clears data and registers and logins user_1, user_2, and user_3
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the three registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -1210,9 +1186,9 @@ def test_channel_addowner_v1_accessErrorToken1():
 def test_channel_addowner_v1_accessError2():
     # Clears data and registers and logins user_1, user_2, and user_3
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
-    auth_register_v2("hah2@gmail.com", "9uisbxh83h", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("hah2@gmail.com", "9uisbxh83h", "Tom", "Green")
 
     # login the three registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -1277,8 +1253,8 @@ AccessError:
 def test_channel_leave_v1_success():
     # Clears data and registers user1 and user2
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -1311,8 +1287,8 @@ def test_channel_leave_v1_success():
 def test_channel_leave_v1_inputErrorChannel():
     # Clears data and registers user1 and user2
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -1337,8 +1313,8 @@ def test_channel_leave_v1_inputErrorChannel():
 def test_channel_leave_v1_accessError():
     # Clears data and registers user1 and user2
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -1360,8 +1336,8 @@ def test_channel_leave_v1_accessError():
 def test_channel_leave_v1_accessErrorToken():
     # Clears data and registers user1 and user2
     clear_v1()
-    auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")
-    auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
 
     # login the two registered users
     dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
@@ -1378,3 +1354,45 @@ def test_channel_leave_v1_accessErrorToken():
     invalid_token = token2 + "rkbgesorgbv#$%"
     with pytest.raises(AccessError):
         channel_leave_v1(invalid_token, channel_1_id)
+
+
+# if __name__ == "__main__":
+#     # create 2 users
+#     auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+#     user1 = auth_login_v1("user1@test.com", "user1password")
+#
+#     # create channel for testing
+#     Testing_channel_id = channels_create_v1(user1["token"], "channel_test", True)
+#
+#     # send testing message into channel chat
+#     for i in range(1, 3):
+#         message_send_v2(user1["token"], Testing_channel_id["channel_id"], f"This is a testing message{i}.")
+#
+#     # 1. return -1 : for no more message after start
+#     message_stored = channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 0)["messages"]
+#     print(message_stored[0]['message'])
+#     print(message_stored[0]['time_created'])
+#     print(message_stored[1]['message'])
+#     print(message_stored[1]['time_created'])
+#     assert len(message_stored) == 2
+
+# if __name__ == "__main__":
+#     # create 2 users
+#     clear_v1()
+#     auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+#     user1 = auth_login_v1("user1@test.com", "user1password")
+#
+#     # create channel for testing
+#     Testing_channel_id = channels_create_v1(user1["token"], "channel_test", True)
+#
+#     # send testing message into channel chat
+#     for i in range(1, 3):
+#         message_send_v2(user1["token"], Testing_channel_id["channel_id"], f"This is a testing message{i}.")
+#
+#     # 1. return -1 : for no more message after start
+#     message_stored = channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 0)["messages"]
+#     print(message_stored[0]['message'])
+#     print(message_stored[0]['time_created'])
+#     print(message_stored[1]['message'])
+#     print(message_stored[1]['time_created'])
+#     assert len(message_stored) == 2

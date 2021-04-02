@@ -4,7 +4,7 @@
 # Updated for iteration 2 by : Emir Aditya Zen
 
 import pytest
-from src.auth import auth_login_v1, auth_register_v2
+from src.auth import auth_login_v1, auth_register_v1
 from src.channel import channel_invite_v1, channel_details_v1, channel_join_v1, channel_messages_v1
 from src.channels import channels_list_v1, channels_create_v1, channels_listall_v1
 from src.error import InputError, AccessError
@@ -37,12 +37,12 @@ AccessError:
 def test_channels_correct_channel():
     clear_v1()
     # Initiate a user
-    auth_register_v2("ZhengRogerLuo@gmail.com", "happysheepQAQ", "Zheng", "Luo")
+    auth_register_v1("ZhengRogerLuo@gmail.com", "happysheepQAQ", "Zheng", "Luo")
     login1 = auth_login_v1("ZhengRogerLuo@gmail.com", "happysheepQAQ")
     token1 = login1['token']
 
     # Create a channel and get its ID
-    channel_id1 = channels_create_v1(token1, "SheepChannel", is_public=True)['channel_id']
+    channels_create_v1(token1, "SheepChannel", is_public=True)
 
     # List the channel of this user belongs to
     channel_list = channels_list_v1(token1)
@@ -54,14 +54,14 @@ def test_channels_correct_channel():
 def test_channels_multiple_channels():
     clear_v1()
     # Initiate a user
-    auth_register_v2("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
+    auth_register_v1("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
     login1 = auth_login_v1("UNSWIsTheBest@gmail.com", "happyEveryday!")
     token1 = login1['token']
 
     # Create multiple channels and get its id
-    channel_id1 = channels_create_v1(token1, "EngineeringChannel", is_public=True)['channel_id']
-    channel_id2 = channels_create_v1(token1, "BussinessChannel", is_public=True)['channel_id']
-    channel_id3 = channels_create_v1(token1, "LawChannel", is_public=True)['channel_id']
+    channels_create_v1(token1, "EngineeringChannel", is_public=True)
+    channels_create_v1(token1, "BussinessChannel", is_public=True)
+    channels_create_v1(token1, "LawChannel", is_public=True)
 
     # List the channel of this user belongs to
     channel_list = channels_list_v1(token1)
@@ -75,8 +75,8 @@ def test_channels_multiple_channels():
 def test_channels_multiple_users():
     clear_v1()
     # Initiate multiple users
-    auth_register_v2("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
-    auth_register_v2("IHateSemester@gmail.com", "BreakIsTooLong", "Ben", "A")
+    auth_register_v1("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
+    auth_register_v1("IHateSemester@gmail.com", "BreakIsTooLong", "Ben", "A")
     login1 = auth_login_v1("ILoveTrimester@gmail.com", "NoStressAtAll")
     login2 = auth_login_v1("IHateSemester@gmail.com", "BreakIsTooLong")
     token1 = login1['token']
@@ -100,7 +100,7 @@ def test_channels_multiple_users():
 def test_channels_oneUser_multiple_private_channels():
     clear_v1()
     # Initiate a user
-    auth_register_v2("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
+    auth_register_v1("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
     login1 = auth_login_v1("ILoveTrimester@gmail.com", "NoStressAtAll")
     token1 = login1['token']
     # Create 2 private channels and 2 public channels
@@ -117,12 +117,12 @@ def test_channels_oneUser_multiple_private_channels():
 def test_channels_invalidToken():
     clear_v1()
     # Initiate a user
-    auth_register_v2("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
+    auth_register_v1("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
     login1 = auth_login_v1("ILoveTrimester@gmail.com", "NoStressAtAll")
     token1 = login1['token']
 
     # Create a channel and get its ID
-    channel_id1 = channels_create_v1(token1, "SheepChannel", is_public=True)['channel_id']
+    channels_create_v1(token1, "SheepChannel", is_public=True)
 
     # Made an invalid token for user 1
     invalid_token = ''.join([token1, "rkbgesorgbv#$%"])
@@ -162,12 +162,12 @@ AccessError:
 def test_allchannels_correct_channel():
     clear_v1()
     # Initiate a user
-    auth_register_v2("ZhengRogerLuo@gmail.com", "happysheepQAQ", "Zheng", "Luo")
+    auth_register_v1("ZhengRogerLuo@gmail.com", "happysheepQAQ", "Zheng", "Luo")
     login1 = auth_login_v1("ZhengRogerLuo@gmail.com", "happysheepQAQ")
     token1 = login1['token']
 
     # Create a channel and get its ID
-    channel_id1 = channels_create_v1(token1, "SheepChannel", is_public=True)['channel_id']
+    channels_create_v1(token1, "SheepChannel", is_public=True)
 
     # List all the channels and check
     assert (len(channels_listall_v1(token1)) == 1)
@@ -176,7 +176,7 @@ def test_allchannels_correct_channel():
 def test_allchannels_multiple_channels():
     clear_v1()
     # Initiate a user
-    auth_register_v2("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
+    auth_register_v1("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
     login1 = auth_login_v1("UNSWIsTheBest@gmail.com", "happyEveryday!")
     token1 = login1['token']
 
@@ -196,8 +196,8 @@ def test_allchannels_multiple_channels():
 def test_allchannels_multiple_users():
     clear_v1()
     # Initiate multiple users
-    auth_register_v2("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
-    auth_register_v2("IHateSemester@gmail.com", "BreakIsTooLong", "Ben", "A")
+    auth_register_v1("ILoveTrimester@gmail.com", "NoStressAtAll", "Iannnn", "J")
+    auth_register_v1("IHateSemester@gmail.com", "BreakIsTooLong", "Ben", "A")
     login1 = auth_login_v1("ILoveTrimester@gmail.com", "NoStressAtAll")
     login2 = auth_login_v1("IHateSemester@gmail.com", "BreakIsTooLong")
     token1 = login1['token']
@@ -216,7 +216,7 @@ def test_allchannels_multiple_users():
 def test_allchannels_private():
     clear_v1()
     # Initiate a user
-    auth_register_v2("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
+    auth_register_v1("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
     login1 = auth_login_v1("UNSWIsTheBest@gmail.com", "happyEveryday!")
     token1 = login1['token']
 
@@ -237,7 +237,7 @@ def test_allchannels_private():
 # if the token input is invalid
 def test_listall_invalid_token():
     clear_v1()
-    auth_register_v2("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
+    auth_register_v1("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
     login1 = auth_login_v1("UNSWIsTheBest@gmail.com", "happyEveryday!")
     token1 = login1['token']
 
@@ -277,6 +277,7 @@ Tests content:
 4. Access error due to invalid token
 """
 
+
 #############################################################################
 #                                                                           #
 #                        Test for Channels_create_v1                        #
@@ -287,7 +288,7 @@ Tests content:
 # test if the name of the channel to be created is less than 20 characters
 def test_channels_create_length_of_name():
     clear_v1()
-    auth_register_v2('shaozhen@gmail.com', 'qwe1212', 'shaozhen', 'yan')
+    auth_register_v1('shaozhen@gmail.com', 'qwe1212', 'shaozhen', 'yan')
     user1 = auth_login_v1('shaozhen@gmail.com', 'qwe1212')
     token1 = user1['token']
     # check the length of name is more than 20 characters raises input error
@@ -298,7 +299,7 @@ def test_channels_create_length_of_name():
 # check the is_public is boolean or not
 def test_channels_create_is_public_bool():
     clear_v1()
-    auth_register_v2('shaozhen@gmail.com', 'qwe1212', 'shaozhen', 'yan')
+    auth_register_v1('shaozhen@gmail.com', 'qwe1212', 'shaozhen', 'yan')
     user1 = auth_login_v1('shaozhen@gmail.com', 'qwe1212')
     token1 = user1['token']
     with pytest.raises(InputError):
@@ -308,7 +309,7 @@ def test_channels_create_is_public_bool():
 # test if the channel has been created successfully
 def test_channels_create_valid():
     clear_v1()
-    auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
     login = auth_login_v1('haha@gmail.com', '123123123')
     token = login['token']
 
@@ -330,7 +331,7 @@ def test_channels_create_valid():
 # test if the function is called by invalid token causing access error
 def test_channels_create_invalid_token():
     clear_v1()
-    auth_register_v2('shaozhen@gmail.com', 'qwe1212', 'shaozhen', 'yan')
+    auth_register_v1('shaozhen@gmail.com', 'qwe1212', 'shaozhen', 'yan')
     user1 = auth_login_v1('shaozhen@gmail.com', 'qwe1212')
     token1 = user1['token']
 
