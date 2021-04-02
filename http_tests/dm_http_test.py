@@ -46,7 +46,7 @@ def test_dm_create_v1_http(parameters0, parameters1):
     u_id1 = json.loads(user1.text).get('auth_user_id')
     incorrect_input = {
         'token': token0,
-        'u_id_list': [1]
+        'u_ids': [1]
     }
     status = requests.post(config.url + 'dm/create/v1', json=incorrect_input).status_code
     assert status == 400
@@ -69,7 +69,7 @@ def test_dm_invite_v1_http(parameters0, parameters1):
     token1 = json.loads(user1.text).get('token')
     input0 = {
         'token': token0,
-        'u_id_list':[1]
+        'u_ids':[1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
