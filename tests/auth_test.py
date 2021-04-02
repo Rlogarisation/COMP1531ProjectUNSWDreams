@@ -32,6 +32,7 @@ def test_auth_register_invalid_email():
     clear_v1()
     with pytest.raises(InputError):
         auth_register_v1('123.com', '12345ufd', 'Lan', 'Lin')
+    with pytest.raises(InputError):
         auth_register_v1('abc@@@.com', '0823hdskhji', 'Langley', 'Lin')
 
 
@@ -48,6 +49,7 @@ def test_auth_register_pwd_length():
     clear_v1()
     with pytest.raises(InputError):
         auth_register_v1('haha@gmail.com', '123', 'Tom', 'White')
+    with pytest.raises(InputError):
         auth_register_v1('haha2@gmail.com', 'ab#', 'Peter', 'White')
 
 
@@ -57,6 +59,7 @@ def test_auth_register_firstName_length():
     name = 'a' * 51
     with pytest.raises(InputError):
         auth_register_v1('haha@gmail.com', '123iwuiused', '', 'White')
+    with pytest.raises(InputError):
         auth_register_v1('haha2@gmail.com', 'iwsdrjcio', name, 'White')
 
 
@@ -66,6 +69,7 @@ def test_auth_register_lastName_length():
     name = 'a' * 51
     with pytest.raises(InputError):
         auth_register_v1('haha@gmail.com', '123kjsldfiew', 'Peter', '')
+    with pytest.raises(InputError):
         auth_register_v1('haha2@gmail.com', 'iwsdcio3', 'Tom', name)
 
 
@@ -167,6 +171,7 @@ def test_auth_login_invalid_email():
     clear_v1()
     with pytest.raises(InputError):
         auth_login_v1('123.@com', '12345ufd')
+    with pytest.raises(InputError):
         auth_login_v1('a.,#0@test.com', '0823hdskhji')
 
 
