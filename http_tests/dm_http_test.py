@@ -44,7 +44,22 @@ def parameters2():
 #                     Http Test for dm_create_v1 Error                      #
 #                                                                           #
 #############################################################################
+"""
+Author: Zheng Luo
 
+dm/create/v1
+
+Background:
+[u_id] is the user(s) that this DM is directed to, and will not include the creator. The creator is the owner of the DM. name should be automatically generated based on the user(s) that is in this dm. The name should be an alphabetically-sorted, comma-separated list of user handles, e.g. 'handle1, handle2, handle3'.
+
+Parameters: (token, [u_id])
+Return Type: { dm_id, dm_name }
+HTTP Method: POST
+
+InputError when any of:
+u_id does not refer to a valid user
+
+"""
 # Invalid input invitee
 def test_dm_create_v1_nonexist_invitee_http(parameters0):
     requests.delete(config.url + 'clear/v1')
@@ -54,7 +69,7 @@ def test_dm_create_v1_nonexist_invitee_http(parameters0):
     token0 = json.loads(user0.text).get('token')
     incorrect_input = {
         'token': token0,
-        'u_ids': [5]
+        'u_id': [5]
     }
     status = requests.post(config.url + 'dm/create/v1', json=incorrect_input).status_code
     assert status == 400
@@ -66,7 +81,26 @@ def test_dm_create_v1_nonexist_invitee_http(parameters0):
 #                     Http Test for dm_invite_v1 Error                      #
 #                                                                           #
 #############################################################################
+"""
+Author: Zheng Luo
 
+dm/invite/v1
+
+Background:
+Inviting a user to an existing dm
+
+Parameters: (token, dm_id, u_id)
+Return Type: {}
+HTTP Method: POST
+
+InputError when any of: 
+          dm_id does not refer to an existing dm.
+          u_id does not refer to a valid user. 
+
+AccessError when: 
+        the authorised user is already a member of the DM.
+
+"""
 # Invaild input u_id
 def test_dm_invite_v1_invaild_uid_http(parameters0, parameters1):
     requests.delete(config.url + 'clear/v1')
@@ -78,14 +112,14 @@ def test_dm_invite_v1_invaild_uid_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_ids':[u_id_1]
+        'u_id':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
     incorrect_input = {
         'token': token0,
         'dm_id': dm_id,
-        'u_ids': '12'
+        'u_id': '12'
     }
     status = requests.post(config.url + 'dm/invite/v1', json=incorrect_input).status_code
     assert status == 400
@@ -103,14 +137,14 @@ def test_dm_invite_v1_invaild_dm_id_http(parameters0, parameters1, parameters2):
     u_id_2 = json.loads(user2.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_ids':[u_id_1]
+        'u_id':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
     incorrect_input = {
         'token': token0,
         'dm_id': 'incorrect_dm_id',
-        'u_ids': u_id_2
+        'u_id': u_id_2
     }
     status = requests.post(config.url + 'dm/invite/v1', json=incorrect_input).status_code
     assert status == 400
@@ -126,14 +160,14 @@ def test_dm_invite_v1_already_user_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_ids':[u_id_1]
+        'u_id':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
     incorrect_input = {
         'token': token0,
         'dm_id': dm_id,
-        'u_ids': u_id_1
+        'u_id': u_id_1
     }
     status = requests.post(config.url + 'dm/invite/v1', json=incorrect_input).status_code
     assert status == 403
@@ -144,11 +178,25 @@ def test_dm_invite_v1_already_user_http(parameters0, parameters1):
 #                     Http Test for dm_remove_v1 Error                      #
 #                                                                           #
 #############################################################################
-'''
+"""
+Author: Zheng Luo
+
+dm/remove/v1
+
+Background:
+Remove an existing DM. This can only be done by the original creator of the DM.
+
 Parameters: (token, dm_id)
 Return Type: {}
 HTTP Method: DELETE
-'''
+
+InputError when:   
+    dm_id does not refer to a valid DM 
+
+AccessError when:  
+    the user is not the original DM creator
+
+"""
 # Invaild input dm_id
 def test_dm_remove_v1_invaild_dm_id_http(parameters0, parameters1):
     requests.delete(config.url + 'clear/v1')
@@ -159,7 +207,7 @@ def test_dm_remove_v1_invaild_dm_id_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_ids':[u_id_1]
+        'u_id':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     incorrect_input = {
@@ -181,7 +229,7 @@ def test_dm_remove_v1_incorrect_token_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_ids':[u_id_1]
+        'u_id':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
@@ -227,7 +275,7 @@ def test_dm_leave_v1_invaild_dm_id_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_ids':[u_id_1]
+        'u_id':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     incorrect_input = {
@@ -251,7 +299,7 @@ def test_dm_leave_v1_invaild_dm_id_http(parameters0, parameters1, parameters2):
     token2 = json.loads(user2.text).get('token')
     input0 = {
         'token': token0,
-        'u_ids':[u_id_1]
+        'u_id':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
@@ -296,7 +344,7 @@ def test_dm_detail_v1_invaild_dm_id_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_ids':[u_id_1]
+        'u_id':[u_id_1]
     }
     incorrect_input = {
         'token': token0,
@@ -318,7 +366,7 @@ def test_dm_detail_v1_unauth_user_http(parameters0, parameters1, parameters2):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_ids':[u_id_1]
+        'u_id':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
@@ -387,7 +435,7 @@ def test_dm_message_v1_invaild_dm_id_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_ids':[u_id_1]
+        'u_id':[u_id_1]
     }
     incorrect_input = {
         'token': token0,
@@ -407,7 +455,7 @@ def test_dm_message_v1_invaild_dm_id_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_ids':[u_id_1]
+        'u_id':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
@@ -431,7 +479,7 @@ def test_dm_message_v1_test_user_not_in_http(parameters0, parameters1, parameter
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_ids':[u_id_1]
+        'u_id':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
