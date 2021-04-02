@@ -1,7 +1,7 @@
 from src.channel import channel_invite_v1, channel_messages_v1
 import pytest
 from src.data_file import data
-from src.dm import dm_create_v1, dm_messages_v1
+from src.dm import dm_create_v1, dm_messages_v1, dm_remove_v1
 from src.error import InputError, AccessError
 from src.channels import channels_create_v1
 from src.auth import auth_register_v1, auth_login_v1
@@ -168,7 +168,7 @@ def test_message_remove_not_owner_or_authorised_user():
         message_remove_v1(token_1, message_0_id)
 
 
-def test_message_remove_valid_case():
+def test_message_remove_channel_valid_case():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
     auth_login_v1("test_email0@gmail.com", "password")
@@ -178,6 +178,34 @@ def test_message_remove_valid_case():
 
     assert message_remove_v1(token_0, message_0_id) == {}
 
+
+def test_message_remove_dm_valid_case():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First", "Last")['token']
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")['auth_user_id']
+
+    dm_id = dm_create_v1(token_0, [u_id_1])['dm_id']
+    message_0_id = message_senddm_v1(token_0, dm_id, 'Hope it works')['message_id']
+
+    assert message_remove_v1(token_0, message_0_id) == {}
+
+
+def test_remove_channel_dm_after_message_send():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First", "Last")['token']
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")['auth_user_id']
+
+    dm_id = dm_create_v1(token_0, [u_id_1])['dm_id']
+    message_0_id = message_senddm_v1(token_0, dm_id, 'Hope it works')['message_id']
+
+    dm_remove_v1(token_0, 0)
+
+    with pytest.raises(InputError):
+        message_remove_v1(token_0, message_0_id)
 
 #############################################################################
 #                                                                           #
@@ -203,7 +231,18 @@ AccessError when none of the following are true:
     - The authorised user is an owner of this channel (if it was sent to a channel) or the **Dreams**
 
 """
+def test_invalid_token():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
 
+    channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
+
+    message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')
+
+    with pytest.raises(AccessError):
+        message_edit_v2("invalid token", message_0_id, 'Hope it works')
+    
 
 def test_message_edit_long_message():
     clear_v1()
@@ -255,15 +294,13 @@ def test_message_edit_empty_message():
 
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
     message_0_id = message_send_v2(token_0, channel_0_id, '')['message_id']
-    message_edit_v2(token_0, message_0_id, 'It works')
+    message_edit_v2(token_0, message_0_id, '')
     all_messages = channel_messages_v1(token_0, channel_0_id, 0)
 
-    assert all_messages['messages'][0]['message'] == 'It works'
-    assert all_messages['messages'][0]['message_id'] == message_0_id
-    assert all_messages['messages'][0]['u_id'] == u_id_0
+    assert all_messages['messages'] == []
 
 
-def test_message_edit_valid_case():
+def test_message_edit_valid_case_channel_msg():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
     u_id = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
@@ -277,6 +314,23 @@ def test_message_edit_valid_case():
     assert all_messages['messages'][0]['message'] == 'It really works'
     assert all_messages['messages'][0]['message_id'] == message_0_id
     assert all_messages['messages'][0]['u_id'] == u_id
+
+def test_message_edit_valid_case_dm_msg():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First", "Last")['token']
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
+    u_id_1 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
+
+    dm_id = dm_create_v1(token_0, [u_id_1])['dm_id']
+    message_0_id = message_senddm_v1(token_0, dm_id, 'It works')['message_id']
+
+    message_edit_v2(token_0, message_0_id, 'It really works')
+    all_messages = dm_messages_v1(token_0, dm_id, 0)
+
+    assert all_messages['messages'][0]['message'] == 'It really works'
+    assert all_messages['messages'][0]['message_id'] == message_0_id
+    assert all_messages['messages'][0]['u_id'] == u_id_0
 
 
 #############################################################################

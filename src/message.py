@@ -138,7 +138,6 @@ InputError:
     - (Added) Invalid token.
     - Length of message is over 1000 characters message_id refers to a deleted message
 AccessError:
-    # FIXME: 这边意思是写反了么？为什么要非auth_user和owner能修改，不应该是只有auth_user和owner能改么？
     - Message with message_id was sent by the authorised user making this request
     - The authorised user is an owner of this channel (if it was sent to a channel) or the **Dreams**
 
@@ -204,7 +203,6 @@ InputError:
     - (Added) Invalid token.
     - Message (based on ID) no longer exists
 AccessError:
-    # FIXME: 这边意思是写反了么？为什么要非auth_user和owner能remove，不应该是只有auth_user和owner能remove么？
     - Message with message_id was sent by the authorised user making this request
     - The authorised user is an owner of this channel (if it was sent to a channel) or the **Dreams**
 
@@ -323,8 +321,6 @@ def create_message_id():
     data['message_num'] = data['message_num'] + 1
     return new_id
 
-
-# FIXME: 想要通过message_id得到u_id,需要遍历messages[]，但每个channel的messages都是从0开始，message_id必定有重复
 # TODO: 用create_session_id来，保证每个channel里面的message_id不重复
 def get_u_id_by_message_id(message_id):
     return get_message_by_message_id(message_id).u_id
@@ -340,7 +336,7 @@ def get_message_by_message_id(message_id):
         for j in i.dm_messages:
             if j.message_id == message_id:
                 return j
-    raise InputError(description="get_message_by_message_id : can not find target message.")
+    return None
 
 
 def get_channel_dm_by_message_id(message_id):
@@ -368,7 +364,7 @@ def delete_message_by_message_id(message_id):
             if j.message_id == target_msg.message_id:
                 i.dm_messages.remove(j)
                 return
-    raise AccessError(description="delete_message_by_message_id : can not find target message.")
+    return None
 
 
 def tagging_user(message, channel_id, dm_id, sender):
