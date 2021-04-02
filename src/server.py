@@ -89,8 +89,8 @@ def user_profile_v2():
     token = request.args.get('token')
     try:
         u_id = int(request.args.get('u_id'))
-    except:
-        raise InputError(description='u_id is not int')
+    except ValueError as error:
+        raise InputError(description='u_id is not int') from error
     result = user_profile_v1(token, u_id)
     dump_data(data)
     return dumps(result)
@@ -191,8 +191,8 @@ def channel_details():
     token = request.args.get('token')
     try:
         channel_id = int(request.args.get('channel_id'))
-    except:
-        raise InputError(description="channel_id is not int")
+    except ValueError as error:
+        raise InputError(description="channel_id is not int") from error
     result = channel_details_v1(token, channel_id)
     dump_data(data)
     return dumps(result)
@@ -235,12 +235,12 @@ def channel_message():
     token = request.args.get("token")
     try:
         channel_id = int(request.args.get("channel_id"))
-    except:
-        raise InputError(description="channel_id is not int")
+    except ValueError as error:
+        raise InputError(description="channel_id is not int") from error
     try:
         start = int(request.args.get("start"))
-    except:
-        raise InputError(description="start is not int")
+    except ValueError as error:
+        raise InputError(description="start is not int") from error
     result = channel_messages_v1(token, channel_id, start)
     dump_data(data)
     return dumps(result)
@@ -373,8 +373,8 @@ def http_dm_detail_v1():
     token = request.args.get('token')
     try:
         dm_id = int(request.args.get('dm_id'))
-    except:
-        raise InputError(description="dm_id is not an int")
+    except ValueError as error:
+        raise InputError(description="dm_id is not an int") from error
     result = dm_details_v1(token, dm_id)
     dump_data(data)
     return dumps(result)
@@ -393,12 +393,12 @@ def http_dm_messages_v1():
     token = request.args.get('token')
     try:
         dm_id = int(request.args.get('dm_id'))
-    except:
-        raise InputError(description="dm_id is not int")
+    except ValueError as error:
+        raise InputError(description="dm_id is not int") from error
     try:
         start = int(request.args.get('start'))
-    except:
-        raise InputError(description="start is not int")
+    except ValueError as error:
+        raise InputError(description="start is not int") from error
     result = dm_messages_v1(token, dm_id, start)
     dump_data(data)
     return dumps(result)

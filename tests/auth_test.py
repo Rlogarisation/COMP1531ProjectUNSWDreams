@@ -259,7 +259,7 @@ def test_auth_logout_successfully_large():
     auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
     token_list = []
     for i in range(20):
-        login = auth_login_v1('haha@gmail.com', '123123123')
+        login = auth_login_v1(f'haha{i}@gmail.com', '123123123')
         token_list.append(login['token'])
     for token in token_list:
         result = auth_logout(token)

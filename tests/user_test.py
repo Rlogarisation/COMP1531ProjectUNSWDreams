@@ -380,7 +380,6 @@ def test_user_profile_setemail_v1_inputError_repeatedEmail():
 
     # login the two registered users
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
-    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
     token1 = token_id_dict1["token"]
 
     # Test conditions leading to an input error outcome due to repeated email
@@ -598,7 +597,6 @@ def test_users_all_v1_successMultiple():
     token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
     token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
     token1 = token_id_dict1["token"]
-    token2 = token_id_dict2["token"]
     u_id1 = token_id_dict1["auth_user_id"]
     u_id2 = token_id_dict2["auth_user_id"]
 

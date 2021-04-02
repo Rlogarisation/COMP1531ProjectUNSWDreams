@@ -454,10 +454,10 @@ def test_no_msg():
     clear_v1()
 
     # create 2 users
-    user1 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
     user1 = auth_login_v1("user1@test.com", "user1password")
 
-    user2 = auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
+    auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
     user2 = auth_login_v1("user2@test.com", "user2password")
 
     # create channel for testing
@@ -473,7 +473,7 @@ def test_less_than_50_msg():
     clear_v1()
 
     # create 2 users
-    user1 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
     user1 = auth_login_v1("user1@test.com", "user1password")
 
     # create channel for testing
@@ -481,7 +481,7 @@ def test_less_than_50_msg():
 
     # send testing message into channel chat
     for i in range(1, 3):
-        message_send_v2(user1["token"], Testing_channel_id["channel_id"], "This is a testing message.")
+        message_send_v2(user1["token"], Testing_channel_id["channel_id"], f"This is a testing message{i}.")
 
     # 1. return -1 : for no more message after start
     message_stored = channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 0)["messages"]
@@ -500,7 +500,7 @@ def test_more_than_50_msg():
 
     # send testing message into channel chat
     for i in range(1, 99):
-        message_send_v2(user1["token"], Testing_channel_id["channel_id"], "This is a testing message.")
+        message_send_v2(user1["token"], Testing_channel_id["channel_id"], f"This is a testing message{i}.")
 
     # 1. return -1 : for no more message after start
     message_stored = channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 0)["messages"]
@@ -582,7 +582,7 @@ def test_channel_join_normal():
     assert output["all_members"][1]["name_first"] == 'Roger'
     assert output["owner_members"][0]["name_first"] == 'ShiTong'
     assert output["name"] == "Testing Channel"
-    assert output["is_public"] == True
+    assert output["is_public"] is True
     assert len(output["all_members"]) == 2
     assert len(output["owner_members"]) == 1
 
@@ -831,7 +831,7 @@ def test_channel_addowner_v1_success():
     assert output["owner_members"][0]["name_first"] == 'Peter'
     assert output["owner_members"][1]["name_first"] == 'Tom'
     assert output["name"] == "channelone"
-    assert output["is_public"] == True
+    assert output["is_public"] is True
     assert len(output["all_members"]) == 2
     assert len(output["owner_members"]) == 2
 
@@ -1138,7 +1138,6 @@ def test_channel_addowner_v1_accessError1():
     token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
     token_id_dict3 = auth_login_v1("hah2@gmail.com", "9uisbxh83h")
     token1 = token_id_dict1["token"]
-    token2 = token_id_dict2["token"]
     token3 = token_id_dict3["token"]
     u_id2 = token_id_dict2["auth_user_id"]
     u_id3 = token_id_dict3["auth_user_id"]
@@ -1277,7 +1276,7 @@ def test_channel_leave_v1_success():
     assert output["all_members"][0]["name_first"] == 'Peter'
     assert output["owner_members"][0]["name_first"] == 'Peter'
     assert output["name"] == "channelone"
-    assert output["is_public"] == True
+    assert output["is_public"] is True
     assert len(output["all_members"]) == 1
     assert len(output["owner_members"]) == 1
 
@@ -1322,7 +1321,6 @@ def test_channel_leave_v1_accessError():
     dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
     token1 = dict_user1["token"]
     token2 = dict_user2["token"]
-    u_id2 = dict_user2["auth_user_id"]
 
     # Create channel made by user1, get its id
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
@@ -1358,25 +1356,25 @@ def test_channel_leave_v1_accessErrorToken():
         channel_leave_v1(invalid_token, channel_1_id)
 
 
-if __name__ == "__main__":
-    # create 2 users
-    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
-    user1 = auth_login_v1("user1@test.com", "user1password")
-
-    # create channel for testing
-    Testing_channel_id = channels_create_v1(user1["token"], "channel_test", True)
-
-    # send testing message into channel chat
-    for i in range(1, 3):
-        message_send_v2(user1["token"], Testing_channel_id["channel_id"], f"This is a testing message{i}.")
-
-    # 1. return -1 : for no more message after start
-    message_stored = channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 0)["messages"]
-    print(message_stored[0]['message'])
-    print(message_stored[0]['time_created'])
-    print(message_stored[1]['message'])
-    print(message_stored[1]['time_created'])
-    assert len(message_stored) == 2
+# if __name__ == "__main__":
+#     # create 2 users
+#     auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+#     user1 = auth_login_v1("user1@test.com", "user1password")
+#
+#     # create channel for testing
+#     Testing_channel_id = channels_create_v1(user1["token"], "channel_test", True)
+#
+#     # send testing message into channel chat
+#     for i in range(1, 3):
+#         message_send_v2(user1["token"], Testing_channel_id["channel_id"], f"This is a testing message{i}.")
+#
+#     # 1. return -1 : for no more message after start
+#     message_stored = channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 0)["messages"]
+#     print(message_stored[0]['message'])
+#     print(message_stored[0]['time_created'])
+#     print(message_stored[1]['message'])
+#     print(message_stored[1]['time_created'])
+#     assert len(message_stored) == 2
 
 # if __name__ == "__main__":
 #     # create 2 users

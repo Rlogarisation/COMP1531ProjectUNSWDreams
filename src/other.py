@@ -75,7 +75,7 @@ def notification_get_v1(token):
     return_list = []
     index = len(noti_list) - 1
     if len(noti_list) >= 20:
-        for i in range(20):
+        for _i in range(20):
             return_list.append(noti_list[index].return_type_notification())
             index -= 1
     else:
