@@ -35,6 +35,7 @@ class User:
         self.dm_owns = []
         self.channel_owns = []  # a list of all channels that the user is the owner of the channel
         self.current_sessions = []  # a list of current sessions of the user
+        self.notifications = []
 
     def return_type_user(self):
         """in 6.1.1 Data Types
@@ -90,7 +91,24 @@ class DM:
         self.dm_messages = []
 
     def return_type_dm(self):
-        return {'dm_id': self.dm_id, 'name': self.dm_name}
+        return {
+            'dm_id': self.dm_id,
+            'name': self.dm_name
+        }
+
+
+class Notification:
+    def __init__(self, channel_id, dm_id, notification_message):
+        self.channel_id = channel_id
+        self.dm_id = dm_id
+        self.notification_message = notification_message
+
+    def return_type_notification(self):
+        return {
+            'channel_id': self.channel_id,
+            'dm_id': self.dm_id,
+            'notification_message': self.notification_message
+        }
 
 
 DATA = {
@@ -104,6 +122,8 @@ DATA = {
     'session_num': 0,
     # to record the number of messages
     'message_num': 0,
+    'channel_num': 0,
+    'dm_num': 0,
     'secret': 'THIS_IS_SECRET'
 }
 

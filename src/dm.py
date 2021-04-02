@@ -1,5 +1,5 @@
 from typing import Dict
-from src.data_file import data, Permission, DM
+from src.data_file import data, Permission, DM, Notification
 from src.error import InputError, AccessError
 from src.auth import get_user_by_auth_id, get_user_by_uid, session_to_token, token_to_session, get_user_by_token
 
@@ -37,6 +37,8 @@ def dm_create_v1(token, u_id_list):
     list_dm_handles.append(inviter.handle_str)
 
     for uid in u_id_list:
+        if not isinstance(u_id_list, list):
+            raise InputError(description='The u_id is invalid, u_id does not refer to a vaild user')
         invitee = get_user_by_uid(uid)
         # input error if u_id does not refer to a valid user
         if invitee is None:
@@ -45,8 +47,9 @@ def dm_create_v1(token, u_id_list):
         list_dm_invitee.append(invitee)
         list_dm_handles.append(invitee.handle_str)
 
+    list_dm_handles.sort()
     dm_name = ", ".join(list_dm_handles)
-    dm_id = len(data['class_dms'])
+    dm_id = create_dm_id()
 
     dm = DM(dm_name, dm_id)
     # Update data
@@ -59,6 +62,10 @@ def dm_create_v1(token, u_id_list):
     for invitee in list_dm_invitee:
         dm.dm_members.append(invitee)
         invitee.part_of_dm.append(dm)
+        # add notification
+        notification_message = f"{inviter.handle_str} added you to {dm.dm_name}"
+        notification = Notification(-1, dm.dm_id, notification_message)
+        invitee.notifications.append(notification)
 
     dm.dm_members.append(inviter)
     inviter.part_of_dm.append(dm)
@@ -116,6 +123,10 @@ def dm_invite_v1(token, dm_id, u_id):
     else:
         dm.dm_members.append(invitee)
         invitee.part_of_dm.append(dm)
+        # add notification
+        notification_message = f"{inviter.handle_str} added you to {dm.dm_name}"
+        notification = Notification(-1, dm.dm_id, notification_message)
+        invitee.notifications.append(notification)
 
     return {}
 
@@ -213,7 +224,7 @@ def dm_leave_v1(token, dm_id):
         if len(dm.dm_owners) == 0 and len(dm.dm_members) > 0:
             dm_next_owner = dm.dm_members[0]
             dm.dm_owners.append(dm_next_owner)
-            dm_next_owner.dm_owns(dm)
+            dm_next_owner.dm_owns.append(dm)
 
     return {}
 
@@ -283,7 +294,9 @@ def dm_list_v1(token):
     list_return = []
     for DMs in user.part_of_dm:
         list_return.append(DMs.return_type_dm())
-    return {'dms': list_return}
+    return {
+        'dms': list_return
+    }
 
 
 """
@@ -341,7 +354,7 @@ def dm_messages_v1(token, dm_id, start):
     return {
         'messages': return_message,
         'start': start,
-        'end': end,
+        'end': end
     }
 
 
@@ -351,11 +364,35 @@ def dm_messages_v1(token, dm_id, start):
 #                                                                           #
 #############################################################################
 
-
 def get_dm_by_dm_id(dm_id):
-    if not isinstance(dm_id, int) or dm_id >= len(data['class_dms']):
+    if (not isinstance(dm_id, int)) or dm_id >= data['dm_num']:
         return None
-    elif data['class_dms'][dm_id]:
-        return data['class_dms'][dm_id]
-    else:
-        return None
+    for dm in data['class_dms']:
+        if dm.dm_id == dm_id:
+            return dm
+
+    return None
+
+
+# check if the user is an owner of channel
+def is_user_owner_dm(dm_id, u_id):
+    dm = get_dm_by_dm_id(dm_id)
+    for owner in dm.dm_owners:
+        if u_id == u_id:
+            return owner
+    return None
+
+
+def create_dm_id():
+    new_id = data['dm_num']
+    data['dm_num'] = data['dm_num'] + 1
+    return new_id
+
+
+# check if the user is a member of channel
+def is_user_in_dm(dm_id, u_id):
+    dm = get_dm_by_dm_id(dm_id)
+    for user in dm.dm_members:
+        if u_id == user.u_id:
+            return user
+    return None

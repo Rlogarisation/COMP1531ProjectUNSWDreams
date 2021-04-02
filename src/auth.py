@@ -2,7 +2,7 @@ import re
 import jwt
 import hashlib
 
-from jwt import InvalidSignatureError
+from jwt import InvalidSignatureError, InvalidTokenError
 from src.data_file import User, Permission, data
 from src.error import InputError
 
@@ -174,6 +174,18 @@ def get_user_by_email(email):
     return None
 
 
+# return the specific user with handle_str
+# the user is a class
+def get_user_by_handle(handle):
+    if handle is None:
+        return None
+    for user in data['class_users']:
+        if user.handle_str == handle:
+            return user
+
+    return None
+
+
 # check the InputError for auth_register
 def auth_register_check_error(email, password, name_first, name_last):
     # if the email address is invalid
@@ -225,7 +237,7 @@ def token_to_session(token):
     try:
         decode_session = jwt.decode(token, data['secret'], algorithms=['HS256'])
         return decode_session
-    except InvalidSignatureError:
+    except:
         return None
 
 
@@ -241,6 +253,7 @@ def full_name_20(name_first, name_last):
     if len(full_name) > 20:
         full_name = list(full_name)[:20]
         full_name = ''.join(full_name)
+    full_name = full_name.lower()
     return full_name
 
 
