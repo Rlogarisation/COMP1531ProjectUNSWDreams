@@ -313,7 +313,7 @@ def test_dm_leave_v1_invaild_dm_id_http(parameters0, parameters1, parameters2):
 
 #############################################################################
 #                                                                           #
-#                     Http Test for dm_detail_v1 Error                      #
+#                     Http Test for dm_details_v1 Error                      #
 #                                                                           #
 #############################################################################
 """
@@ -322,7 +322,7 @@ Author: Zheng Luo
 dm/details/v1
 
 Background:
-Users that are part of this direct message can view basic information about the DM
+Users that are part of this direct messages can view basic information about the DM
 
 Parameters: (token, dm_id)
 Return Type: { name, members }
@@ -335,16 +335,23 @@ AccessError when
     Authorised user is not a member of this DM with dm_id
 """
 # dm_id is not a valid dm
-def test_dm_detail_v1_invaild_dm_id_http(parameters0):
+def test_dm_details_v1_invaild_dm_id_http(parameters0, parameters1):
     requests.delete(config.url + 'clear/v1')
     user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
+    user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
     # Obtain tokens based on registered users.
     token0 = json.loads(user0.text).get('token')
-    status = requests.get(config.url + 'dm/detail/v1?token=' + token0 + '&dm_id=invalid_dm_id').status_code
+    u_id_1 = json.loads(user1.text).get('auth_user_id')
+    input0 = {
+        'token': token0,
+        'u_ids':[u_id_1]
+    }
+    requests.post(config.url + 'dm/create/v1', json=input0)
+    status = requests.get(config.url + 'dm/details/v1?token=' + token0 + '&dm_id=invalid_dm_id').status_code
     assert status == 400
 
 # Authorised user is not a member of this DM with dm_id
-def test_dm_detail_v1_unauth_user_http(parameters0, parameters1, parameters2):
+def test_dm_details_v1_unauth_user_http(parameters0, parameters1, parameters2):
     requests.delete(config.url + 'clear/v1')
     user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
     user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
@@ -360,7 +367,7 @@ def test_dm_detail_v1_unauth_user_http(parameters0, parameters1, parameters2):
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
-    status = requests.get(config.url + 'dm/detail/v1?token=' + token2 + '&dm_id=' + dm_id).status_code
+    status = requests.get(config.url + 'dm/details/v1?token=' + token2 + '&dm_id=' + str(dm_id)).status_code
     assert status == 403
 
 
@@ -386,7 +393,7 @@ TEST CASES:
 
 #############################################################################
 #                                                                           #
-#                     Http Test for dm_message_v1 Error                      #
+#                     Http Test for dm_messages_v1 Error                      #
 #                                                                           #
 #############################################################################
 """
@@ -412,16 +419,16 @@ AccessError when any of:
 """
 
 # dm_id is not a valid dm
-def test_dm_message_v1_invaild_dm_id_http(parameters0):
+def test_dm_messages_v1_invaild_dm_id_http(parameters0):
     requests.delete(config.url + 'clear/v1')
     user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
     # Obtain tokens based on registered users.
     token0 = json.loads(user0.text).get('token')
-    status = requests.get(config.url + 'dm/message/v1?token=' + token0 + '&dm_id=invalid_dm_id&start=0').status_code
+    status = requests.get(config.url + 'dm/messages/v1?token=' + token0 + '&dm_id=invalid_dm_id&start=0').status_code
     assert status == 400
 
 # oversize start
-def test_dm_message_v1_invaild_dm_id_http(parameters0, parameters1):
+def test_dm_messages_v1_invaild_dm_id_http(parameters0, parameters1):
     requests.delete(config.url + 'clear/v1')
     user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
     user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
@@ -434,11 +441,11 @@ def test_dm_message_v1_invaild_dm_id_http(parameters0, parameters1):
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
-    status = requests.get(config.url + 'dm/message/v1?token=' + token0 + '&dm_id=' + dm_id + '&start=999').status_code
+    status = requests.get(config.url + 'dm/messages/v1?token=' + token0 + '&dm_id=' + str(dm_id) + '&start=999').status_code
     assert status == 400
 
 # Test user not in
-def test_dm_message_v1_test_user_not_in_http(parameters0, parameters1, parameters2):
+def test_dm_messages_v1_test_user_not_in_http(parameters0, parameters1, parameters2):
     requests.delete(config.url + 'clear/v1')
     user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
     user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
@@ -453,6 +460,6 @@ def test_dm_message_v1_test_user_not_in_http(parameters0, parameters1, parameter
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
-    status = requests.get(config.url + 'dm/message/v1?token=' + token2 + '&dm_id=' + dm_id + '&start=0').status_code
+    status = requests.get(config.url + 'dm/messages/v1?token=' + token2 + '&dm_id=' + str(dm_id) + '&start=0').status_code
     assert status == 403
 
