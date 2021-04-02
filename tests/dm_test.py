@@ -1,7 +1,7 @@
 import pytest
 from src.error import InputError, AccessError
 from src.dm import dm_create_v1, dm_details_v1, dm_invite_v1, dm_leave_v1, dm_list_v1, dm_messages_v1, dm_remove_v1
-from src.auth import auth_register_v1, auth_login_v1, get_user_by_token
+from src.auth import auth_register_v2, auth_login_v1, get_user_by_token
 from src.other import clear_v1
 #############################################################################
 #                                                                           #
@@ -28,9 +28,9 @@ TEST CASES:
 def test_dm_details_v1():
 
     clear_v1()
-    token0 = auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")['token']
-    token1 = auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
-    token2 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")['token']
+    token0 = auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")['token']
+    token1 = auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
+    token2 = auth_register_v2("user1@test.com", "user1password", "Roger", "Luo")['token']
 
     auth_id0 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
     auth_id1 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
@@ -79,9 +79,9 @@ TEST CASES:
 
 def test_dm_list_v1():
     clear_v1()
-    token0 = auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")['token']
-    token1 = auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
-    token2 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")['token']
+    token0 = auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")['token']
+    token1 = auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
+    token2 = auth_register_v2("user1@test.com", "user1password", "Roger", "Luo")['token']
 
     auth_id0 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
     auth_id1 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
@@ -124,9 +124,9 @@ TEST CASES:
 
 def test_dm_create_v1():
     clear_v1()
-    token0 = auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")['token']
-    token1 = auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
-    token2 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")['token']
+    token0 = auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")['token']
+    token1 = auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
+    token2 = auth_register_v2("user1@test.com", "user1password", "Roger", "Luo")['token']
 
     auth_id0 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
     auth_id1 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
@@ -173,9 +173,9 @@ TEST CASES:
 
 def test_dm_remove_v1():
     clear_v1()
-    token0 = auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")['token']
-    token1 = auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
-    token2 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")['token']
+    token0 = auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")['token']
+    token1 = auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
+    token2 = auth_register_v2("user1@test.com", "user1password", "Roger", "Luo")['token']
 
     auth_id0 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
     auth_id1 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
@@ -225,9 +225,9 @@ TEST CASES:
 
 def test_dm_invite_v1():
     clear_v1()
-    token0 = auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")['token']
-    token1 = auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
-    token2 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")['token']
+    token0 = auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")['token']
+    token1 = auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
+    token2 = auth_register_v2("user1@test.com", "user1password", "Roger", "Luo")['token']
 
     auth_id0 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
     auth_id1 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
@@ -283,9 +283,9 @@ TEST CASES:
 
 def test_dm_leave_v1():
     clear_v1()
-    token0 = auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")['token']
-    token1 = auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
-    token2 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")['token']
+    token0 = auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")['token']
+    token1 = auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
+    token2 = auth_register_v2("user1@test.com", "user1password", "Roger", "Luo")['token']
 
     auth_id0 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
     auth_id1 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
@@ -336,9 +336,9 @@ TEST CASES:
 
 def test_dm_messages_v1():
     clear_v1()
-    token0 = auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")['token']
-    token1 = auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
-    token2 = auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")['token']
+    token0 = auth_register_v2("haha@gmail.com", "123123123", "Peter", "White")['token']
+    token1 = auth_register_v2("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
+    token2 = auth_register_v2("user1@test.com", "user1password", "Roger", "Luo")['token']
 
     auth_id0 = auth_login_v1("haha@gmail.com", "123123123")["auth_user_id"]
     auth_id1 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]

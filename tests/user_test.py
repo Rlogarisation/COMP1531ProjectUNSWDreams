@@ -1,6 +1,6 @@
 import pytest
 from src.other import clear_v1
-from src.auth import auth_login_v1, auth_register_v1, auth_logout, get_user_by_token
+from src.auth import auth_login_v1, auth_register_v2, auth_logout, get_user_by_token
 from src.error import InputError, AccessError
 from src.channel import channel_details_v1, channel_invite_v1, channel_join_v1
 from src.channels import channels_create_v1
@@ -15,10 +15,10 @@ from src.data_file import Permission
 
 def test_invalid_token():
     clear_v1()
-    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    register1 = auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
     token = register1['token']
     invalid_token = f"{token}123"
-    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    register2 = auth_register_v2('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
     u_id2 = register2['auth_user_id']
     new_permission_id = Permission.global_owner
     with pytest.raises(AccessError):
@@ -27,9 +27,9 @@ def test_invalid_token():
 
 def test_admin_change_permission_invalid_owner():
     clear_v1()
-    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
-    register3 = auth_register_v1('haha1@gmail.com', '1231231231', 'Pete', 'Whit')
+    auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v2('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    register3 = auth_register_v2('haha1@gmail.com', '1231231231', 'Pete', 'Whit')
     token2 = register2['token']
     uid3 = register3['auth_user_id']
     with pytest.raises(AccessError):
@@ -38,8 +38,8 @@ def test_admin_change_permission_invalid_owner():
 
 def test_admin_change_permission_invalid_user():
     clear_v1()
-    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    register1 = auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v2('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
     token1 = register1['token']
     uid2 = register2['auth_user_id']
     invalid_uid = uid2 + 100
@@ -49,8 +49,8 @@ def test_admin_change_permission_invalid_user():
 
 def test_admin_change_permission_invalid_permission():
     clear_v1()
-    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    register1 = auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v2('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
     token1 = register1['token']
     uid2 = register2['auth_user_id']
     invalid_permission = 3
@@ -60,8 +60,8 @@ def test_admin_change_permission_invalid_permission():
 
 def test_admin_change_permission_owner():
     clear_v1()
-    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    register1 = auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v2('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
     token1 = register1['token']
     uid2 = register2['auth_user_id']
     token2 = register2['token']
@@ -72,8 +72,8 @@ def test_admin_change_permission_owner():
 
 def test_admin_change_permission_member():
     clear_v1()
-    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    register1 = auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v2('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
     token1 = register1['token']
     uid1 = register1['auth_user_id']
     uid2 = register2['auth_user_id']
@@ -92,7 +92,7 @@ def test_admin_change_permission_member():
 #############################################################################
 def test_admin_user_remove_invalid_uid():
     clear_v1()
-    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    register1 = auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
     token1 = register1['token']
     with pytest.raises(InputError):
         admin_user_remove(token1, None)
@@ -102,7 +102,7 @@ def test_admin_user_remove_invalid_uid():
 
 def test_admin_user_remove_only_owner():
     clear_v1()
-    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    register1 = auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
     token1 = register1['token']
     uid1 = register1['auth_user_id']
     with pytest.raises(InputError):
@@ -111,8 +111,8 @@ def test_admin_user_remove_only_owner():
 
 def test_admin_user_remove_invalid_owner():
     clear_v1()
-    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v2('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
     token2 = register2['token']
     uid2 = register2['auth_user_id']
     with pytest.raises(AccessError):
@@ -121,8 +121,8 @@ def test_admin_user_remove_invalid_owner():
 
 def test_admin_user_remove_successfully():
     clear_v1()
-    regiester1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    regiester1 = auth_register_v2('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v2('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
     token1 = regiester1['token']
     token2 = register2['token']
     uid2 = register2['auth_user_id']
