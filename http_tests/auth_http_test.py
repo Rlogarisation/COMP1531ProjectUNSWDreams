@@ -85,7 +85,7 @@ def test_auth_register_lastName_length_http():
     assert status == 400
 #############################################################################
 #                                                                           #
-#                       http test for auth_login Error                   #
+#                       http test for auth_login Error                      #
 #                                                                           #
 #############################################################################
 
@@ -130,7 +130,7 @@ def test_auth_login_wrong_password_http(parameters):
     assert status == 400
 #############################################################################
 #                                                                           #
-#                       http test for auth_logout Error                   #
+#                       http test for auth_logout Error                     #
 #                                                                           #
 #############################################################################
 

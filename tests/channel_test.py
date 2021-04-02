@@ -1126,7 +1126,7 @@ def test_channel_removeowner_v1_inputErrorOnlyOwner():
 # Case 5 - tests for access error due to non authorised user
 #          expected outcome is input error
 # Occurs when remove owner function is by a member of channel who is not a global owner
-def test_channel_addowner_v1_accessError1():
+def test_channel_removeowner_v1_accessError1():
     # Clears data and registers and logins user_1, user_2, and user_3
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
@@ -1146,17 +1146,18 @@ def test_channel_addowner_v1_accessError1():
     # Create Channel_1 made by user_1, get its id, and invite user2
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
     channel_invite_v1(token1, channel_1_id, u_id2)
+    channel_invite_v1(token1, channel_1_id, u_id3)
     channel_addowner_v1(token1, channel_1_id, u_id2)
 
     # Conditions leads to an access error outcome and tests for it
-    with pytest.raises(InputError):
-        channel_addowner_v1(token3, channel_1_id, u_id3)
+    with pytest.raises(AccessError):
+        channel_removeowner_v1(token3, channel_1_id, u_id2)
 
 
 # Case 6 - tests for access error due invalid token
 #          expected outcome is access error
-# Occurs when add owner function is called using invalid token
-def test_channel_addowner_v1_accessErrorToken1():
+# Occurs when remove owner function is called using invalid token
+def test_channel_removeowner_v1_accessErrorToken1():
     # Clears data and registers and logins user_1, user_2, and user_3
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
@@ -1183,8 +1184,8 @@ def test_channel_addowner_v1_accessErrorToken1():
 
 # Case 7 - tests for global owner exception
 #          expected outcome is user with u_id becomes owner
-# Occurs when add owner function is called by global owner
-def test_channel_addowner_v1_accessError2():
+# Occurs when remove owner function is called by global owner
+def test_channel_removeowner_v1_globalOwner():
     # Clears data and registers and logins user_1, user_2, and user_3
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
@@ -1203,21 +1204,20 @@ def test_channel_addowner_v1_accessError2():
     channel_1_id = channels_create_v1(token2, "channelone", True)["channel_id"]
     channel_invite_v1(token2, channel_1_id, u_id3)
 
-    # Calls addowner function for testing by global owner
-    # Expected output is user_3 becomes owner
+    # Calls addowner and removeowner function for testing by global owner
+    # Expected output is user_3 becomes owner then back to member
     channel_addowner_v1(token1, channel_1_id, u_id3)
+    channel_removeowner_v1(token1, channel_1_id, u_id3)
 
     # Calls details function for testing
     output = channel_details_v1(token2, channel_1_id)
 
     assert output["all_members"][0]["name_first"] == 'Tom'
-    assert output["all_members"][1]["name_first"] == 'Tom'
     assert output["owner_members"][0]["name_first"] == 'Tom'
-    assert output["owner_members"][1]["name_first"] == 'Tom'
     assert output["name"] == "channelone"
     assert output["is_public"] is True
     assert len(output["all_members"]) == 2
-    assert len(output["owner_members"]) == 2
+    assert len(output["owner_members"]) == 1
 
 
 """
