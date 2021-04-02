@@ -428,7 +428,7 @@ def test_dm_messages_v1_invaild_dm_id_http(parameters0):
     assert status == 400
 
 # oversize start
-def test_dm_messages_v1_invaild_dm_id_http(parameters0, parameters1):
+def test_dm_messages_v1_invaild_dm_id1_http(parameters0, parameters1):
     requests.delete(config.url + 'clear/v1')
     user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
     user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
