@@ -302,8 +302,8 @@ def message_share():
 def http_dm_create_v1():
     info = request.get_json()
     token = info['token']
-    u_id_list = info['u_id_list']
-    result = dm_create_v1(token, u_id_list)
+    u_ids = info['u_ids']
+    result = dm_create_v1(token, u_ids)
     dump_data(data)
     return dumps(result)
 
