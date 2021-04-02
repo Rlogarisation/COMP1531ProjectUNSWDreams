@@ -37,9 +37,11 @@ def dm_create_v1(token, u_id_list):
         raise AccessError(description='The token is invalid, or the inviter has not registered')
     list_dm_handles.append(inviter.handle_str)
 
+    # input error if u_id_list is invalid
+    if (u_id_list is None) or (isinstance(u_id_list, list) == False):
+        raise InputError(description='The u_id is invalid, u_id does not refer to a vaild user')
+
     for uid in u_id_list:
-        if not isinstance(u_id_list, list):
-            raise InputError(description='The u_id is invalid, u_id does not refer to a vaild user')
         invitee = get_user_by_uid(uid)
         # input error if u_id does not refer to a valid user
         if invitee is None:
@@ -116,7 +118,9 @@ def dm_invite_v1(token, dm_id, u_id):
     # Access error when the authorised user is not already a member of the DM.
     inviter = get_user_by_token(token)
     if inviter is None:
-        raise AccessError(description="The authorised user is not already a member of the DM")
+        raise AccessError(description="The authorised user is invalid.")
+    elif inviter not in dm.dm_owners:
+        raise AccessError(description="The authorised user is not a onwer of the DM")
 
     # Expect invitee is not part of member yet
     if invitee in dm.dm_members:
