@@ -288,7 +288,7 @@ def test_dm_leave_v1_invaild_dm_id_http(parameters0, parameters1):
 # The test user is not in the dm yet => accessError => 403
 # user0 invite user1
 # error when user2 want to leave dm_id 0
-def test_dm_leave_v1_invaild_dm_id_http(parameters0, parameters1, parameters2):
+def test_dm_leave_v1_not_in_dm_http(parameters0, parameters1, parameters2):
     requests.delete(config.url + 'clear/v1')
     user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
     user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
