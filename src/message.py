@@ -1,10 +1,12 @@
 from datetime import timezone, datetime
 import json
+import re
 from src.data_file import data, Message, Permission
 from src.error import InputError, AccessError
-from src.auth import get_user_by_token
-from src.channel import get_channel_by_channel_id, is_user_owner_channel
-from src.dm import is_user_owner_dm, get_dm_by_dm_id
+from src.auth import get_user_by_token, get_user_by_handle
+from src.channel import get_channel_by_channel_id, is_user_owner_channel, is_user_in_channel
+from src.dm import is_user_owner_dm, get_dm_by_dm_id, is_user_in_dm
+from src.other import Notification
 
 #############################################################################
 #                                                                           #
@@ -57,6 +59,9 @@ def message_send_v2(token, channel_id, message):
     message_created = Message(new_message_id, auth_user.u_id, message, time_created, channel.channel_id, -1)
     channel.messages.append(message_created)
 
+    # check and tag user
+    tagging_user(message, channel_id, -1, auth_user)
+
     return {
         'message_id': new_message_id,
     }
@@ -108,6 +113,9 @@ def message_senddm_v1(token, dm_id, message):
     message_created = Message(new_message_id, auth_user.u_id, message, created_time, -1, dm.dm_id)
 
     dm.dm_messages.append(message_created)
+
+    # check and tag user
+    tagging_user(message, -1, dm_id, auth_user)
 
     return {
         'message_id': new_message_id,
@@ -171,6 +179,11 @@ def message_edit_v2(token, message_id, message):
     # Case 2: else edit message
     else:
         get_message_by_message_id(message_id).message = message
+        # check and tag user
+        if channel_dm[1] == 0:
+            tagging_user(message, channel_dm[0].channel_id, -1, auth_user)
+        if channel_dm[1] == 1:
+            tagging_user(message, -1, channel_dm[0].dm_id, auth_user)
 
     return {}
 
@@ -279,7 +292,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         raise AccessError(description="message_share_v1 : user need to be authorized.")
 
     og_message = get_message_by_message_id(og_message_id)
-    message_added = ''.join([og_message.message, '\n', '"""', '\n', message, '\n', '"""'])
+    message_added = ''.join([message, '\n', '"""', '\n', og_message.message, '\n', '"""'])
     # add og_message to new_message
     created_time = datetime.utcnow().isoformat()
     new_message = Message(create_message_id(), user.u_id, message_added, created_time, channel_id, dm_id)
@@ -287,8 +300,10 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     # send shared message to the channel or dm
     if channel_id != -1:
         message_send_v2(token, channel_id, new_message.message)
+        tagging_user(new_message.message, channel_id, -1, user)
     if dm_id != -1:
         message_senddm_v1(token, dm_id, new_message.message)
+        tagging_user(new_message.message, -1, dm_id, user)
 
     return {
         'shared_message_id': new_message.message_id
@@ -355,3 +370,47 @@ def delete_message_by_message_id(message_id):
                 return
     raise AccessError(description="delete_message_by_message_id : can not find target message.")
 
+
+def tagging_user(message, channel_id, dm_id, sender):
+    channel = None
+    dm = None
+    if channel_id != -1:
+        channel = get_channel_by_channel_id(channel_id)
+        if channel is None:
+            return None
+
+    if dm_id != -1:
+        dm = get_dm_by_dm_id(dm_id)
+        if dm is None:
+            return None
+
+    if len(message) >= 20:
+        first_20_char = message[:21]
+    else:
+        first_20_char = message[:]
+    first_20_char = ''.join(first_20_char)
+
+    split_msg = message.split()
+    for word in split_msg:
+        if re.search('@', word):
+            handle = word[1:]
+            invitee = get_user_by_handle(handle)
+            if invitee is None:
+                continue
+
+            if channel_id != -1:
+                if is_user_in_channel(channel_id, invitee.u_id) is None:
+                    continue
+                # add notification
+                notification_message = f"{sender.handle_str} tagged you in {channel.name}: {first_20_char}"
+                notification = Notification(channel.channel_id, -1, notification_message)
+                invitee.notifications.append(notification)
+
+            if dm_id != -1:
+
+                if is_user_in_dm(dm, invitee.u_id) is None:
+                    continue
+                # add notification
+                notification_message = f"{sender.handle_str} tagged you in {dm.dm_name}: {first_20_char}"
+                notification = Notification(-1, dm_id, notification_message)
+                invitee.notifications.append(notification)

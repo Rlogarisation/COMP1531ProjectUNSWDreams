@@ -174,6 +174,18 @@ def get_user_by_email(email):
     return None
 
 
+# return the specific user with handle_str
+# the user is a class
+def get_user_by_handle(handle):
+    if handle is None:
+        return None
+    for user in data['class_users']:
+        if user.handle_str == handle:
+            return user
+
+    return None
+
+
 # check the InputError for auth_register
 def auth_register_check_error(email, password, name_first, name_last):
     # if the email address is invalid

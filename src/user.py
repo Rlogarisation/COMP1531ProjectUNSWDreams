@@ -118,8 +118,8 @@ def admin_user_remove(token, u_id):
 
     # the user first name and last name is replaced by 'Remove user'
     # if the user can be removed successfully
-    user.name_first = user.name_last = 'Removed user'
-
+    user.name_first = 'Removed'
+    user.name_last = 'user'
     # deal with the messages the removed user sent in channels
     for channel in data['class_channels']:
         for msg in channel.messages:
