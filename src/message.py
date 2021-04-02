@@ -292,7 +292,11 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         raise AccessError(description="message_share_v1 : user need to be authorized.")
 
     og_message = get_message_by_message_id(og_message_id)
-    message_added = ''.join([message, '\n', '"""', '\n', og_message.message, '\n', '"""'])
+    message_added = f'{message}' \
+                    f'"""' \
+                    f'{og_message.message}' \
+                    f'"""'
+    # message_added = ''.join([message, '\n', '"""', '\n', og_message.message, '\n', '"""'])
     # add og_message to new_message
     created_time = datetime.utcnow().isoformat()
     new_message = Message(create_message_id(), user.u_id, message_added, created_time, channel_id, dm_id)
