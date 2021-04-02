@@ -8,7 +8,7 @@ from src.data_file import data, dump_data
 from src.auth import auth_register_v1, auth_login_v1, auth_logout
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1, \
     users_all, admin_user_remove, admin_userpermission_change
-from src.other import clear_v1, search_v1, notification_get_v1
+from src.other import clear_v1, search_v1
 from src.channel import channel_invite_v1, channel_details_v1, channel_messages_v1, channel_join_v1, channel_leave_v1, \
     channel_addowner_v1, channel_removeowner_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
@@ -216,7 +216,7 @@ def http_dm_messages_v1():
     start = int(request.args.get('start'))
     result = dm_messages_v1(token, dm_id, start)
 
-    
+
 #############################################################################
 #                                                                           #
 #                           Server for channel.py by Lan Lin                #
