@@ -16,6 +16,8 @@ def clear_v1():
     data['class_dms'] = []
     data['session_num'] = 0
     data['message_num'] = 0
+    data['channel_num'] = 0
+    data['dm_num'] = 0
     data['secret'] = 'THIS_IS_SECRET'
     dump_data(DATA)
     return {}

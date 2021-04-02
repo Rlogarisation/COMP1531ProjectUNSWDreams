@@ -180,48 +180,6 @@ def channel_messages_v1(token, channel_id, start):
     }
 
 
-# def channel_messages_v1(token, channel_id, start):
-#     target_user = get_user_by_token(token)
-#     if target_user is None:
-#         raise AccessError(description="user does not refer to a vaild user")
-#
-#     target_channel = get_channel_by_channel_id(channel_id)
-#     if target_channel is None:
-#         raise (InputError(description="channel_messages_v1: invalid channel_id."))
-#
-#     # check if target user is in channel's members
-#     target_u_id = target_user.u_id
-#     user_inside = False
-#     for i in target_channel.all_members:
-#         if i.u_id == target_u_id:
-#             user_inside = True
-#             break
-#     if user_inside is False:
-#         raise (InputError(description="channel_messages_v1 : target user is not in channel"))
-#
-#     num_msgs = len(target_channel.messages)
-#     if num_msgs < start:
-#         raise (InputError(description="channel_messages_v1 : the start >= total messages."))
-#
-#     # grab the targeted list of Message Class
-#     if num_msgs >= (start + 50):
-#         return_msg_class = target_channel.messages[start: start + 50]
-#     else:
-#         return_msg_class = target_channel.messages[start:]
-#
-#     # turn Message Class to dictionary
-#     print(return_msg_class)
-#     return_msg = []
-#     for message in return_msg_class:
-#         return_msg.append(message)
-#
-#     return {
-#         "messages": return_msg,
-#         "start": target_channel.start,
-#         "end": target_channel.end,
-#     }
-
-
 """
 Author : Shi Tong Yuan
 
@@ -417,12 +375,13 @@ def channel_removeowner_v1(token, channel_id, u_id):
 
 def get_channel_by_channel_id(channel_id):
 
-    if (not isinstance(channel_id, int)) or channel_id >= len(data["class_channels"]):
+    if (not isinstance(channel_id, int)) or channel_id >= data['channel_num']:
         return None
-    elif data["class_channels"][channel_id]:
-        return data["class_channels"][channel_id]
-    else:
-        return None
+    for channel in data['class_channels']:
+        if channel.channel_id == channel_id:
+            return channel
+
+    return None
 
 
 # Function checking if user exists in current data

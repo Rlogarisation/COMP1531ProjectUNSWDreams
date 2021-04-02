@@ -48,7 +48,7 @@ def dm_create_v1(token, u_id_list):
 
     list_dm_handles.sort()
     dm_name = ", ".join(list_dm_handles)
-    dm_id = len(data['class_dms'])
+    dm_id = create_dm_id()
 
     dm = DM(dm_name, dm_id)
     # Update data
@@ -364,12 +364,13 @@ def dm_messages_v1(token, dm_id, start):
 #############################################################################
 
 def get_dm_by_dm_id(dm_id):
-    if (not isinstance(dm_id, int)) or dm_id >= len(data['class_dms']):
+    if (not isinstance(dm_id, int)) or dm_id >= data['dm_num']:
         return None
-    elif data['class_dms'][dm_id]:
-        return data['class_dms'][dm_id]
-    else:
-        return None
+    for dm in data['class_dms']:
+        if dm.dm_id == dm_id:
+            return dm
+
+    return None
 
 
 # check if the user is an owner of channel
@@ -379,3 +380,9 @@ def is_user_owner_dm(dm_id, u_id):
         if u_id == u_id:
             return owner
     return None
+
+
+def create_dm_id():
+    new_id = data['dm_num']
+    data['dm_num'] = data['dm_num'] + 1
+    return new_id

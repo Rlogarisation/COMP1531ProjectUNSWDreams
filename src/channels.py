@@ -87,8 +87,9 @@ Return Type: { channel_id }
 
 
 def create_channel_id():
-    channel_id = len(data['class_channels'])
-    return channel_id
+    new_id = data['channel_num']
+    data['channel_num'] = data['channel_num'] + 1
+    return new_id
 
 
 def channels_create_v1(token, name, is_public):
