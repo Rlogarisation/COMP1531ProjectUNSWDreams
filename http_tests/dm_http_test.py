@@ -58,7 +58,7 @@ def test_dm_create_v1_http(parameters0, parameters1):
 #                     Http Test for dm_invite_v1 Error                      #
 #                                                                           #
 #############################################################################
-'''
+
 def test_dm_invite_v1_http(parameters0, parameters1):
     requests.delete(config.url + 'clear/v1')
     # Create(register) two users: user0 and user1.
@@ -72,12 +72,11 @@ def test_dm_invite_v1_http(parameters0, parameters1):
         'u_id_list':[1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
-    print(dm_info)
+    dm_id = json.loads(dm_info.text).get('dm_id')
     incorrect_input = {
         'token': token0,
-        'dm_id': dm_info.dm_id,
+        'dm_id': dm_id,
         'u_id': '12'
     }
     status = requests.post(config.url + 'dm/invite/v1', json=incorrect_input).status_code
     assert status == 400
-'''
