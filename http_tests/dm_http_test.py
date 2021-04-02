@@ -69,7 +69,7 @@ def test_dm_create_v1_nonexist_invitee_http(parameters0):
     token0 = json.loads(user0.text).get('token')
     incorrect_input = {
         'token': token0,
-        'u_id': [5]
+        'u_ids': [5]
     }
     status = requests.post(config.url + 'dm/create/v1', json=incorrect_input).status_code
     assert status == 400
@@ -112,7 +112,7 @@ def test_dm_invite_v1_invaild_uid_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_id':[u_id_1]
+        'u_ids':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
@@ -137,7 +137,7 @@ def test_dm_invite_v1_invaild_dm_id_http(parameters0, parameters1, parameters2):
     u_id_2 = json.loads(user2.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_id':[u_id_1]
+        'u_ids':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
@@ -160,7 +160,7 @@ def test_dm_invite_v1_already_user_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_id':[u_id_1]
+        'u_ids':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
@@ -207,7 +207,7 @@ def test_dm_remove_v1_invaild_dm_id_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_id':[u_id_1]
+        'u_ids':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     incorrect_input = {
@@ -229,7 +229,7 @@ def test_dm_remove_v1_incorrect_token_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_id':[u_id_1]
+        'u_ids':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
@@ -275,7 +275,7 @@ def test_dm_leave_v1_invaild_dm_id_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_id':[u_id_1]
+        'u_ids':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     incorrect_input = {
@@ -299,7 +299,7 @@ def test_dm_leave_v1_invaild_dm_id_http(parameters0, parameters1, parameters2):
     token2 = json.loads(user2.text).get('token')
     input0 = {
         'token': token0,
-        'u_id':[u_id_1]
+        'u_ids':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
@@ -344,7 +344,7 @@ def test_dm_detail_v1_invaild_dm_id_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_id':[u_id_1]
+        'u_ids':[u_id_1]
     }
     incorrect_input = {
         'token': token0,
@@ -366,7 +366,7 @@ def test_dm_detail_v1_unauth_user_http(parameters0, parameters1, parameters2):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_id':[u_id_1]
+        'u_ids':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
@@ -435,7 +435,7 @@ def test_dm_message_v1_invaild_dm_id_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_id':[u_id_1]
+        'u_ids':[u_id_1]
     }
     incorrect_input = {
         'token': token0,
@@ -455,7 +455,7 @@ def test_dm_message_v1_invaild_dm_id_http(parameters0, parameters1):
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_id':[u_id_1]
+        'u_ids':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
@@ -479,7 +479,7 @@ def test_dm_message_v1_test_user_not_in_http(parameters0, parameters1, parameter
     u_id_1 = json.loads(user1.text).get('auth_user_id')
     input0 = {
         'token': token0,
-        'u_id':[u_id_1]
+        'u_ids':[u_id_1]
     }
     dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
     dm_id = json.loads(dm_info.text).get('dm_id')
