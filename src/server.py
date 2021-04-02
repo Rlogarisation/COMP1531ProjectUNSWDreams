@@ -2,7 +2,6 @@ import sys
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src.error import InputError
 from src import config
 from src.data_file import data, dump_data
 from src.auth import auth_register_v1, auth_login_v1, auth_logout
@@ -14,6 +13,7 @@ from src.channel import channel_invite_v1, channel_details_v1, channel_messages_
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.message import message_send_v2, message_senddm_v1, message_edit_v2, message_remove_v1, message_share_v1
 from src.dm import dm_create_v1, dm_invite_v1, dm_remove_v1, dm_leave_v1, dm_details_v1, dm_list_v1, dm_messages_v1
+from src.error import InputError, AccessError
 
 
 def defaultHandler(err):
@@ -87,7 +87,10 @@ def auth_logout_v1():
 @APP.route("/user/profile/v2", methods=['GET'])
 def user_profile_v2():
     token = request.args.get('token')
-    u_id = int(request.args.get('u_id'))
+    try:
+        u_id = int(request.args.get('u_id'))
+    except:
+        raise InputError(description='u_id is not int')
     result = user_profile_v1(token, u_id)
     dump_data(data)
     return dumps(result)
@@ -151,6 +154,23 @@ def clear():
     result = clear_v1()
     dump_data(data)
     return dumps(result)
+
+
+@APP.route("/search/v2", methods=['GET'])
+def search():
+    token = request.args.get('token')
+    query_str = request.args.get('query_str')
+    result = search_v1(token, query_str)
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/notifications/get/v1", methods=['GET'])
+def notifications():
+    token = request.args.get('token')
+    result = notification_get_v1(token)
+    dump_data(data)
+    return dumps(result)
 #############################################################################
 #                                                                           #
 #                           Server for channel.py by Lan Lin                #
@@ -169,7 +189,10 @@ def channel_invite():
 @APP.route("/channel/details/v2", methods=['GET'])
 def channel_details():
     token = request.args.get('token')
-    channel_id = int(request.args.get('channel_id'))
+    try:
+        channel_id = int(request.args.get('channel_id'))
+    except:
+        raise InputError(description="channel_id is not int")
     result = channel_details_v1(token, channel_id)
     dump_data(data)
     return dumps(result)
@@ -210,8 +233,14 @@ def channel_leave():
 @APP.route("/channel/messages/v2", methods=['GET'])
 def channel_message():
     token = request.args.get("token")
-    channel_id = int(request.args.get("channel_id"))
-    start = int(request.args.get("start"))
+    try:
+        channel_id = int(request.args.get("channel_id"))
+    except:
+        raise InputError(description="channel_id is not int")
+    try:
+        start = int(request.args.get("start"))
+    except:
+        raise InputError(description="start is not int")
     result = channel_messages_v1(token, channel_id, start)
     dump_data(data)
     return dumps(result)
@@ -342,7 +371,10 @@ def http_dm_leave_v1():
 @APP.route("/dm/details/v1", methods=['GET'])
 def http_dm_detail_v1():
     token = request.args.get('token')
-    dm_id = int(request.args.get('dm_id'))
+    try:
+        dm_id = int(request.args.get('dm_id'))
+    except:
+        raise InputError(description="dm_id is not an int")
     result = dm_details_v1(token, dm_id)
     dump_data(data)
     return dumps(result)
@@ -359,8 +391,14 @@ def http_dm_list_v1():
 @APP.route("/dm/messages/v1", methods=['GET'])
 def http_dm_messages_v1():
     token = request.args.get('token')
-    dm_id = int(request.args.get('dm_id'))
-    start = int(request.args.get('start'))
+    try:
+        dm_id = int(request.args.get('dm_id'))
+    except:
+        raise InputError(description="dm_id is not int")
+    try:
+        start = int(request.args.get('start'))
+    except:
+        raise InputError(description="start is not int")
     result = dm_messages_v1(token, dm_id, start)
     dump_data(data)
     return dumps(result)

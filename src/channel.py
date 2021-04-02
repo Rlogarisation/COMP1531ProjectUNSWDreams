@@ -48,7 +48,7 @@ def channel_invite_v1(token, channel_id, u_id):
         add_user_into_channel(channel, invitee)
 
     # add notification
-    notification_message = f'added to a channel:"{inviter.handle_str} added you to {channel.name}"'
+    notification_message = f"{inviter.handle_str} added you to {channel.name}"
     notification = Notification(channel.channel_id, -1, notification_message)
     invitee.notifications.append(notification)
     return {}

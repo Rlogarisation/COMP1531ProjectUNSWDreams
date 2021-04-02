@@ -38,6 +38,8 @@ def dm_create_v1(token, u_id_list):
     list_dm_handles.append(inviter.handle_str)
 
     for uid in u_id_list:
+        if not isinstance(u_id_list, list):
+            raise InputError(description='The u_id is invalid, u_id does not refer to a vaild user')
         invitee = get_user_by_uid(uid)
         # input error if u_id does not refer to a valid user
         if invitee is None:
@@ -62,7 +64,7 @@ def dm_create_v1(token, u_id_list):
         dm.dm_members.append(invitee)
         invitee.part_of_dm.append(dm)
         # add notification
-        notification_message = f'added to a DM:"{inviter.handle_str} added you to {dm.dm_name}"'
+        notification_message = f"{inviter.handle_str} added you to {dm.dm_name}"
         notification = Notification(-1, dm.dm_id, notification_message)
         invitee.notifications.append(notification)
 
@@ -123,7 +125,7 @@ def dm_invite_v1(token, dm_id, u_id):
         dm.dm_members.append(invitee)
         invitee.part_of_dm.append(dm)
         # add notification
-        notification_message = f'added to a DM:"{inviter.handle_str} added you to {dm.dm_name}"'
+        notification_message = f"{inviter.handle_str} added you to {dm.dm_name}"
         notification = Notification(-1, dm.dm_id, notification_message)
         invitee.notifications.append(notification)
 
@@ -386,3 +388,12 @@ def create_dm_id():
     new_id = data['dm_num']
     data['dm_num'] = data['dm_num'] + 1
     return new_id
+
+
+# check if the user is a member of channel
+def is_user_in_dm(dm_id, u_id):
+    dm = get_dm_by_dm_id(dm_id)
+    for user in dm.dm_members:
+        if u_id == user.u_id:
+            return user
+    return None
