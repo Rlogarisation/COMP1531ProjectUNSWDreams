@@ -448,3 +448,70 @@ def test_message_share_channel_dm_id_both():
 
     with pytest.raises(InputError):
         message_share_v1(token_1, og_message_0_id, message_0, channel_0_id, dm_0_id)
+
+#############################################################################
+#                                                                           #
+#                        Test for message_senddm_v1                         #
+#                                                                           #
+#############################################################################
+"""
+Author: Shi Tong Yuan
+
+message/senddm/v1
+
+Background:
+Send a message from authorised_user to the DM specified by dm_id. Note: Each message should have it's own unique ID. I.E. No messages should share an ID with another message, even if that other message is in a different channel or DM.
+
+Parameters: (token, dm_id, message)
+Return Type: { message_id }
+HTTP Method: POST
+
+InputError:
+    - (Added) Invalid token.
+    - Message is more than 1000 characters
+AccessError:
+    - (Added) Invalid channel_id
+    - the authorised user has not joined the channel they are trying to post to
+
+"""
+def test_message_senddm_v1():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
+    token_2 = auth_register_v1("test_email2@gmail.com", "password", "First2", "Last2")['token']
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")['auth_user_id']
+    u_id_2 = auth_login_v1("test_email2@gmail.com", "password")['auth_user_id']
+
+    dm_0_id = dm_create_v1(token_0, [u_id_1])['dm_id']
+
+    def test_invalid_token():
+        with pytest.raises(AccessError):
+            message_senddm_v1("invalid_token", dm_0_id, "dm_msg")
+        with pytest.raises(AccessError):
+            message_senddm_v1(None, dm_0_id, "dm_msg")
+    
+    def test_large_message():
+        message_send = ""
+        for i in range(0, 2000):
+            message_send += "1"
+        with pytest.raises(InputError):
+            message_senddm_v1(token_0, dm_0_id, message_send)
+
+    def test_invalid_dm_id():
+        with pytest.raises(InputError):
+            message_senddm_v1(token_0, "invalid dm_id", "dm_msg")
+        with pytest.raises(InputError):
+            message_senddm_v1(token_0, 99999, "dm_msg")
+        with pytest.raises(InputError):
+            message_senddm_v1(token_0, None, "dm_msg")
+    
+    def test_auth_not_dm_member():
+        with pytest.raises(AccessError):
+            message_senddm_v1(token_2, dm_0_id, "dm_msg")
+    # ----------------------------testing------------------------------------
+    test_invalid_token()
+    test_large_message()
+    test_invalid_dm_id()
+    test_auth_not_dm_member()
+    pass
