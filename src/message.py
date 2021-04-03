@@ -226,12 +226,12 @@ def message_remove_v1(token, message_id):
     if channel_dm is None:
         raise InputError(description="The message is not in any channel or dm")
     # if the message is in a channel
-    if channel_dm[1] == 0:
+    elif channel_dm[1] == 0:
         channel = channel_dm[0]
         # check if the authorised user is the owner of the channel
         check_owner = is_user_owner_channel(channel.channel_id, auth_user.u_id)
     # if the message is in a dm
-    if channel_dm[1] == 1:
+    elif channel_dm[1] == 1:
         dm = channel_dm[0]
         # check if the authorised user is the owner of the dm
         check_owner = is_user_owner_dm(dm.dm_id, auth_user.u_id)
