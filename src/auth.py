@@ -266,10 +266,10 @@ def create_handle(name_first, name_last):
     # to form a new handle
     else:
         count -= 1
-        count_len = len(str(count))
-        char_len = 20 - count_len
-        name = list(name)[:char_len]
-        name = ''.join(name)
+        # count_len = len(str(count))
+        # char_len = 20 - count_len
+        # name = list(name)[:char_len]
+        # name = ''.join(name)
         handle = name + str(count)
         return handle
 
