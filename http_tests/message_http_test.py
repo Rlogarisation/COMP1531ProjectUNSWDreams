@@ -2,10 +2,9 @@ import pytest
 import requests
 import json
 from src import config
-from src.data_file import Permission
 
 """
-http server tests of user.py
+http server tests of message.py
 Auther: Lan Lin
 """
 

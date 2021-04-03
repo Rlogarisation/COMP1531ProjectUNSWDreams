@@ -1,7 +1,7 @@
 from typing import Dict
 from src.data_file import data, Permission, DM, Notification
 from src.error import InputError, AccessError
-from src.auth import get_user_by_auth_id, get_user_by_uid, session_to_token, token_to_session, get_user_by_token
+from src.auth import get_user_by_uid, session_to_token, token_to_session, get_user_by_token
 
 #############################################################################
 #                                                                           #

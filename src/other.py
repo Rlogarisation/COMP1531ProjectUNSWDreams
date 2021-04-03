@@ -1,5 +1,5 @@
 from src.data_file import data, DATA, dump_data, Notification
-from src.auth import get_user_by_auth_id, get_user_by_uid, get_user_by_token
+from src.auth import get_user_by_uid, get_user_by_token
 from src.error import InputError, AccessError
 import re
 """

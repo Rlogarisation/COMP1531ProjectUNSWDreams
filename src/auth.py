@@ -140,18 +140,6 @@ def get_user_session_by_token(token):
 
 # return the specific user with the auth_user_id
 # the user is a class
-def get_user_by_auth_id(auth_user_id):
-    if auth_user_id is None:
-        return None
-    for user in data['class_users']:
-        if user.auth_user_id == auth_user_id:
-            return user
-
-    return None
-
-
-# return the specific user with the auth_user_id
-# the user is a class
 def get_user_by_uid(u_id):
     if u_id is None:
         return None
