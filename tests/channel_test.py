@@ -1,4 +1,5 @@
 # Imports the necessary function implementations
+from os import access
 from src.auth import auth_login_v1, auth_register_v1
 from src.channel import channel_invite_v1, channel_details_v1, channel_messages_v1, channel_join_v1, \
     channel_addowner_v1, channel_removeowner_v1, channel_leave_v1
@@ -409,7 +410,7 @@ AccessError:
 #                                                                           #
 #############################################################################
 
-def test_invalid_channel_id1():
+def test_invalid_channel_id():
     clear_v1()
 
     # create 2 users
@@ -423,9 +424,29 @@ def test_invalid_channel_id1():
     Testing_channel_id = channels_create_v1(user1["token"], "channel_test", True)
     channel_invite_v1(user1["token"], Testing_channel_id["channel_id"], user2["auth_user_id"])
 
-    # testing for channel message function for invalid channel id inputError
+    # testing for channel message function for invalid channel id inputError    
     with pytest.raises(InputError):
-        channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 10)
+        channel_messages_v1(user1['token'], "invalid channel_id", 0)
+    with pytest.raises(InputError):
+        channel_messages_v1(user1['token'], None, 0)
+
+def test_invalid_token():
+    clear_v1()
+
+    # create 2 users
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+    user1 = auth_login_v1("user1@test.com", "user1password")
+
+    auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
+    user2 = auth_login_v1("user2@test.com", "user2password")
+
+    # create channel for testing
+    Testing_channel_id = channels_create_v1(user1["token"], "channel_test", True)
+
+    with pytest.raises(AccessError):
+        channel_messages_v1("invalid token", Testing_channel_id["channel_id"], 0)
+    with pytest.raises(AccessError):
+        channel_messages_v1(None, Testing_channel_id["channel_id"], 0 )
 
 
 def test_auth_missing():
@@ -506,6 +527,18 @@ def test_more_than_50_msg():
     message_stored = channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 0)["messages"]
     assert len(message_stored) == 50
 
+def test_great_starter():
+    clear_v1()
+
+    # create 2 users
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+    user1 = auth_login_v1("user1@test.com", "user1password")
+
+    # create channel for testing
+    Testing_channel_id = channels_create_v1(user1["token"], "channel_test", True)
+
+    with pytest.raises(InputError):
+        channel_messages_v1(user1['token'], Testing_channel_id['channel_id'], 100)
 
 """
 Author : Shi Tong Yuan
