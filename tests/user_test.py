@@ -4,6 +4,8 @@ from src.auth import auth_login_v1, auth_register_v1, auth_logout
 from src.error import InputError, AccessError
 from src.channel import channel_details_v1, channel_invite_v1, channel_join_v1
 from src.channels import channels_create_v1
+from src.dm import dm_create_v1
+from src.message import message_send_v2, message_senddm_v1
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1, \
     users_all, admin_user_remove, admin_userpermission_change
 from src.data_file import Permission
@@ -132,6 +134,18 @@ def test_user_profile_v1_accessError():
     # Test conditions leading to an access error outcome due to invalid token
     with pytest.raises(AccessError):
         user_profile_v1(invalid_token, u_id1)
+    
+
+def test_user_profile_v1_token_not_match_u_id():
+    clear_v1()
+    token_0 = auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")['token']
+    token_1 = auth_register_v1("990102@gmail.com", "123123123", "ShiTong", "Yuan")['token']
+    u_id_0 = auth_login_v1("haha@gmail.com", "123123123")['auth_user_id']
+    u_id_1 = auth_login_v1("990102@gmail.com", "123123123")['auth_user_id']
+
+    with pytest.raises(InputError):
+        user_profile_v1(token_0, u_id_1)
+
 
 
 """
@@ -738,6 +752,13 @@ Input Error:
 2. The user is currently the only owner
 Access Error: The authorised user is not an owner
 """
+def test_admin_user_remove_invalid_token():
+    clear_v1()
+    u_id_0 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')['auth_user_id']
+    with pytest.raises(AccessError):
+        admin_user_remove("invalid token",u_id_0)
+    with pytest.raises(AccessError):
+        admin_user_remove(None, u_id_0)
 
 
 def test_admin_user_remove_invalid_uid():
@@ -778,6 +799,30 @@ def test_admin_user_remove_successfully():
     uid2 = register2['auth_user_id']
     user_profile2 = user_profile_v1(token2, uid2)
     assert user_profile2['user']['email'] == 'test@testexample.com'
+    admin_user_remove(token1, uid2)
+    user_profile2 = user_profile_v1(token2, uid2)
+    name_first = user_profile2['user']['name_first']
+    name_last = user_profile2['user']['name_last']
+    assert f'{name_first} {name_last}' == 'Removed user'
+
+def test_admin_user_remove_successfully2():
+    clear_v1()
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    token1 = register1['token']
+    token2 = register2['token']
+    uid1 = register1['auth_user_id']
+    uid2 = register2['auth_user_id']
+
+    channel_id_0 = channels_create_v1(token2, "channel1", True)['channel_id']
+    dm_id_0 = dm_create_v1(token2, [uid2])['dm_id']
+
+    message_send_v2(token2, channel_id_0, "channel_msg")
+    message_senddm_v1(token2, dm_id_0, "dm_msg")
+
+    user_profile2 = user_profile_v1(token2, uid2)
+    assert user_profile2['user']['email'] == 'test@testexample.com'
+
     admin_user_remove(token1, uid2)
     user_profile2 = user_profile_v1(token2, uid2)
     name_first = user_profile2['user']['name_first']
