@@ -175,8 +175,8 @@ def test_auth_login_invalid_email():
         auth_login_v1('123.@com', '12345ufd')
     with pytest.raises(InputError):
         auth_login_v1('a.,#0@test.com', '0823hdskhji')
-    # with pytest.raises(InputError):
-    #     auth_login_v1(None, 'password')
+    with pytest.raises(InputError):
+        auth_login_v1(None, 'password')
 
 
 # test for email entered does not belong to a user

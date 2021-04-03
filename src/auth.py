@@ -165,8 +165,7 @@ def get_user_by_email(email):
 # return the specific user with handle_str
 # the user is a class
 def get_user_by_handle(handle):
-    if handle is None:
-        return None
+    # handle will never be None
     for user in data['class_users']:
         if user.handle_str == handle:
             return user
@@ -286,12 +285,12 @@ def create_permission(u_id):
 # the email entered does not belong to a user
 # and the password is incorrect
 def auth_login_error_check(email, password):
-    if not is_email_valid(email):
-        raise InputError(description='Email address is not valid')
-
     user = get_user_by_email(email)
     if user is None:
         raise InputError(description='Email entered does not belong to a user')
+
+    if not is_email_valid(email):
+        raise InputError(description='Email address is not valid')
 
     if user.hashed_password != hash_password(password):
         raise InputError(description='Password is not correct')

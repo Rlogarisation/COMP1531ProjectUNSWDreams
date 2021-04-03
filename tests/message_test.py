@@ -1,6 +1,5 @@
 from src.channel import channel_invite_v1, channel_messages_v1
 import pytest
-from src.data_file import data
 from src.dm import dm_create_v1, dm_messages_v1, dm_remove_v1
 from src.error import InputError, AccessError
 from src.channels import channels_create_v1
@@ -145,11 +144,19 @@ def test_message_remove_invalid_token():
 
 def test_message_remove_message_not_exist():
     clear_v1()
-    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
-    auth_login_v1("test_email0@gmail.com", "password")
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")['auth_user_id']
+
+    dm_0_id = dm_create_v1(token_0, [u_id_1])['dm_id']
+    message_id = message_senddm_v1(token_0, dm_0_id, "test_msg")['message_id']
+
+    message_remove_v1(token_0, message_id)
 
     with pytest.raises(InputError):
-        message_remove_v1(token_0, -1)
+        message_remove_v1(token_0, message_id)
+
 
 
 def test_message_remove_not_owner_or_authorised_user_channel():
@@ -374,7 +381,57 @@ AccessError:
     - the authorised user has not joined the channel or DM they are trying to share the message to
 
 """
+def test_message_share_channel_normal_case():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
+    auth_login_v1("test_email0@gmail.com", "password")
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")['auth_user_id']
 
+    channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
+    og_message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
+    
+    all_messages = channel_messages_v1(token_0, channel_0_id, 0)
+    message_0 = all_messages['messages'][0]['message']
+
+    shared_message = message_share_v1(token_0, og_message_0_id, message_0, channel_0_id, -1)
+
+    assert shared_message['shared_message_id'] == 1
+
+def test_message_share_dm_normal_case():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
+    auth_login_v1("test_email0@gmail.com", "password")
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")['auth_user_id']
+
+    dm_0_id = dm_create_v1(token_0, [u_id_1])['dm_id']
+    og_message_0_id = message_senddm_v1(token_0, dm_0_id, 'Hope it works')['message_id']
+    
+    all_messages = dm_messages_v1(token_0, dm_0_id, 0)
+    message_0 = all_messages['messages'][0]['message']
+
+    shared_message = message_share_v1(token_0, og_message_0_id, message_0, -1, dm_0_id)
+
+    assert shared_message['shared_message_id'] == 1
+
+def test_message_share_user_invalid():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
+    auth_login_v1("test_email0@gmail.com", "password")
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")['auth_user_id']
+
+    channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
+    og_message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
+    
+    all_messages = channel_messages_v1(token_0, channel_0_id, 0)
+    message_0 = all_messages['messages'][0]['message']
+
+    with pytest.raises(AccessError):
+        message_share_v1("invalid token", og_message_0_id, message_0, channel_0_id, -1)
+    with pytest.raises(AccessError):
+        message_share_v1(None, og_message_0_id, message_0, channel_0_id, -1)
 
 def test_message_share_not_joing_channel():
     clear_v1()
@@ -530,6 +587,10 @@ def test_message_senddm_v1():
         # @_target_user not exists
         result = message_senddm_v1(token_0, dm_0_id, "@yst990102 i_love_you")
         assert result['message_id'] == 3
+    def test_failed_case3_with_at():
+        # @_target_user is None
+        result = message_senddm_v1(token_0, dm_0_id, "@yst990102 i_love_you")
+        assert result['message_id'] == 4
     # ----------------------------testing------------------------------------
     test_invalid_token()
     test_large_message()
@@ -539,4 +600,5 @@ def test_message_senddm_v1():
     test_normal_case_with_at()
     test_failed_case_with_at()
     test_failed_case2_with_at()
+    test_failed_case3_with_at()
     pass

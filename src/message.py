@@ -222,6 +222,7 @@ def message_remove_v1(token, message_id):
 
     # if cannot find the channel or dm
     channel_dm = get_channel_dm_by_message_id(message_id)
+    print("channel_dm == ", channel_dm)
     check_owner = None
     if channel_dm is None:
         raise InputError(description="The message is not in any channel or dm")
@@ -280,8 +281,6 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         raise InputError(description="message_share_v1 : neither channel_id nor dm_id is -1.")
     elif channel_id == -1 and dm_id == -1:
         raise InputError(description="message_share_v1 : both channel_id and dm_id is -1.")
-    else:
-        raise InputError(description="message_share_v1 : invalid input.")
 
     user = get_user_by_token(token)
     if user is None:

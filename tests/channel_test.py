@@ -1,5 +1,4 @@
 # Imports the necessary function implementations
-from os import access
 from src.auth import auth_login_v1, auth_register_v1
 from src.channel import channel_invite_v1, channel_details_v1, channel_messages_v1, channel_join_v1, \
     channel_addowner_v1, channel_removeowner_v1, channel_leave_v1
@@ -225,7 +224,7 @@ def test_channel_invite_v1_accessError_token():
     with pytest.raises(AccessError):
         channel_invite_v1(None, channel_1_id, u_id2)
 
-def test_invalid_channel_id():
+def test_channel_invite_v1_invalid_channel_id():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
     auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
@@ -433,7 +432,7 @@ AccessError:
 #                                                                           #
 #############################################################################
 
-def test_invalid_channel_id():
+def test_channel_messages_v1_invalid_channel_id():
     clear_v1()
 
     # create 2 users
@@ -646,7 +645,7 @@ def test_channel_join_normal():
 # Case 2 - tests for input error due to invalid channel
 #          expected outcome is input error
 # Occurs when channel id used is invalid
-def test_invalid_channel_id2():
+def test_channel_join_v1_invalid_channel_id2():
     # Clears data and registers and logins owner and joiner
     clear_v1()
     auth_register_v1("TheOwner@test.com", "thisispassword", "ShiTong", "Yuan")
