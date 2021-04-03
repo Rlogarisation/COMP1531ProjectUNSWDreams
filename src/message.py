@@ -380,23 +380,21 @@ def tagging_user(message, channel_id, dm_id, sender):
     dm = None
     if channel_id != -1:
         channel = get_channel_by_channel_id(channel_id)
-        if channel is None:
-            return None
 
     if dm_id != -1:
         dm = get_dm_by_dm_id(dm_id)
-        if dm is None:
-            return None
+
+    if dm is None and channel is None:
+        return
 
     if len(message) >= 20:
-        first_20_char = message[:21]
+        first_20_char = message[:20]
     else:
         first_20_char = message[:]
-    first_20_char = ''.join(first_20_char)
 
     split_msg = message.split()
     for word in split_msg:
-        if re.search('@', word):
+        if re.search('@', word) is not None:
             handle = word[1:]
             invitee = get_user_by_handle(handle)
             if invitee is None:
@@ -412,7 +410,7 @@ def tagging_user(message, channel_id, dm_id, sender):
 
             if dm_id != -1:
 
-                if is_user_in_dm(dm, invitee.u_id) is None:
+                if is_user_in_dm(dm_id, invitee.u_id) is None:
                     continue
                 # add notification
                 notification_message = f"{sender.handle_str} tagged you in {dm.dm_name}: {first_20_char}"
