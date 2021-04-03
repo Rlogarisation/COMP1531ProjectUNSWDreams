@@ -1,6 +1,6 @@
 import pytest
 from src.other import clear_v1
-from src.auth import auth_login_v1, auth_register_v1, auth_logout, get_user_by_token
+from src.auth import auth_login_v1, auth_register_v1, auth_logout
 from src.error import InputError, AccessError
 from src.channel import channel_details_v1, channel_invite_v1
 from src.channels import channels_create_v1
@@ -34,6 +34,8 @@ def test_auth_register_invalid_email():
         auth_register_v1('123.com', '12345ufd', 'Lan', 'Lin')
     with pytest.raises(InputError):
         auth_register_v1('abc@@@.com', '0823hdskhji', 'Langley', 'Lin')
+    # with pytest.raises(InputError):
+    #     auth_register_v1(None, "password", 'Lan', 'Lin')
 
 
 # test email address is already being used by another user
@@ -161,7 +163,7 @@ Tests content:
 """
 #############################################################################
 #                                                                           #
-#                       Test for auth_login_v1                           #
+#                       Test for auth_login_v1                              #
 #                                                                           #
 #############################################################################
 
@@ -173,6 +175,8 @@ def test_auth_login_invalid_email():
         auth_login_v1('123.@com', '12345ufd')
     with pytest.raises(InputError):
         auth_login_v1('a.,#0@test.com', '0823hdskhji')
+    # with pytest.raises(InputError):
+    #     auth_login_v1(None, 'password')
 
 
 # test for email entered does not belong to a user
@@ -243,9 +247,10 @@ def test_auth_logout_invalid_token():
     token = register1['token']
     invalid_token = f"{token}123"
     assert auth_logout(invalid_token) == {'is_success': False}
+    assert auth_logout(None) == {'is_success': False}
 
 
-def test_auth_logout_successfully_small():
+def test_auth_logout_successfully_emall():
     clear_v1()
     register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
     token1 = register1['token']

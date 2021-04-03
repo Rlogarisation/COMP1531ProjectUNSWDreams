@@ -1,6 +1,6 @@
 import pytest
 from src.other import clear_v1
-from src.auth import auth_login_v1, auth_register_v1, auth_logout, get_user_by_token
+from src.auth import auth_login_v1, auth_register_v1, auth_logout
 from src.error import InputError, AccessError
 from src.channel import channel_details_v1, channel_invite_v1, channel_join_v1
 from src.channels import channels_create_v1
