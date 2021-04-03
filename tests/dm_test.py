@@ -42,6 +42,13 @@ def test_dm_details_v1():
     # user1 create the dm, invite user0 into dm
     dm_create_v1(token1, [0])
 
+    def test_invalid_token():
+        # token type error
+        with pytest.raises(AccessError):
+            dm_details_v1("invalid token", 0)
+        with pytest.raises(AccessError):
+            dm_details_v1(None, 0)
+
     def test_invalid_dm():
         # dm_id type invalid
         with pytest.raises(InputError):
@@ -64,6 +71,7 @@ def test_dm_details_v1():
         dm_details_v1(token1, 0)
 
     # --------------------------testing---------------------------
+    test_invalid_token()
     test_invalid_dm()
     test_Inaccessible_member()
     test_invalid_user()
@@ -108,6 +116,8 @@ def test_dm_list_v1():
     def test_invalid_token():
         with pytest.raises(AccessError):
             dm_list_v1("invalid token")
+        with pytest.raises(AccessError):
+            dm_list_v1(None)
     
     def test_normal_case():
         dm_create_v1(token0, [1])
@@ -159,6 +169,12 @@ def test_dm_create_v1():
     auth_id1 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")["auth_user_id"]
     auth_id2 = auth_login_v1("user1@test.com", "user1password")["auth_user_id"]
 
+    def test_invalid_token():
+        with pytest.raises(AccessError):
+            dm_create_v1("invalid token", [1])
+        with pytest.raises(AccessError):
+            dm_create_v1(None, [1])
+
     def test_invalid_u_id_list():
         with pytest.raises(InputError):
             dm_create_v1(token1, "i am not a list.")
@@ -174,6 +190,7 @@ def test_dm_create_v1():
         assert dm1['dm_id'] == 0
         assert dm1['dm_name'] == "peterwhite, tomgreen"
     # --------------------------testing---------------------------
+    test_invalid_token()
     test_normal_case()
     test_invalid_u_id_list()
     test_none_inviter()
@@ -216,6 +233,12 @@ def test_dm_remove_v1():
     dm_create_v1(token0, [2])
     dm_create_v1(token1, [2])
     
+    def test_invalid_token():
+        with pytest.raises(AccessError):
+            dm_remove_v1("invalid token", 0)
+        with pytest.raises(AccessError):
+            dm_remove_v1(None, 0)
+
     def test_invalid_dm_id():
         # dm_id type invalid
         with pytest.raises(InputError):
@@ -240,6 +263,7 @@ def test_dm_remove_v1():
         dm_remove_v1(token0, 0)
 
     # --------------------------testing---------------------------
+    test_invalid_token()
     test_invalid_dm_id()
     test_remove_dm_twice()
     test_not_creator()
@@ -283,6 +307,12 @@ def test_dm_invite_v1():
     dm_create_v1(token0, [2])
     dm_create_v1(token1, [2])
 
+    def test_invalid_token():
+        with pytest.raises(AccessError):
+            dm_invite_v1("invalid token", 0, 2)
+        with pytest.raises(AccessError):
+            dm_invite_v1(None, 0, 2)
+
     def test_invalid_dm_id():
         # dm_id type invalid
         with pytest.raises(InputError):
@@ -316,6 +346,7 @@ def test_dm_invite_v1():
         dm_invite_v1(token0, 0, auth_id2)
 
     # --------------------------testing---------------------------
+    test_invalid_token()
     test_invalid_dm_id()
     test_pre_exist_dm()
     test_invalid_u_id()
@@ -361,6 +392,12 @@ def test_dm_leave_v1():
     dm_create_v1(token0, [2])
     dm_create_v1(token1, [2])
 
+    def test_invalid_token():
+        with pytest.raises(AccessError):
+            dm_leave_v1("invalid token", 0)
+        with pytest.raises(AccessError):
+            dm_leave_v1(None, 0)
+
     def test_invalid_dm_id():
         # dm_id type invalid
         with pytest.raises(InputError):
@@ -386,6 +423,7 @@ def test_dm_leave_v1():
     def test_normal_case():
         dm_leave_v1(token0, 0)
     # --------------------------testing---------------------------
+    test_invalid_token()
     test_invalid_dm_id()
     test_leave_nonexist_dm()
     test_user_not_in()
@@ -430,6 +468,7 @@ def test_dm_messages_v1():
     dm_create_v1(token0, [1])
     dm_create_v1(token0, [2])
     dm_create_v1(token1, [2])
+    
     def test_invalid_token():
         with pytest.raises(AccessError):
             dm_messages_v1("invalid token", 1, 0)
