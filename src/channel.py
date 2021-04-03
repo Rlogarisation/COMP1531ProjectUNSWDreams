@@ -339,10 +339,6 @@ def channel_removeowner_v1(token, channel_id, u_id):
     if channel is None:
         raise InputError(description="Channel_id does not refer to a valid channel")
 
-    # Checks for cases of InputError indicated by user with u_id is not an owner of channel
-    if is_user_owner_channel(channel_id, u_id) is None:
-        raise InputError(description="User is not an owner")
-
     # Checks if the user is currently the only owner
     if len(channel.owner_members) == 1:
         raise InputError(description="User is the only owner")
@@ -380,8 +376,6 @@ def get_channel_by_channel_id(channel_id):
     for channel in data['class_channels']:
         if channel.channel_id == channel_id:
             return channel
-
-    return None
 
 
 # Function checking if user exists in current data

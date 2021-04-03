@@ -390,6 +390,7 @@ def tagging_user(message, channel_id, dm_id, sender):
     for word in split_msg:
         if re.search('@', word):
             handle = word[1:]
+            print("handle == ", handle)
             invitee = get_user_by_handle(handle)
             if invitee is None:
                 continue
@@ -403,8 +404,7 @@ def tagging_user(message, channel_id, dm_id, sender):
                 invitee.notifications.append(notification)
 
             if dm_id != -1:
-
-                if is_user_in_dm(dm, invitee.u_id) is None:
+                if is_user_in_dm(dm_id, invitee.u_id) is None:
                     continue
                 # add notification
                 notification_message = f"{sender.handle_str} tagged you in {dm.dm_name}: {first_20_char}"
