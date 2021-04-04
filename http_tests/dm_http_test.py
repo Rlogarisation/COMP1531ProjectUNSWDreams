@@ -146,8 +146,7 @@ def test_dm_invite_v1_invaild_dm_id_http(parameters0, parameters1, parameters2):
         'token': token0,
         'u_ids': [u_id_1]
     }
-    dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
-    dm_id = json.loads(dm_info.text).get('dm_id')
+    requests.post(config.url + 'dm/create/v1', json=input0)
     incorrect_input = {
         'token': token0,
         'dm_id': 'incorrect_dm_id',
@@ -219,7 +218,7 @@ def test_dm_remove_v1_invaild_dm_id_http(parameters0, parameters1):
         'token': token0,
         'u_ids': [u_id_1]
     }
-    dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
+    requests.post(config.url + 'dm/create/v1', json=input0)
     incorrect_input = {
         'token': token0,
         'dm_id': 'incorrect_value'
@@ -289,7 +288,7 @@ def test_dm_leave_v1_invaild_dm_id_http(parameters0, parameters1):
         'token': token0,
         'u_ids': [u_id_1]
     }
-    dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
+    requests.post(config.url + 'dm/create/v1', json=input0)
     incorrect_input = {
         'token': token0,
         'dm_id': "invalid_dm_id"
@@ -301,7 +300,7 @@ def test_dm_leave_v1_invaild_dm_id_http(parameters0, parameters1):
 # The test user is not in the dm yet => accessError => 403
 # user0 invite user1
 # error when user2 want to leave dm_id 0
-def test_dm_leave_v1_invaild_dm_id_http(parameters0, parameters1, parameters2):
+def test_dm_leave_v1_invaild_dm_id_http1(parameters0, parameters1, parameters2):
     requests.delete(config.url + 'clear/v1')
     user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
     user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
