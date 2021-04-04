@@ -239,8 +239,8 @@ def message_remove_v1(token, message_id):
         check_owner = is_user_owner_dm(dm.dm_id, auth_user.u_id)
 
     # AccessError 1: Message editted by neither auth_user nor owner nor global owner.
-    if auth_user.u_id != get_u_id_by_message_id(message_id) and check_owner is None and \
-            auth_user.permission_id != Permission.global_owner:
+    if (auth_user.u_id != get_u_id_by_message_id(message_id) and check_owner is None and
+            auth_user.permission_id != Permission.global_owner):
         raise AccessError(description='message_edit_v2 : Message editted by neither auth_user nor owner '
                                       'nor global_owner.')
     # delete_message_by_message_id(message_id)
@@ -328,13 +328,12 @@ def create_message_id():
     return new_id
 
 
-# FIXME: 想要通过message_id得到u_id,需要遍历messages[]，但每个channel的messages都是从0开始，message_id必定有重复
-# TODO: 用create_session_id来，保证每个channel里面的message_id不重复
+# get the sender's uid by message id
 def get_u_id_by_message_id(message_id):
     return get_message_by_message_id(message_id).u_id
 
 
-# TODO: 通过message_id获取目标message
+# get the class Message by message id
 def get_message_by_message_id(message_id):
     for i in data['class_channels']:
         for j in i.messages:
@@ -347,6 +346,7 @@ def get_message_by_message_id(message_id):
     raise InputError(description="get_message_by_message_id : can not find target message.")
 
 
+# return class channel or dm by message id
 def get_channel_dm_by_message_id(message_id):
     for i in data['class_channels']:
         for j in i.messages:
@@ -359,7 +359,8 @@ def get_channel_dm_by_message_id(message_id):
     return None
 
 
-# TODO:通过message_id删除message
+# find the class Message by message id
+# delete the Message
 def delete_message_by_message_id(message_id):
     target_msg = get_message_by_message_id(message_id)
     for i in data['class_channels']:
@@ -375,6 +376,7 @@ def delete_message_by_message_id(message_id):
     raise AccessError(description="delete_message_by_message_id : can not find target message.")
 
 
+# tagging user if the message include @handle
 def tagging_user(message, channel_id, dm_id, sender):
     channel = None
     dm = None
@@ -416,3 +418,4 @@ def tagging_user(message, channel_id, dm_id, sender):
                 notification_message = f"{sender.handle_str} tagged you in {dm.dm_name}: {first_20_char}"
                 notification = Notification(-1, dm_id, notification_message)
                 invitee.notifications.append(notification)
+

@@ -192,6 +192,11 @@ def test_allchannels_multiple_channels():
     assert channel_user['channels'][2]['name'] == "LawChannel"
     assert len(channels_listall_v1(token1)['channels']) == 3
 
+def test_invalid_token():
+    clear_v1()
+    with pytest.raises(AccessError):
+        channels_listall_v1("invalid token")
+
 
 def test_allchannels_multiple_users():
     clear_v1()

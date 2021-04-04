@@ -100,6 +100,8 @@ def auth_logout(token):
 
 # check if email entered is valid
 def is_email_valid(email):
+    if email is None:
+        return False
     regex = '^[a-zA-Z0-9]+[\\._]?[a-zA-Z0-9]+[@]\\w+[.]\\w{2,3}$'
     if re.search(regex, email):
         return True

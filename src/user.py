@@ -128,7 +128,7 @@ def admin_user_remove(token, u_id):
 
     # deal with the messages the removed user sent in channels
     for dm in data['class_dms']:
-        for msg in dm.messages:
+        for msg in dm.dm_messages:
             if msg.u_id == user.u_id:
                 msg.message = 'Removed user'
 

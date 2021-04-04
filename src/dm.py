@@ -379,7 +379,7 @@ def get_dm_by_dm_id(dm_id):
 def is_user_owner_dm(dm_id, u_id):
     dm = get_dm_by_dm_id(dm_id)
     for owner in dm.dm_owners:
-        if u_id == u_id:
+        if owner.u_id == u_id:
             return owner
     return None
 
