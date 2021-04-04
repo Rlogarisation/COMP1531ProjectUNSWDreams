@@ -1,5 +1,4 @@
-from datetime import timezone, datetime
-import json
+from datetime import datetime
 import re
 from src.data_file import data, Message, Permission
 from src.error import InputError, AccessError
@@ -258,7 +257,10 @@ Author: Shi Tong Yuan
 message/share/v1
 
 Background:
-og_message_id is the original message. channel_id is the channel that the message is being shared to, and is -1 if it is being sent to a DM. dm_id is the DM that the message is being shared to, and is -1 if it is being sent to a channel. message is the optional message in addition to the shared message, and will be an empty string '' if no message is given
+og_message_id is the original message. channel_id is the channel that the message is being shared to, 
+and is -1 if it is being sent to a DM. dm_id is the DM that the message is being shared to, and is -1 if it is being
+ sent to a channel. message is the optional message in addition to the shared message, and will be an empty string '' 
+ if no message is given
 
 Parameters: (token, og_message_id, message, channel_id, dm_id)
 Return Type: {shared_message_id}

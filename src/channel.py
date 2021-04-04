@@ -1,4 +1,3 @@
-from typing import Dict
 from src.data_file import data, Permission, Notification
 from src.error import InputError, AccessError
 from src.auth import session_to_token, token_to_session, get_user_by_token, auth_register_v1, \
