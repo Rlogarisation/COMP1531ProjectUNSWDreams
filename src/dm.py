@@ -1,7 +1,7 @@
 from typing import Dict
 from src.data_file import data, Permission, DM, Notification
 from src.error import InputError, AccessError
-from src.auth import get_user_by_auth_id, get_user_by_uid, session_to_token, token_to_session, get_user_by_token
+from src.auth import get_user_by_uid, session_to_token, token_to_session, get_user_by_token
 
 #############################################################################
 #                                                                           #
@@ -379,7 +379,7 @@ def get_dm_by_dm_id(dm_id):
 def is_user_owner_dm(dm_id, u_id):
     dm = get_dm_by_dm_id(dm_id)
     for owner in dm.dm_owners:
-        if u_id == u_id:
+        if owner.u_id == u_id:
             return owner
     return None
 
