@@ -139,7 +139,7 @@ def test_user_profile_v1_accessError():
         user_profile_v1(invalid_token, u_id1)
 
 
-def test_user_profile_v1_valid():
+def test_user_profile_v1_token_not_match_u_id():
     clear_v1()
     token_0 = auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")['token']
     auth_register_v1("990102@gmail.com", "123123123", "ShiTong", "Yuan")

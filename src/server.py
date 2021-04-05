@@ -155,72 +155,22 @@ def clear():
     dump_data(data)
     return dumps(result)
 
-#############################################################################
-#                                                                           #
-#                     Server for dm.py by Zheng Luo                         #
-#                                                                           #
-#############################################################################
 
-@APP.route("/dm/create/v1", methods=['POST'])
-def http_dm_create_v1():
-    info = request.get_json()
-    token = info['token']
-    u_ids = info['u_ids']
-    result = dm_create_v1(token, u_ids)
-    dump_data(data)
-    return dumps(result)
-
-@APP.route("/dm/invite/v1", methods=['POST'])
-def http_dm_invite_v1():
-    info = request.get_json()
-    token = info['token']
-    dm_id = info['dm_id']
-    u_id = info['u_id']
-    result = dm_invite_v1(token, dm_id, u_id)
-    dump_data(data)
-    return dumps(result)
-
-@APP.route("/dm/remove/v1", methods=['DELETE'])
-def http_dm_remove_v1():
-    info = request.get_json()
-    token = info['token']
-    dm_id = info['dm_id']
-    result = dm_remove_v1(token, dm_id)
-    dump_data(data)
-    return dumps(result)
-
-@APP.route("/dm/leave/v1", methods=['POST'])
-def http_dm_leave_v1():
-    info = request.get_json()
-    token = info['token']
-    dm_id = info['dm_id']
-    result = dm_leave_v1(token, dm_id)
-    dump_data(data)
-    return dumps(result)
-
-@APP.route("/dm/details/v1", methods=['GET'])
-def http_dm_detail_v1():
+@APP.route("/search/v2", methods=['GET'])
+def search():
     token = request.args.get('token')
-    dm_id = int(request.args.get('dm_id'))
-    result = dm_details_v1(token, dm_id)
+    query_str = request.args.get('query_str')
+    result = search_v1(token, query_str)
     dump_data(data)
     return dumps(result)
 
-@APP.route("/dm/list/v1", methods=['GET'])
-def http_dm_list_v1():
+
+@APP.route("/notifications/get/v1", methods=['GET'])
+def notifications():
     token = request.args.get('token')
-    result = dm_list_v1(token)
+    result = notification_get_v1(token)
     dump_data(data)
     return dumps(result)
-
-@APP.route("/dm/messages/v1", methods=['GET'])
-def http_dm_messages_v1():
-    token = request.args.get('token')
-    dm_id = int(request.args.get('dm_id'))
-    start = int(request.args.get('start'))
-    result = dm_messages_v1(token, dm_id, start)
-
-
 #############################################################################
 #                                                                           #
 #                           Server for channel.py by Lan Lin                #
