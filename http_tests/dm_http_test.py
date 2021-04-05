@@ -14,7 +14,7 @@ def parameters0():
     parameters0 = {
         "email": "ZhengRogerLuo@gmail.com",
         "password": "TrimesterIsTheBest2021!",
-        "name_first": "Zheng",
+        "name_first": "Aheng",
         "name_last": "Luo"
     }
     return parameters0
@@ -481,3 +481,81 @@ def test_dm_message_v1_test_user_not_in_http(parameters0, parameters1, parameter
     status = requests.get(
         config.url + 'dm/messages/v1?token=' + token2 + '&dm_id=' + str(dm_id) + '&start=0').status_code
     assert status == 403
+#############################################################################
+#                                                                           #
+#                     Http Test for normal cases                            #
+#                                                                           #
+#############################################################################
+
+
+def test_dm_all_normal_cases_http(parameters0, parameters1, parameters2):
+    requests.delete(config.url + 'clear/v1')
+    user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
+    user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
+    user2 = requests.post(config.url + 'auth/register/v2', json=parameters2)
+    # Obtain tokens based on registered users.
+    token0 = json.loads(user0.text).get('token')
+    token1 = json.loads(user1.text).get('token')
+    token2 = json.loads(user2.text).get('token')
+    assert token0 == "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU"
+    assert token1 == "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA"
+    assert token2 == "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjJ9.3Mmom--Q72L0chR2xd74Wm6IUmJyvipXQy5FLqagMCU"
+
+    u_id_0 = json.loads(user0.text).get('auth_user_id')
+    u_id_1 = json.loads(user1.text).get('auth_user_id')
+    u_id_2 = json.loads(user2.text).get('auth_user_id')
+    assert u_id_0 == 0
+    assert u_id_1 == 1
+    assert u_id_2 == 2
+    # Testing Create function
+    input0 = {
+        'token': token0,
+        'u_ids': [u_id_1]
+    }
+    dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
+    dm_id = json.loads(dm_info.text).get('dm_id')
+    assert dm_id == 0
+    dm_name = json.loads(dm_info.text).get('dm_name')
+    assert dm_name == 'ahengluo, rogerluo'
+
+    # Testing list function
+    dm_list = requests.get(config.url + 'dm/list/v1?token=' + token0)
+    list_of_dm = json.loads(dm_list.text).get('dms')
+    assert len(list_of_dm) == 1
+
+    # Testing detail function
+    dm_detail = requests.get(config.url + 'dm/details/v1?token=' + token0 + '&dm_id=' + str(dm_id))
+    dm_detail_name = json.loads(dm_detail.text).get('name')
+    assert dm_detail_name == 'ahengluo, rogerluo'
+    dm_detail_members = json.loads(dm_detail.text).get('members')
+    assert len(dm_detail_members) == 2
+
+    # Testing invite function
+    invite_input = {
+        'token': token0,
+        'dm_id': dm_id,
+        'u_id': u_id_2
+    }
+    requests.post(config.url + 'dm/invite/v1', json=invite_input)
+
+    dm_detail = requests.get(config.url + 'dm/details/v1?token=' + token0 + '&dm_id=' + str(dm_id))
+    dm_detail_members = json.loads(dm_detail.text).get('members')
+    assert len(dm_detail_members) == 3
+
+    # Testing leave function
+    leave_input = {
+        'token': token2,
+        'dm_id': dm_id
+    }
+    requests.post(config.url + 'dm/leave/v1', json=leave_input)
+    dm_detail = requests.get(config.url + 'dm/details/v1?token=' + token0 + '&dm_id=' + str(dm_id))
+    dm_detail_members = json.loads(dm_detail.text).get('members')
+    assert len(dm_detail_members) == 2
+
+    # Testing remove dm
+    remove_input = {
+        'token': token0,
+        'dm_id': 0
+    }
+    status = requests.delete(config.url + 'dm/remove/v1', json=remove_input).status_code
+    assert status == 200

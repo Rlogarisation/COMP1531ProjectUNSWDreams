@@ -146,8 +146,7 @@ def test_user_profile_v1_token_not_match_u_id():
     auth_login_v1("haha@gmail.com", "123123123")
     u_id_1 = auth_login_v1("990102@gmail.com", "123123123")['auth_user_id']
 
-    with pytest.raises(InputError):
-        user_profile_v1(token_0, u_id_1)
+    user_profile_v1(token_0, u_id_1)
 
 
 """
