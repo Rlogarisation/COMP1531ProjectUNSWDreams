@@ -1,5 +1,5 @@
 from src.data_file import data, DATA, dump_data, Notification
-from src.auth import get_user_by_auth_id, get_user_by_uid, get_user_by_token
+from src.auth import get_user_by_uid, get_user_by_token
 from src.error import InputError, AccessError
 import re
 """
@@ -16,6 +16,8 @@ def clear_v1():
     data['class_dms'] = []
     data['session_num'] = 0
     data['message_num'] = 0
+    data['channel_num'] = 0
+    data['dm_num'] = 0
     data['secret'] = 'THIS_IS_SECRET'
     dump_data(DATA)
     return {}
@@ -73,7 +75,7 @@ def notification_get_v1(token):
     return_list = []
     index = len(noti_list) - 1
     if len(noti_list) >= 20:
-        for i in range(20):
+        for _i in range(20):
             return_list.append(noti_list[index].return_type_notification())
             index -= 1
     else:

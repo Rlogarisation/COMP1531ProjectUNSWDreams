@@ -42,7 +42,7 @@ def test_channels_correct_channel():
     token1 = login1['token']
 
     # Create a channel and get its ID
-    channel_id1 = channels_create_v1(token1, "SheepChannel", is_public=True)['channel_id']
+    channels_create_v1(token1, "SheepChannel", is_public=True)
 
     # List the channel of this user belongs to
     channel_list = channels_list_v1(token1)
@@ -59,9 +59,9 @@ def test_channels_multiple_channels():
     token1 = login1['token']
 
     # Create multiple channels and get its id
-    channel_id1 = channels_create_v1(token1, "EngineeringChannel", is_public=True)['channel_id']
-    channel_id2 = channels_create_v1(token1, "BussinessChannel", is_public=True)['channel_id']
-    channel_id3 = channels_create_v1(token1, "LawChannel", is_public=True)['channel_id']
+    channels_create_v1(token1, "EngineeringChannel", is_public=True)
+    channels_create_v1(token1, "BussinessChannel", is_public=True)
+    channels_create_v1(token1, "LawChannel", is_public=True)
 
     # List the channel of this user belongs to
     channel_list = channels_list_v1(token1)
@@ -122,7 +122,7 @@ def test_channels_invalidToken():
     token1 = login1['token']
 
     # Create a channel and get its ID
-    channel_id1 = channels_create_v1(token1, "SheepChannel", is_public=True)['channel_id']
+    channels_create_v1(token1, "SheepChannel", is_public=True)
 
     # Made an invalid token for user 1
     invalid_token = ''.join([token1, "rkbgesorgbv#$%"])
@@ -167,7 +167,7 @@ def test_allchannels_correct_channel():
     token1 = login1['token']
 
     # Create a channel and get its ID
-    channel_id1 = channels_create_v1(token1, "SheepChannel", is_public=True)['channel_id']
+    channels_create_v1(token1, "SheepChannel", is_public=True)
 
     # List all the channels and check
     assert (len(channels_listall_v1(token1)) == 1)
@@ -191,6 +191,11 @@ def test_allchannels_multiple_channels():
     assert channel_user['channels'][1]['name'] == "BussinessChannel"
     assert channel_user['channels'][2]['name'] == "LawChannel"
     assert len(channels_listall_v1(token1)['channels']) == 3
+
+def test_invalid_token():
+    clear_v1()
+    with pytest.raises(AccessError):
+        channels_listall_v1("invalid token")
 
 
 def test_allchannels_multiple_users():

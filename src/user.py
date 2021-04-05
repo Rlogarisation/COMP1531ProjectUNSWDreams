@@ -17,8 +17,6 @@ def user_profile_v1(token, u_id):
     user_ = get_user_by_uid(u_id)
     if user_ is None:
         raise InputError(description="User with u_id is not a valid user")
-    if user is not user_:
-        raise InputError(description="Token and u_id are from different users")
 
     result = user.return_type_user()
     return {
@@ -128,7 +126,7 @@ def admin_user_remove(token, u_id):
 
     # deal with the messages the removed user sent in channels
     for dm in data['class_dms']:
-        for msg in dm.messages:
+        for msg in dm.dm_messages:
             if msg.u_id == user.u_id:
                 msg.message = 'Removed user'
 

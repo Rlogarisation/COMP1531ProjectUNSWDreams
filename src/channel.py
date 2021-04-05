@@ -1,7 +1,6 @@
-from typing import Dict
 from src.data_file import data, Permission, Notification
 from src.error import InputError, AccessError
-from src.auth import get_user_by_auth_id, session_to_token, token_to_session, get_user_by_token, auth_register_v1, \
+from src.auth import session_to_token, token_to_session, get_user_by_token, auth_register_v1, \
     auth_login_v1
 
 #############################################################################
@@ -48,7 +47,7 @@ def channel_invite_v1(token, channel_id, u_id):
         add_user_into_channel(channel, invitee)
 
     # add notification
-    notification_message = f'added to a channel:"{inviter.handle_str} added you to {channel.name}"'
+    notification_message = f"{inviter.handle_str} added you to {channel.name}"
     notification = Notification(channel.channel_id, -1, notification_message)
     invitee.notifications.append(notification)
     return {}
@@ -178,48 +177,6 @@ def channel_messages_v1(token, channel_id, start):
         'start': start,
         'end': end
     }
-
-
-# def channel_messages_v1(token, channel_id, start):
-#     target_user = get_user_by_token(token)
-#     if target_user is None:
-#         raise AccessError(description="user does not refer to a vaild user")
-#
-#     target_channel = get_channel_by_channel_id(channel_id)
-#     if target_channel is None:
-#         raise (InputError(description="channel_messages_v1: invalid channel_id."))
-#
-#     # check if target user is in channel's members
-#     target_u_id = target_user.u_id
-#     user_inside = False
-#     for i in target_channel.all_members:
-#         if i.u_id == target_u_id:
-#             user_inside = True
-#             break
-#     if user_inside is False:
-#         raise (InputError(description="channel_messages_v1 : target user is not in channel"))
-#
-#     num_msgs = len(target_channel.messages)
-#     if num_msgs < start:
-#         raise (InputError(description="channel_messages_v1 : the start >= total messages."))
-#
-#     # grab the targeted list of Message Class
-#     if num_msgs >= (start + 50):
-#         return_msg_class = target_channel.messages[start: start + 50]
-#     else:
-#         return_msg_class = target_channel.messages[start:]
-#
-#     # turn Message Class to dictionary
-#     print(return_msg_class)
-#     return_msg = []
-#     for message in return_msg_class:
-#         return_msg.append(message)
-#
-#     return {
-#         "messages": return_msg,
-#         "start": target_channel.start,
-#         "end": target_channel.end,
-#     }
 
 
 """
@@ -417,12 +374,13 @@ def channel_removeowner_v1(token, channel_id, u_id):
 
 def get_channel_by_channel_id(channel_id):
 
-    if (not isinstance(channel_id, int)) or channel_id >= len(data["class_channels"]):
+    if (not isinstance(channel_id, int)) or channel_id >= data['channel_num']:
         return None
-    elif data["class_channels"][channel_id]:
-        return data["class_channels"][channel_id]
-    else:
-        return None
+    for channel in data['class_channels']:
+        if channel.channel_id == channel_id:
+            return channel
+
+    return None
 
 
 # Function checking if user exists in current data

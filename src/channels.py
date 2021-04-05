@@ -5,7 +5,7 @@
 # Written by Lan (channels_create_v1)
 
 
-from src.auth import auth_login_v1, auth_register_v1, get_user_by_auth_id, session_to_token, token_to_session, \
+from src.auth import auth_login_v1, auth_register_v1, session_to_token, token_to_session, \
     get_user_by_token
 from src.error import InputError, AccessError
 from src.data_file import Channel, data
@@ -87,8 +87,9 @@ Return Type: { channel_id }
 
 
 def create_channel_id():
-    channel_id = len(data['class_channels'])
-    return channel_id
+    new_id = data['channel_num']
+    data['channel_num'] = data['channel_num'] + 1
+    return new_id
 
 
 def channels_create_v1(token, name, is_public):
