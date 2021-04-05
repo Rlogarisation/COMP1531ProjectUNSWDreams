@@ -72,7 +72,8 @@ Author: Shi Tong Yuan
 message/senddm/v1
 
 Background:
-Send a message from authorised_user to the DM specified by dm_id. Note: Each message should have it's own unique ID. I.E. No messages should share an ID with another message, even if that other message is in a different channel or DM.
+Send a message from authorised_user to the DM specified by dm_id. Note: Each message should have it's own unique ID. 
+I.E. No messages should share an ID with another message, even if that other message is in a different channel or DM.
 
 Parameters: (token, dm_id, message)
 Return Type: { message_id }
@@ -137,7 +138,6 @@ InputError:
     - (Added) Invalid token.
     - Length of message is over 1000 characters message_id refers to a deleted message
 AccessError:
-    # FIXME: 这边意思是写反了么？为什么要非auth_user和owner能修改，不应该是只有auth_user和owner能改么？
     - Message with message_id was sent by the authorised user making this request
     - The authorised user is an owner of this channel (if it was sent to a channel) or the **Dreams**
 
@@ -203,7 +203,6 @@ InputError:
     - (Added) Invalid token.
     - Message (based on ID) no longer exists
 AccessError:
-    # FIXME: 这边意思是写反了么？为什么要非auth_user和owner能remove，不应该是只有auth_user和owner能remove么？
     - Message with message_id was sent by the authorised user making this request
     - The authorised user is an owner of this channel (if it was sent to a channel) or the **Dreams**
 
