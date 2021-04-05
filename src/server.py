@@ -378,7 +378,7 @@ def message_share():
 #############################################################################
 
 @APP.route("/dm/create/v1", methods=['POST'])
-def http_dm_create_v1():
+def dm_create_v1():
     info = request.get_json()
     token = info['token']
     u_ids = info['u_ids']
@@ -388,7 +388,7 @@ def http_dm_create_v1():
 
 
 @APP.route("/dm/invite/v1", methods=['POST'])
-def http_dm_invite_v1():
+def dm_invite_v1():
     info = request.get_json()
     token = info['token']
     dm_id = info['dm_id']
@@ -399,7 +399,7 @@ def http_dm_invite_v1():
 
 
 @APP.route("/dm/remove/v1", methods=['DELETE'])
-def http_dm_remove_v1():
+def dm_remove_v1():
     info = request.get_json()
     token = info['token']
     dm_id = info['dm_id']
@@ -409,7 +409,7 @@ def http_dm_remove_v1():
 
 
 @APP.route("/dm/leave/v1", methods=['POST'])
-def http_dm_leave_v1():
+def dm_leave_v1():
     info = request.get_json()
     token = info['token']
     dm_id = info['dm_id']
@@ -419,7 +419,7 @@ def http_dm_leave_v1():
 
 
 @APP.route("/dm/details/v1", methods=['GET'])
-def http_dm_detail_v1():
+def dm_detail_v1():
     token = request.args.get('token')
     try:
         dm_id = int(request.args.get('dm_id'))
@@ -431,7 +431,7 @@ def http_dm_detail_v1():
 
 
 @APP.route("/dm/list/v1", methods=['GET'])
-def http_dm_list_v1():
+def dm_list_v1():
     token = request.args.get('token')
     result = dm_list_v1(token)
     dump_data(data)
@@ -439,7 +439,7 @@ def http_dm_list_v1():
 
 
 @APP.route("/dm/messages/v1", methods=['GET'])
-def http_dm_messages_v1():
+def dm_messages_v1():
     token = request.args.get('token')
     try:
         dm_id = int(request.args.get('dm_id'))
