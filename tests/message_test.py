@@ -702,3 +702,174 @@ def test_message_senddm_v1():
     test_failed_case2_with_at()
     test_failed_case3_with_at()
     pass
+
+
+#############################################################################
+#                                                                           #
+#                      Test for message_sendlater_v1                        #
+#                                                                           #
+#############################################################################
+"""
+Author: Shi Tong Yuan
+
+message/sendlater/v1
+
+Background:
+Send a message from authorised_user to the channel specified by channel_id automatically at a specified time in the future
+
+Parameters: (token, channel_id, message, time_sent)
+Return Type: { message_id }
+HTTP Method: POST
+
+InputError:
+    - Channel ID is not a valid channel
+    - Message is more than 1000 characters
+    - Time sent is a time in the past
+AccessError:
+    - the authorised user has not joined the channel they are trying to post to
+
+"""
+def test_message_sendlater_v1():
+    pass
+
+#############################################################################
+#                                                                           #
+#                     Test for message_sendlaterdm_v1                       #
+#                                                                           #
+#############################################################################
+"""
+Author: Shi Tong Yuan
+
+message/sendlaterdm/v1
+
+Background:
+Send a message from authorised_user to the DM specified by dm_id automatically at a specified time in the future
+
+Parameters: (token, dm_id, message, time_sent)
+Return Type: { message_id }
+HTTP Method: POST
+
+InputError:
+    - DM ID is not a valid DM
+    - Message is more than 1000 characters
+    - Time sent is a time in the past
+AccessError:
+    - the authorised user is not a member of the DM they are trying to post to
+
+"""
+def test_message_sendlaterdm_v1():
+    pass
+
+#############################################################################
+#                                                                           #
+#                        Test for message_react_v1                          #
+#                                                                           #
+#############################################################################
+"""
+Author: Shi Tong Yuan
+
+message/react/v1
+
+Background:
+Given a message within a channel or DM the authorised user is part of, add a "react" to that particular message
+
+Parameters: (token, message_id, react_id)
+Return Type: {}
+HTTP Method: POST
+
+InputError:
+    - message_id is not a valid message within a channel or DM that the authorised user has joined
+    - react_id is not a valid React ID. The only valid react ID the frontend has is 1
+    - Message with ID message_id already contains an active React with ID react_id from the authorised user
+AccessError:
+    - The authorised user is not a member of the channel or DM that the message is within
+
+"""
+def test_message_react_v1():
+    pass
+
+
+#############################################################################
+#                                                                           #
+#                       Test for message_unreact_v1                         #
+#                                                                           #
+#############################################################################
+"""
+Author: Shi Tong Yuan
+
+message/unreact/v1
+
+Background:
+Given a message within a channel or DM the authorised user is part of, remove a "react" to that particular message.
+
+Parameters: (token, message_id, react_id)
+Return Type: {}
+HTTP Method: POST
+
+InputError:
+    - message_id is not a valid message within a channel or DM that the authorised user has joined
+    - react_id is not a valid React ID
+    - Message with ID message_id does not contain an active React with ID react_id from the authorised user
+AccessError:
+    - The authorised user is not a member of the channel or DM that the message is within
+
+"""
+def test_message_unreact_v1():
+    pass
+
+#############################################################################
+#                                                                           #
+#                          Test for message_pin_v1                          #
+#                                                                           #
+#############################################################################
+"""
+Author: Shi Tong Yuan
+
+message/pin/v1
+
+Background:
+Given a message within a channel or DM, mark it as "pinned" to be given special display treatment by the frontend
+
+Parameters: (token, message_id)
+Return Type: {}
+HTTP Method: POST
+
+InputError:
+    - message_id is not a valid message
+    - Message with ID message_id is already pinned
+AccessError:
+    - The authorised user is not a member of the channel or DM that the message is within
+    - The authorised user is not an owner of the channel or DM
+
+"""
+def test_message_pin_v1():
+    pass
+
+
+#############################################################################
+#                                                                           #
+#                        Test for message_unpin_v1                          #
+#                                                                           #
+#############################################################################
+"""
+Author: Shi Tong Yuan
+
+message/unpin/v1
+
+Background:
+Given a message within a channel or DM, remove it's mark as unpinned
+
+Parameters: (token, message_id)
+Return Type: {}
+HTTP Method: POST
+
+InputError:
+    - message_id is not a valid message
+    - Message with ID message_id is already unpinned
+AccessError:
+    - The authorised user is not a member of the channel or DM that the message is within
+    - The authorised user is not an owner of the channel or DM
+
+"""
+def test_message_unpin_v1():
+    pass
