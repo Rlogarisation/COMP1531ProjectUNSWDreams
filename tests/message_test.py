@@ -1,3 +1,4 @@
+from jwt import InvalidAlgorithmError
 from src.channel import channel_invite_v1, channel_messages_v1
 import pytest
 from src.dm import dm_create_v1, dm_messages_v1, dm_remove_v1
@@ -730,6 +731,20 @@ AccessError:
 
 """
 def test_message_sendlater_v1():
+    # test for the inputs
+    def test_invalid_token():
+        pass
+    def test_invalid_channel_id():
+        pass
+    def test_invalid_message():
+        pass
+    def test_invalid_time_sent():
+        pass
+    # ----------------------------testing------------------------------------
+    test_invalid_token()
+    test_invalid_channel_id()
+    test_invalid_message()
+    test_invalid_time_sent()
     pass
 
 #############################################################################
@@ -758,6 +773,20 @@ AccessError:
 
 """
 def test_message_sendlaterdm_v1():
+    # test for the inputs
+    def test_invalid_token():
+        pass
+    def test_invalid_dm_id():
+        pass
+    def test_invalid_message():
+        pass
+    def test_invalid_time_sent():
+        pass
+    # ----------------------------testing------------------------------------
+    test_invalid_token()
+    test_invalid_dm_id()
+    test_invalid_message()
+    test_invalid_time_sent()
     pass
 
 #############################################################################
@@ -786,6 +815,17 @@ AccessError:
 
 """
 def test_message_react_v1():
+    # test for the inputs
+    def test_invalid_token():
+        pass
+    def test_invalid_message_id():
+        pass
+    def test_invalid_react_id():
+        pass
+    # ----------------------------testing------------------------------------
+    test_invalid_token()
+    test_invalid_message_id()
+    test_invalid_react_id()
     pass
 
 
@@ -815,6 +855,17 @@ AccessError:
 
 """
 def test_message_unreact_v1():
+    # test for the inputs
+    def test_invalid_token():
+        pass
+    def test_invalid_message_id():
+        pass
+    def test_invalid_react_id():
+        pass
+    # ----------------------------testing------------------------------------
+    test_invalid_token()
+    test_invalid_message_id()
+    test_invalid_react_id()
     pass
 
 #############################################################################
@@ -843,6 +894,14 @@ AccessError:
 
 """
 def test_message_pin_v1():
+    # test for the inputs
+    def test_invalid_token():
+        pass
+    def test_invalid_message_id():
+        pass
+    # ----------------------------testing------------------------------------
+    test_invalid_token()
+    test_invalid_message_id()
     pass
 
 
@@ -872,4 +931,12 @@ AccessError:
 
 """
 def test_message_unpin_v1():
+    # test for the inputs
+    def test_invalid_token():
+        pass
+    def test_invalid_message_id():
+        pass
+    # ----------------------------testing------------------------------------
+    test_invalid_token()
+    test_invalid_message_id()
     pass
