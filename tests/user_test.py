@@ -9,6 +9,7 @@ from src.message import message_send_v2, message_senddm_v1
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1, \
     users_all, admin_user_remove, admin_userpermission_change
 from src.data_file import Permission
+
 """
 Author: Emir Aditya Zen
 
@@ -29,6 +30,8 @@ InputError:
 AccessError:
 - The function is called with an invalid token
 """
+
+
 #############################################################################
 #                                                                           #
 #                        Test for user_profile_v1                           #
@@ -148,6 +151,16 @@ def test_user_profile_v1_token_not_match_u_id():
 
 
 
+def test_user_profile_v1_token_not_match_u_id():
+    clear_v1()
+    token_0 = auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")['token']
+    auth_register_v1("990102@gmail.com", "123123123", "ShiTong", "Yuan")
+    auth_login_v1("haha@gmail.com", "123123123")
+    u_id_1 = auth_login_v1("990102@gmail.com", "123123123")['auth_user_id']
+
+    user_profile_v1(token_0, u_id_1)
+
+
 """
 Author: Emir Aditya Zen
 
@@ -168,6 +181,8 @@ InputError:
 AccessError:
 - The function is called with an invalid token
 """
+
+
 #############################################################################
 #                                                                           #
 #                    Test for user_profile_setname_v1                       #
@@ -231,7 +246,7 @@ def test_user_profile_setname_v1_inputError_nameFirst_caseTwo():
     token1 = token_id_dict1["token"]
 
     # Made an invalid first_name for testing
-    invalid_first_name = 51*"a"
+    invalid_first_name = 51 * "a"
 
     # Test conditions leading to an input error outcome due to invalid first name
     with pytest.raises(InputError):
@@ -268,7 +283,7 @@ def test_user_profile_setname_v1_inputError_nameLast_caseTwo():
     token1 = token_id_dict1["token"]
 
     # Made an invalid last_name for testing
-    invalid_last_name = 51*"a"
+    invalid_last_name = 51 * "a"
 
     # Test conditions leading to an input error outcome due to invalid last name
     with pytest.raises(InputError):
@@ -315,6 +330,8 @@ InputError:
 AccessError:
 - The function is called with an invalid token
 """
+
+
 #############################################################################
 #                                                                           #
 #                   Test for user_profile_setemail_v1                       #
@@ -441,6 +458,8 @@ InputError:
 AccessError:
 - The function is called with an invalid token
 """
+
+
 #############################################################################
 #                                                                           #
 #                   Test for user_profile_sethandle_v1                      #
@@ -505,7 +524,7 @@ def test_user_profile_sethandle_v1_inputError_handle_caseTwo():
     token1 = token_id_dict1["token"]
 
     # Made an invalid handle for testing
-    invalid_handle = 51*"a"
+    invalid_handle = 51 * "a"
 
     # Test conditions leading to an input error outcome due to invalid handle
     with pytest.raises(InputError):
@@ -567,6 +586,8 @@ Return Type: { users }
 AccessError:
 - The function is called with an invalid token
 """
+
+
 #############################################################################
 #                                                                           #
 #                          Test for users_all_v1                            #
@@ -648,6 +669,7 @@ def test_users_all_v1_accessError():
     # Test conditions leading to an access error outcome due to invalid token
     with pytest.raises(AccessError):
         users_all(invalid_token)
+
 
 #############################################################################
 #                                                                           #
@@ -761,6 +783,15 @@ def test_admin_user_remove_invalid_token():
         admin_user_remove(None, u_id_0)
 
 
+def test_admin_user_remove_invalid_token():
+    clear_v1()
+    u_id_0 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')['auth_user_id']
+    with pytest.raises(AccessError):
+        admin_user_remove("invalid token", u_id_0)
+    with pytest.raises(AccessError):
+        admin_user_remove(None, u_id_0)
+
+
 def test_admin_user_remove_invalid_uid():
     clear_v1()
     register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
@@ -811,7 +842,6 @@ def test_admin_user_remove_successfully2():
     register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
     token1 = register1['token']
     token2 = register2['token']
-    uid1 = register1['auth_user_id']
     uid2 = register2['auth_user_id']
 
     channel_id_0 = channels_create_v1(token2, "channel1", True)['channel_id']

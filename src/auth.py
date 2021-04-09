@@ -100,6 +100,8 @@ def auth_logout(token):
 
 # check if email entered is valid
 def is_email_valid(email):
+    if email is None:
+        return False
     regex = '^[a-zA-Z0-9]+[\\._]?[a-zA-Z0-9]+[@]\\w+[.]\\w{2,3}$'
     if re.search(regex, email):
         return True
@@ -137,7 +139,6 @@ def get_user_session_by_token(token):
             return result
     return None
 
-    
 # return the specific user with the auth_user_id
 # the user is a class
 def get_user_by_uid(u_id):
@@ -265,10 +266,10 @@ def create_handle(name_first, name_last):
     # to form a new handle
     else:
         count -= 1
-        count_len = len(str(count))
-        char_len = 20 - count_len
-        name = list(name)[:char_len]
-        name = ''.join(name)
+        # count_len = len(str(count))
+        # char_len = 20 - count_len
+        # name = list(name)[:char_len]
+        # name = ''.join(name)
         handle = name + str(count)
         return handle
 

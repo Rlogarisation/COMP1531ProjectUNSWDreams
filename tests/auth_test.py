@@ -146,8 +146,8 @@ def test_auth_register_handle_valid():
 
     assert member1['handle_str'] == 'zxcvbnmasdfghjklqwe'
     assert member2['handle_str'] == 'zxcvbnmasdfghjklqwer'
-    assert member3['handle_str'] == 'zxcvbnmasdfghjklqwe0'
-    assert member4['handle_str'] == 'zxcvbnmasdfghjklqwe1'
+    assert member3['handle_str'] == 'zxcvbnmasdfghjklqwer0'
+    assert member4['handle_str'] == 'zxcvbnmasdfghjklqwer1'
 
 
 """

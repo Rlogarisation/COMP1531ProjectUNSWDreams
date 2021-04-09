@@ -29,8 +29,8 @@ def test_clear_v1():
     register = auth_register_v1('user@gmail.com', 'qwe1212', 'shaozhen', 'yan')
 
     # create channels
-    channel0_id = channels_create_v1(register['token'], 'test_public_channel', True)['channel_id']
-    channel1_id = channels_create_v1(register['token'], 'test_private_channel', False)['channel_id']
+    channels_create_v1(register['token'], 'test_public_channel', True)
+    channels_create_v1(register['token'], 'test_private_channel', False)
 
     # check if the user and channel are created correctly
     assert channels_listall_v1(register['token'])['channels'][0] == {'channel_id': 0, 'name': 'test_public_channel'}
@@ -44,11 +44,11 @@ def test_clear_v1():
 
 
 def test_search_v1():
-    u_id0 = auth_register_v1('user0@gmail.com', 'qwe1212', 'shaozhen', 'yan')['auth_user_id']
+    auth_register_v1('user0@gmail.com', 'qwe1212', 'shaozhen', 'yan')
     token0 = auth_login_v1('user0@gmail.com', 'qwe1212')['token']
 
     u_id1 = auth_register_v1('user1@gmail.com', 'yst990102', 'shitong', 'yuan')['auth_user_id']
-    token1 = auth_login_v1('user1@gmail.com', 'yst990102')['token']
+    auth_login_v1('user1@gmail.com', 'yst990102')
 
     channel0_id = channels_create_v1(token0, "test_channel", True)['channel_id']
     dm0_id = dm_create_v1(token0, [u_id1])['dm_id']
@@ -57,13 +57,14 @@ def test_search_v1():
         # token type error
         with pytest.raises(AccessError):
             search_v1("invalid token", "query string")
+
     def test_oversize_string():
         oversize_string = ""
-        for i in range(0, 2000):
+        for _i in range(0, 2000):
             oversize_string += "a"
         with pytest.raises(InputError):
             search_v1(token0, oversize_string)
-        
+
     def test_search_in_channel():
         message_send_v2(token0, channel0_id, "channel_msg")
 

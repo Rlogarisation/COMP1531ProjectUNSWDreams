@@ -237,6 +237,16 @@ def test_channel_invite_v1_invalid_channel_id():
     u_id2 = token_id_dict2["auth_user_id"]
 
     # Create Channel_1 made by user_1 and get its id
+    channels_create_v1(token1, "channelone", True)
+
+    with pytest.raises(InputError):
+        channel_invite_v1(token1, 123456, u_id2)
+    with pytest.raises(InputError):
+        channel_invite_v1(token1, None, u_id2)
+    with pytest.raises(InputError):
+        channel_invite_v1(token1, "invalid channel_id", u_id2)
+
+    # Create Channel_1 made by user_1 and get its id
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
 
     with pytest.raises(InputError):
@@ -450,7 +460,10 @@ def test_channel_messages_v1_invalid_channel_id():
     with pytest.raises(InputError):
         channel_messages_v1(user1['token'], "invalid channel_id", 0)
     with pytest.raises(InputError):
+        channel_messages_v1(user1['token'], "invalid channel_id", 0)
+    with pytest.raises(InputError):
         channel_messages_v1(user1['token'], None, 0)
+
 
 def test_invalid_token():
     clear_v1()
@@ -460,7 +473,7 @@ def test_invalid_token():
     user1 = auth_login_v1("user1@test.com", "user1password")
 
     auth_register_v1("user2@test.com", "user2password", "Lan", "Lin")
-    user2 = auth_login_v1("user2@test.com", "user2password")
+    auth_login_v1("user2@test.com", "user2password")
 
     # create channel for testing
     Testing_channel_id = channels_create_v1(user1["token"], "channel_test", True)
@@ -468,7 +481,7 @@ def test_invalid_token():
     with pytest.raises(AccessError):
         channel_messages_v1("invalid token", Testing_channel_id["channel_id"], 0)
     with pytest.raises(AccessError):
-        channel_messages_v1(None, Testing_channel_id["channel_id"], 0 )
+        channel_messages_v1(None, Testing_channel_id["channel_id"], 0)
 
 
 def test_auth_missing():
@@ -561,6 +574,20 @@ def test_great_starter():
 
     with pytest.raises(InputError):
         channel_messages_v1(user1['token'], Testing_channel_id['channel_id'], 100)
+
+def test_great_starter():
+    clear_v1()
+
+    # create 2 users
+    auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
+    user1 = auth_login_v1("user1@test.com", "user1password")
+
+    # create channel for testing
+    Testing_channel_id = channels_create_v1(user1["token"], "channel_test", True)
+
+    with pytest.raises(InputError):
+        channel_messages_v1(user1['token'], Testing_channel_id['channel_id'], 100)
+
 
 """
 Author : Shi Tong Yuan
@@ -962,6 +989,26 @@ def test_channel_addowner_v1_inputError_UserNotIn_channel():
         channel_addowner_v1(token1, channel_1_id, u_id2)
 
 
+def test_channel_addowner_v1_inputError_UserNotIn_channel():
+    # Clears data and registers and logins user_1 and user_2
+    clear_v1()
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+
+    # login the two registered users
+    token_id_dict1 = auth_login_v1("haha@gmail.com", "123123123")
+    token_id_dict2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = token_id_dict1["token"]
+    u_id2 = token_id_dict2["auth_user_id"]
+
+    # Create Channel_1 made by user_1, get its id, and invite user2
+    channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
+
+    # Conditions leads to an input error outcome and tests for it
+    with pytest.raises(InputError):
+        channel_addowner_v1(token1, channel_1_id, u_id2)
+
+
 # Case 4 - tests for access error due to non authorised user
 #          expected outcome is input error
 # Occurs when add owner function is by a member of channel who is not a global owner
@@ -1219,11 +1266,12 @@ def test_channel_removeowner_v1_accessError1():
     # Create Channel_1 made by user_1, get its id, and invite user2
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
     channel_invite_v1(token1, channel_1_id, u_id2)
+    channel_invite_v1(token1, channel_1_id, u_id3)
     channel_addowner_v1(token1, channel_1_id, u_id2)
 
     # Conditions leads to an access error outcome and tests for it
     with pytest.raises(AccessError):
-        channel_removeowner_v1(token3, channel_1_id, u_id3)
+        channel_removeowner_v1(token3, channel_1_id, u_id2)
 
 
 # Case 6 - tests for access error due invalid token
@@ -1274,17 +1322,14 @@ def test_channel_removeowner_v1_accessError2():
     token_id_dict3 = auth_login_v1("test2@testexample.com", "wp01^#$dp1o23")
 
     token1 = token_id_dict1["token"]
-    token2 = token_id_dict2["token"]
     token3 = token_id_dict3["token"]
 
-    u_id1 = token_id_dict1["auth_user_id"]
     u_id2 = token_id_dict2["auth_user_id"]
-    u_id3 = token_id_dict3["auth_user_id"]
 
     # Create Channel_1 made by user_1, get its id, and invite user_2
     channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
     channel_invite_v1(token1, channel_1_id, u_id2)
-    channel_addowner_v1(token1, channel_1_id,u_id2)
+    channel_addowner_v1(token1, channel_1_id, u_id2)
 
     with pytest.raises(AccessError):
         channel_removeowner_v1(token3, channel_1_id, u_id2)
@@ -1350,6 +1395,36 @@ def test_channel_leave_joined_user():
     assert output["is_public"] is True
     assert len(output["all_members"]) == 1
     assert len(output["owner_members"]) == 1
+
+def test_channel_leave_owner():
+    # Clears data and registers user1 and user2
+    clear_v1()
+    auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+
+    # login the two registered users
+    dict_user1 = auth_login_v1("haha@gmail.com", "123123123")
+    dict_user2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")
+    token1 = dict_user1["token"]
+    token2 = dict_user2["token"]
+    u_id2 = dict_user2["auth_user_id"]
+
+    # Create channel made by user1, get its id, and invite user2
+    channel_1_id = channels_create_v1(token1, "channelone", True)["channel_id"]
+    channel_invite_v1(token1, channel_1_id, u_id2)
+
+    # Calls channel_leave for testing
+    # Expected output is user2 leaves channel
+    channel_leave_v1(token1, channel_1_id)
+
+    output = channel_details_v1(token2, channel_1_id)
+    assert output["all_members"][0]["name_first"] == 'Tom'
+    assert output["owner_members"][0]["name_first"] == 'Tom'
+    assert output["name"] == "channelone"
+    assert output["is_public"] is True
+    assert len(output["all_members"]) == 1
+    assert len(output["owner_members"]) == 1
+
 
 def test_channel_leave_owner():
     # Clears data and registers user1 and user2
@@ -1454,45 +1529,3 @@ def test_channel_leave_v1_accessErrorToken():
     invalid_token = token2 + "rkbgesorgbv#$%"
     with pytest.raises(AccessError):
         channel_leave_v1(invalid_token, channel_1_id)
-
-
-# if __name__ == "__main__":
-#     # create 2 users
-#     auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
-#     user1 = auth_login_v1("user1@test.com", "user1password")
-#
-#     # create channel for testing
-#     Testing_channel_id = channels_create_v1(user1["token"], "channel_test", True)
-#
-#     # send testing message into channel chat
-#     for i in range(1, 3):
-#         message_send_v2(user1["token"], Testing_channel_id["channel_id"], f"This is a testing message{i}.")
-#
-#     # 1. return -1 : for no more message after start
-#     message_stored = channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 0)["messages"]
-#     print(message_stored[0]['message'])
-#     print(message_stored[0]['time_created'])
-#     print(message_stored[1]['message'])
-#     print(message_stored[1]['time_created'])
-#     assert len(message_stored) == 2
-
-# if __name__ == "__main__":
-#     # create 2 users
-#     clear_v1()
-#     auth_register_v1("user1@test.com", "user1password", "Roger", "Luo")
-#     user1 = auth_login_v1("user1@test.com", "user1password")
-#
-#     # create channel for testing
-#     Testing_channel_id = channels_create_v1(user1["token"], "channel_test", True)
-#
-#     # send testing message into channel chat
-#     for i in range(1, 3):
-#         message_send_v2(user1["token"], Testing_channel_id["channel_id"], f"This is a testing message{i}.")
-#
-#     # 1. return -1 : for no more message after start
-#     message_stored = channel_messages_v1(user1["token"], Testing_channel_id["channel_id"], 0)["messages"]
-#     print(message_stored[0]['message'])
-#     print(message_stored[0]['time_created'])
-#     print(message_stored[1]['message'])
-#     print(message_stored[1]['time_created'])
-#     assert len(message_stored) == 2
