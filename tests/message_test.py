@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from jwt import InvalidAlgorithmError
 from src.channel import channel_invite_v1, channel_messages_v1
 import pytest
@@ -6,7 +7,7 @@ from src.error import InputError, AccessError
 from src.channels import channels_create_v1
 from src.auth import auth_register_v1, auth_login_v1
 from src.other import clear_v1
-from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_share_v1, message_senddm_v1
+from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_share_v1, message_senddm_v1, message_sendlater_v1, message_sendlaterdm_v1, message_react_v1, message_unreact_v1, message_pin_v1, message_unpin_v1
 
 #############################################################################
 #                                                                           #
@@ -637,13 +638,14 @@ AccessError:
 def test_message_senddm_v1():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
-    auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
     token_2 = auth_register_v1("test_email2@gmail.com", "password", "First2", "Last2")['token']
-    token_2 = auth_register_v1("test_email3@gmail.com", "password", "First3", "Last3")['token']
-    auth_login_v1("test_email0@gmail.com", "password")
+    token_3 = auth_register_v1("test_email3@gmail.com", "password", "First3", "Last3")['token']
+    
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
     u_id_1 = auth_login_v1("test_email1@gmail.com", "password")['auth_user_id']
-    auth_login_v1("test_email2@gmail.com", "password")
-    auth_login_v1("test_email3@gmail.com", "password")
+    u_id_2 = auth_login_v1("test_email2@gmail.com", "password")['auth_user_id']
+    u_id_3 = auth_login_v1("test_email3@gmail.com", "password")['auth_user_id']
 
     dm_0_id = dm_create_v1(token_0, [u_id_1])['dm_id']
 
@@ -731,14 +733,47 @@ AccessError:
 
 """
 def test_message_sendlater_v1():
-    # test for the inputs
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
+    
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
+
+    channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
+
+    time_sent = datetime(2021,4,9).replace(tzinfo=timezone.utc).timestamp()
+
+    # test for the inputs checking
     def test_invalid_token():
+        with pytest.raises(InputError):
+            message_sendlater_v1("string token", channel_0_id, "I am message.", time_sent)
+        with pytest.raises(InputError):
+            message_sendlater_v1(111000, channel_0_id, "I am message.", time_sent)
+        with pytest.raises(InputError):
+            message_sendlater_v1(None, channel_0_id, "I am message.", time_sent)
         pass
     def test_invalid_channel_id():
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, "invalid channel_id", "I am message.", time_sent)
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, 99999, "I am message.", time_sent)
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, None, "I am message.", time_sent)
         pass
     def test_invalid_message():
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, channel_0_id, 123456, time_sent)
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, channel_0_id, "a" * 2000, time_sent)
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, channel_0_id, None, time_sent)
         pass
     def test_invalid_time_sent():
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, channel_0_id, "I am message.", "string time_sent")
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, channel_0_id, "I am message.", 123456)
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, channel_0_id, "I am message.", None)
         pass
     # ----------------------------testing------------------------------------
     test_invalid_token()
@@ -773,14 +808,49 @@ AccessError:
 
 """
 def test_message_sendlaterdm_v1():
-    # test for the inputs
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
+    
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")['auth_user_id']
+
+    dm_0_id = dm_create_v1(token_0, [u_id_1])['dm_id']
+
+    time_sent = datetime(2021,4,9).replace(tzinfo=timezone.utc).timestamp()
+
+    # test for the inputs checking
     def test_invalid_token():
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1("string token", dm_0_id, "I am message.", time_sent)
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(111000, dm_0_id, "I am message.", time_sent)
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(None, dm_0_id, "I am message.", time_sent)
         pass
     def test_invalid_dm_id():
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, "invalid dm_id", "I am message.", time_sent)
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, 99999, "I am message.", time_sent)
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, None, "I am message.", time_sent)
         pass
     def test_invalid_message():
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, dm_0_id, 123456, time_sent)
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, dm_0_id, "a" * 2000, time_sent)
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, dm_0_id, None, time_sent)
         pass
     def test_invalid_time_sent():
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, dm_0_id, "I am message.", "string time_sent")
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, dm_0_id, "I am message.", 123456)
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, dm_0_id, "I am message.", None)
         pass
     # ----------------------------testing------------------------------------
     test_invalid_token()
@@ -815,7 +885,27 @@ AccessError:
 
 """
 def test_message_react_v1():
-    # test for the inputs
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
+    
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")['auth_user_id']
+
+    dm_0_id = dm_create_v1(token_0, [u_id_1])['dm_id']
+    channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
+
+    dm_message_0 = message_senddm_v1(token_0, dm_0_id, "I am message.")
+    dm_message_0_message_id = dm_message_0['message_id']
+    dm_message_1 = message_senddm_v1(token_0, dm_0_id, "@first1last1 I am message.")
+    dm_message_1_message_id = dm_message_1['message_id']
+
+    channel_message_0 = message_send_v2(token_0, channel_0_id, "I am message.")
+    channel_message_0_message_id = channel_message_0['message_id']
+    channel_message_1 = message_send_v2(token_0, channel_0_id, "@first0last0 I am message.")
+    channel_message_1_message_id = channel_message_1['message_id']
+
+    # test for the inputs checking
     def test_invalid_token():
         pass
     def test_invalid_message_id():
@@ -855,7 +945,27 @@ AccessError:
 
 """
 def test_message_unreact_v1():
-    # test for the inputs
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
+    
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")['auth_user_id']
+
+    dm_0_id = dm_create_v1(token_0, [u_id_1])['dm_id']
+    channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
+
+    dm_message_0 = message_senddm_v1(token_0, dm_0_id, "I am message.")
+    dm_message_0_message_id = dm_message_0['message_id']
+    dm_message_1 = message_senddm_v1(token_0, dm_0_id, "@first1last1 I am message.")
+    dm_message_1_message_id = dm_message_1['message_id']
+
+    channel_message_0 = message_send_v2(token_0, channel_0_id, "I am message.")
+    channel_message_0_message_id = channel_message_0['message_id']
+    channel_message_1 = message_send_v2(token_0, channel_0_id, "@first0last0 I am message.")
+    channel_message_1_message_id = channel_message_1['message_id']
+
+    # test for the inputs checking
     def test_invalid_token():
         pass
     def test_invalid_message_id():
@@ -894,10 +1004,42 @@ AccessError:
 
 """
 def test_message_pin_v1():
-    # test for the inputs
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
+    
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")['auth_user_id']
+
+    dm_0_id = dm_create_v1(token_0, [u_id_1])['dm_id']
+    channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
+
+    dm_message_0 = message_senddm_v1(token_0, dm_0_id, "I am message.")
+    dm_message_0_message_id = dm_message_0['message_id']
+    dm_message_1 = message_senddm_v1(token_0, dm_0_id, "@first1last1 I am message.")
+    dm_message_1_message_id = dm_message_1['message_id']
+
+    channel_message_0 = message_send_v2(token_0, channel_0_id, "I am message.")
+    channel_message_0_message_id = channel_message_0['message_id']
+    channel_message_1 = message_send_v2(token_0, channel_0_id, "@first0last0 I am message.")
+    channel_message_1_message_id = channel_message_1['message_id']
+
+    # test for the inputs checking
     def test_invalid_token():
+        with pytest.raises(InputError):
+            message_pin_v1("string token", dm_message_0_message_id)
+        with pytest.raises(InputError):
+            message_pin_v1(111000, dm_message_0_message_id)
+        with pytest.raises(InputError):
+            message_pin_v1(None, dm_message_0_message_id)
         pass
     def test_invalid_message_id():
+        with pytest.raises(InputError):
+            message_pin_v1(token_0, "string message_id")
+        with pytest.raises(InputError):
+            message_pin_v1(token_0, 99999999)
+        with pytest.raises(InputError):
+            message_pin_v1(token_0, None)
         pass
     # ----------------------------testing------------------------------------
     test_invalid_token()
@@ -931,10 +1073,43 @@ AccessError:
 
 """
 def test_message_unpin_v1():
-    # test for the inputs
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
+    
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")['auth_user_id']
+
+    dm_0_id = dm_create_v1(token_0, [u_id_1])['dm_id']
+    channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
+
+    dm_message_0 = message_senddm_v1(token_0, dm_0_id, "I am message.")
+    dm_message_0_message_id = dm_message_0['message_id']
+    dm_message_1 = message_senddm_v1(token_0, dm_0_id, "@first1last1 I am message.")
+    dm_message_1_message_id = dm_message_1['message_id']
+
+    channel_message_0 = message_send_v2(token_0, channel_0_id, "I am message.")
+    channel_message_0_message_id = channel_message_0['message_id']
+    channel_message_1 = message_send_v2(token_0, channel_0_id, "@first0last0 I am message.")
+    channel_message_1_message_id = channel_message_1['message_id']
+
+
+    # test for the inputs checking
     def test_invalid_token():
+        with pytest.raises(InputError):
+            message_unpin_v1("string token", dm_message_0_message_id)
+        with pytest.raises(InputError):
+            message_unpin_v1(111000, dm_message_0_message_id)
+        with pytest.raises(InputError):
+            message_unpin_v1(None, dm_message_0_message_id)
         pass
     def test_invalid_message_id():
+        with pytest.raises(InputError):
+            message_unpin_v1(token_0, "string message_id")
+        with pytest.raises(InputError):
+            message_unpin_v1(token_0, 99999999)
+        with pytest.raises(InputError):
+            message_unpin_v1(token_0, None)
         pass
     # ----------------------------testing------------------------------------
     test_invalid_token()
