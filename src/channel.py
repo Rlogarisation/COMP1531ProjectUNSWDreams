@@ -1,8 +1,7 @@
-from typing import Dict
-from src.data_file import data
+from src.data_file import data, Permission, Notification
 from src.error import InputError, AccessError
-from src.auth import get_user_by_auth_id
-
+from src.auth import session_to_token, token_to_session, get_user_by_token, auth_register_v1, \
+    auth_login_v1
 
 #############################################################################
 #                                                                           #
@@ -30,13 +29,13 @@ AccessError:
 """
 
 
-def channel_invite_v1(auth_user_id, channel_id, u_id):
+def channel_invite_v1(token, channel_id, u_id):
     # Case 1 error checks
     # Checks for cases of InputError indicated by invalid channel_id or u_id
     # In addition, checks for cases of AccessError indicated by authorised user calling
     # channel_invite_v1 function into a channel he is not part in
-    error_check(channel_id, u_id, auth_user_id)
-
+    error_check(channel_id, u_id, token)
+    inviter = get_user_by_token(token)
     # Case 2 no error occurs but user invited is already part of channel
     # Expected outcome is channel_invite_v1 function will just ignore the second
     # invitation call
@@ -47,6 +46,10 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         # Expected outcome is invited user is now a member of the channel specified
         add_user_into_channel(channel, invitee)
 
+    # add notification
+    notification_message = f"{inviter.handle_str} added you to {channel.name}"
+    notification = Notification(channel.channel_id, -1, notification_message)
+    invitee.notifications.append(notification)
     return {}
 
 
@@ -69,19 +72,25 @@ AccessError:
 """
 
 
-def channel_details_v1(auth_user_id, channel_id):
+def channel_details_v1(token, channel_id):
     # Case 1 InputError checks
     # Checks for cases of InputError indicated by invalid channel_id
     channel = get_channel_by_channel_id(channel_id)
     if channel is None:
-        raise InputError("Channel_id does not refer to a valid channel")
+        raise InputError(description="Channel_id does not refer to a valid channel")
 
     # Case 2 AccessError checks
     # Checks for cases of AccessError indicated by authorised user calling
     # channel_invite_v1 function into a channel he is not part in
-    sender = is_user_in_channel(channel_id, auth_user_id)
+    sender = get_user_by_token(token)
     if sender is None:
-        raise AccessError("The authorised user is not a member of the channel")
+        # the token given is invalid
+        raise AccessError(description="token is invalid")
+
+    # check if the sender is in the channel
+    sender_in_channel = is_user_in_channel(channel_id, sender.auth_user_id)
+    if sender_in_channel is None:
+        raise AccessError(description="The authorised user is not a member of the channel")
 
     # Case 3 succesfull function calling
     # Expected outcome is function return basic details on the channel
@@ -110,6 +119,7 @@ def channel_details_v1(auth_user_id, channel_id):
 
     return {
         'name': channel.name,
+        'is_public': channel.is_public,
         'owner_members': owner_list,
         'all_members': member_list
     }
@@ -134,39 +144,38 @@ AccessError:
 """
 
 
-def channel_messages_v1(auth_user_id, channel_id, start):
-    if auth_user_id == -1:
-        raise (InputError("channel_messages_v1: invalid token."))
+def channel_messages_v1(token, channel_id, start):
+    # Input error when channel_id does not refer to an existing channel.
+    channel = get_channel_by_channel_id(channel_id)
+    if channel is None:
+        raise InputError(description="channel_id does not refer to a valid or exising dm")
+    # Input error when start is greater than the total number of messages in the channel
+    if start > len(channel.messages):
+        raise InputError(description="start is greater than the total number of messages in the channel")
 
-    target_channel = get_channel_by_channel_id(channel_id)
-    if target_channel == None:
-        raise (InputError("channel_messages_v1: invalid channel_id."))
+    # Access error when Authorised user is not a member of channel with channel_id
+    user = get_user_by_token(token)
+    if user is None:
+        raise AccessError(description="Token is invalid")
+    elif channel not in user.part_of_channel:
+        raise AccessError(description="The authorised user is not already a member of the channel")
 
-    # check if target user is in channel's members
-    target_user = get_user_by_auth_id(auth_user_id)
-    target_auth_user_id = target_user.auth_user_id
-    user_inside = False
-    for i in target_channel.all_members:
-        if i.auth_user_id == target_auth_user_id:
-            user_inside = True
-            break
-    if user_inside == False:
-        raise (InputError("channel_messages_v1 : target user is not in channel"))
-
-    num_msgs = len(target_channel.messages)
-    if num_msgs < start:
-        raise (InputError("channel_messages_v1 : the start >= total messages."))
-
-    return_msg = []
-    if num_msgs > (start + 50):
-        return_msg = target_channel.messages[start: start + 50]
+    return_message = []
+    counter_start = len(channel.messages) - start - 1
+    if (counter_start + 1) - 50 > 0:
+        counter_end = (counter_start + 1) - 50
+        end = start + 50
     else:
-        return_msg = target_channel.messages[start:]
+        counter_end = 0
+        end = -1
+    while counter_start >= counter_end:
+        return_message.append(channel.messages[counter_start].return_type_message())
+        counter_start -= 1
 
     return {
-        "messages": return_msg,
-        "start": target_channel.start,
-        "end": target_channel.end,
+        'messages': return_message,
+        'start': start,
+        'end': end
     }
 
 
@@ -188,38 +197,171 @@ AccessError:
 """
 
 
-def channel_join_v1(auth_user_id, channel_id):
+def channel_join_v1(token, channel_id):
+    user = get_user_by_token(token)
+    if user is None:
+        raise AccessError(description="Token passed in is invalid")
+
     target_channel = get_channel_by_channel_id(channel_id)
-
     if target_channel is None:
-        raise (InputError("channel_join_v1 : invalid channel_id."))
+        raise (InputError(description="channel_join_v1 : invalid channel_id."))
 
-    if target_channel.is_public is False:
-        raise (AccessError("channel_join_v1 : channel is PRIVATE."))
+    if target_channel.is_public is False and user.permission_id != Permission.global_owner:
+        raise (AccessError(description="channel_join_v1 : channel is PRIVATE."))
 
-    assert type(auth_user_id) is int
-    if auth_user_id == -1:
-        raise (InputError("channel_join_v1 : invalid auth_user_id"))
+    add_user_into_channel(target_channel, user)
+    return {}
 
-    new_member = get_user_by_auth_id(auth_user_id)
 
-    for i in data["class_channels"]:
-        if i.channel_id == channel_id:
-            i.all_members.append(new_member)
-            break
+"""
+Author : Emir Aditya Zen
+
+Background
+Given a channel ID, the user removed as a member of this channel. 
+Their messages should remain in the channel
+
+Parameters: (token, channel_id)
+Return Type: {}
+
+InputError:
+- channel_id does not refer to a valid channel.
+
+AccessError:
+- Authorised user is not a member of channel with channel_id
+- token is invalid
+
+"""
+
+
+def channel_leave_v1(token, channel_id):
+    # Get channel and user
+    channel = get_channel_by_channel_id(channel_id)
+    user = get_user_by_token(token)
+    u_id = token_into_u_id(token)
+
+    # Case 1 InputError checks
+    # Checks for cases of InputError indicated by invalid channel_id
+    if channel is None:
+        raise InputError(description="Channel_id does not refer to a valid channel")
+
+    # Case 2 AccessError checks
+    # Checks if token is invalid and user is in channel specified
+    if user is None:
+        raise AccessError(description="token is invalid")
+    else:
+        if is_user_in_channel(channel_id, u_id) is None:
+            raise AccessError(description="User is not in channel specified")
+
+    # Case 3 succesfull function calling
+    # Expected outcome is user leaves channel
+    user_leaves_channel(channel, user, u_id, channel_id)
+    return {}
+
+
+"""
+Author : Emir Aditya Zen
+
+Background
+Make user with user id u_id an owner of this channel
+
+Parameters: (token, channel_id, u_id)
+Return Type: {}
+
+InputError:
+- channel_id does not refer to a valid channel.
+- user with u_id is already an owner of the channel
+
+AccessError:
+- The authorised user is not owner of dreams or channel
+- The function is called with an invalid token
+"""
+
+
+def channel_addowner_v1(token, channel_id, u_id):
+    # Case 1 InputError checks
+    # Checks for cases of InputError indicated by invalid channel_id
+    channel = get_channel_by_channel_id(channel_id)
+    if channel is None:
+        raise InputError(description="Channel_id does not refer to a valid channel")
+
+    # Checks for cases of InputError indicated by user with u_id being an owner already
+    if is_user_owner_channel(channel_id, u_id) is not None:
+        raise InputError(description="User is already an owner")
+    # Check if the user to be added as owner is in the channel
+    if is_user_in_channel(channel_id, u_id) is None:
+        raise InputError(description="The user to be added as owner is not in the channel")
+
+    # Case 2 AccessError checks
+    # Checks if token is invalid
+    sender = get_user_by_token(token)
+    if sender is None:
+        # the token given is invalid
+        raise AccessError(description="token is invalid")
+
+    # check if the sender is owner of the channel or a global owner
+    sender_in_channel = is_user_owner_channel(channel_id, sender.auth_user_id)
+    if sender_in_channel is None and sender.permission_id != Permission.global_owner:
+        raise AccessError(description="The authorised user is not an owner of the channel, and not the global owner")
+
+    # Case 3 succesfull function calling
+    # Expected outcome is user with u_id becomes an owner of the channel
+    owner_added = get_user_by_u_id(u_id)
+    add_user_into_owner_channel(channel, owner_added)
 
     return {}
 
 
-def channel_leave_v1(auth_user_id, channel_id):
-    return {}
+"""
+Author : Emir Aditya Zen
+
+Background
+Remove user with user id u_id an owner of this channel
+
+Parameters: (token, channel_id, u_id)
+Return Type: {}
+
+InputError:
+- channel_id does not refer to a valid channel.
+- user with u_id is not an owner of the channel.
+- user is currently the only owner
+
+AccessError:
+- The authorised user is not owner of dreams or channel
+- The function is called with an invalid token
+"""
 
 
-def channel_addowner_v1(auth_user_id, channel_id, u_id):
-    return {}
+def channel_removeowner_v1(token, channel_id, u_id):
+    # Case 1 InputError checks
+    # Checks for cases of InputError indicated by invalid channel_id
+    channel = get_channel_by_channel_id(channel_id)
+    if channel is None:
+        raise InputError(description="Channel_id does not refer to a valid channel")
 
+    # Checks for cases of InputError indicated by user with u_id is not an owner of channel
+    if is_user_owner_channel(channel_id, u_id) is None:
+        raise InputError(description="User is not an owner")
 
-def channel_removeowner_v1(auth_user_id, channel_id, u_id):
+    # Checks if the user is currently the only owner
+    if len(channel.owner_members) == 1:
+        raise InputError(description="User is the only owner")
+
+    # Case 2 AccessError checks
+    # Checks if token is invalid
+    sender = get_user_by_token(token)
+    if sender is None:
+        # the token given is invalid
+        raise AccessError(description="token is invalid")
+
+    # check if the sender is owner of the channel or a global owner
+    sender_in_channel = is_user_owner_channel(channel_id, sender.auth_user_id)
+    if sender_in_channel is None and sender.permission_id != Permission.global_owner:
+        raise AccessError(description="The authorised user is not an owner of the channel")
+
+    # Case 3 succesfull function calling
+    # Expected outcome is user with u_id becomes an owner of the channel
+    owner_remove = get_user_by_u_id(u_id)
+    remove_user_from_owner_channel(channel, owner_remove)
     return {}
 
 
@@ -231,18 +373,14 @@ def channel_removeowner_v1(auth_user_id, channel_id, u_id):
 
 
 def get_channel_by_channel_id(channel_id):
-    # for channel in data['class_channels']:
-    #     if channel_id == channel.channel_id:
-    #         return channel
-    #     else:
-    #         return None
 
-    if channel_id >= len(data["class_channels"]):
+    if (not isinstance(channel_id, int)) or channel_id >= data['channel_num']:
         return None
-    elif data["class_channels"][channel_id]:
-        return data["class_channels"][channel_id]
-    else:
-        return None
+    for channel in data['class_channels']:
+        if channel.channel_id == channel_id:
+            return channel
+
+    return None
 
 
 # Function checking if user exists in current data
@@ -265,26 +403,75 @@ def is_user_in_channel(channel_id, auth_user_id):
 
 
 # Checks if function channel_invite_v1 will generate an error
-def error_check(channel_id, u_id, auth_user_id):
+def error_check(channel_id, u_id, token):
     # Checking for InputError
     # error_test1 and error_test2 checks if channel and user is valid or not
     # if user or channel is invalid throw inputError
     channel_ = get_channel_by_channel_id(channel_id)
     if channel_ is None:
-        raise InputError("Channel_id does not refer to a valid channel")
+        raise InputError(description="Channel_id does not refer to a valid channel")
 
     invitee = get_user_by_u_id(u_id)
     if invitee is None:
-        raise InputError("u_id does not refer to a valid user")
+        raise InputError(description="u_id does not refer to a valid user")
 
     # Checking for AccessError
     # error_test3 checks if user inviting the other user is in the channel
-    sender = is_user_in_channel(channel_id, auth_user_id)
+    sender = get_user_by_token(token)
     if sender is None:
-        raise AccessError("The authorised user is not a member of the channel")
+        # the token given is invalid
+        raise AccessError(description="token is invalid")
+
+    # check if the sender is in the channel
+    sender_in_channel = is_user_in_channel(channel_id, sender.auth_user_id)
+    if sender_in_channel is None:
+        raise AccessError(description="The authorised user is not a member of the channel")
 
 
 # Function adding user into specified channel and adds that channel into user class
 def add_user_into_channel(channel, invitee):
     invitee.part_of_channel.append(channel)
     channel.all_members.append(invitee)
+
+
+# check if the user is an owner of channel
+def is_user_owner_channel(channel_id, auth_user_id):
+    channel = get_channel_by_channel_id(channel_id)
+    for owner in channel.owner_members:
+        if auth_user_id == owner.auth_user_id:
+            return owner
+    return None
+
+
+# Function making user into specified channel owner and adds that channel into user class
+def add_user_into_owner_channel(channel, owner):
+    owner.channel_owns.append(channel)
+    channel.owner_members.append(owner)
+
+
+# Function making user into specified channel member from owner
+def remove_user_from_owner_channel(channel, owner):
+    owner.channel_owns.remove(channel)
+    channel.owner_members.remove(owner)
+    # If the leaving owner is the only one owner and there is still member in the dm
+    # Then first availble person in member become owner
+    if len(channel.owner_members) == 0 and len(channel.all_members) > 0:
+        next_owner = channel.all_members[0]
+        channel.owner_members.append(next_owner)
+        next_owner.channel_owns.append(channel)
+
+
+def user_leaves_channel(channel, user, u_id, channel_id):
+    user.part_of_channel.remove(channel)
+    channel.all_members.remove(user)
+    if is_user_owner_channel(channel_id, u_id) is not None:
+        remove_user_from_owner_channel(channel, user)
+
+
+def token_into_u_id(token):
+    user = get_user_by_token(token)
+    if user is None:
+        return None
+    u_id = user.u_id
+    return u_id
+

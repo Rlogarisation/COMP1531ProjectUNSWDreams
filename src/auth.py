@@ -1,5 +1,9 @@
 import re
-from src.data_file import User, data
+import jwt
+import hashlib
+
+from jwt import InvalidSignatureError, InvalidTokenError
+from src.data_file import User, Permission, data
 from src.error import InputError
 
 #############################################################################
@@ -32,12 +36,18 @@ def auth_register_v1(email, password, name_first, name_last):
     u_id = create_uid()
     auth_user_id = create_auth_user_id(u_id)
     handle = create_handle(name_first, name_last)
-    role = create_role(u_id)
+    permission_id = create_permission(u_id)
+    hashed_password = hash_password(password)
 
-    user_ = User(u_id, email, password, name_first, name_last, handle, auth_user_id, role)
+    user_ = User(u_id, email, hashed_password, name_first, name_last, handle, auth_user_id, permission_id)
+    session_id = create_session_id()
+    token = session_to_token(session_id)
+    user_.current_sessions.append(session_id)
+
     data['class_users'].append(user_)
 
     return {
+        'token': token,
         'auth_user_id': auth_user_id
     }
 
@@ -62,10 +72,24 @@ def auth_login_v1(email, password):
     auth_login_error_check(email, password)
 
     user = get_user_by_email(email)
+    session_id = create_session_id()
+    user.current_sessions.append(session_id)
+    token = session_to_token(session_id)
     return {
+        'token': token,
         'auth_user_id': user.auth_user_id
     }
 
+
+def auth_logout(token):
+    user_session = get_user_session_by_token(token)
+    if user_session is not None:
+        user = user_session[0]
+        session_id = user_session[1]
+        user.current_sessions.remove(session_id)
+        return {'is_success': True}
+
+    return {'is_success': False}
 
 #############################################################################
 #                                                                           #
@@ -73,8 +97,11 @@ def auth_login_v1(email, password):
 #                                                                           #
 #############################################################################
 
+
 # check if email entered is valid
 def is_email_valid(email):
+    if email is None:
+        return False
     regex = '^[a-zA-Z0-9]+[\\._]?[a-zA-Z0-9]+[@]\\w+[.]\\w{2,3}$'
     if re.search(regex, email):
         return True
@@ -82,11 +109,44 @@ def is_email_valid(email):
         return False
 
 
+def get_user_by_token(token):
+    if token is None:
+        return None
+    session_dict = token_to_session(token)
+    if session_dict is None:
+        return None
+
+    session_id = session_dict['sessionID']
+    for user in data['class_users']:
+        s = set(user.current_sessions)
+        if session_id in s:
+            return user
+    return None
+
+
+def get_user_session_by_token(token):
+    if token is None:
+        return None
+    session_dict = token_to_session(token)
+    if session_dict is None:
+        return None
+
+    session_id = session_dict['sessionID']
+    for user in data['class_users']:
+        s = set(user.current_sessions)
+        if session_id in s:
+            result = [user, session_id]
+            return result
+    return None
+
+
 # return the specific user with the auth_user_id
 # the user is a class
-def get_user_by_auth_id(auth_user_id):
+def get_user_by_uid(u_id):
+    if u_id is None:
+        return None
     for user in data['class_users']:
-        if user.auth_user_id == auth_user_id:
+        if user.u_id == u_id:
             return user
 
     return None
@@ -95,8 +155,22 @@ def get_user_by_auth_id(auth_user_id):
 # return the specific user with email
 # the user is a class
 def get_user_by_email(email):
+    if email is None:
+        return None
     for user in data['class_users']:
         if user.email == email:
+            return user
+
+    return None
+
+
+# return the specific user with handle_str
+# the user is a class
+def get_user_by_handle(handle):
+    if handle is None:
+        return None
+    for user in data['class_users']:
+        if user.handle_str == handle:
             return user
 
     return None
@@ -106,25 +180,25 @@ def get_user_by_email(email):
 def auth_register_check_error(email, password, name_first, name_last):
     # if the email address is invalid
     if not is_email_valid(email):
-        raise InputError('Email address is not valid')
+        raise InputError(description='Email address is not valid')
 
     # if the length of password is less than 6
     if len(password) < 6:
-        raise InputError('Password length is less than 6')
+        raise InputError(description='Password length is less than 6')
 
     # if name_first is not between 1 and 50 characters
     if not (1 <= len(name_first) <= 50):
-        raise InputError('name_first is not between 1 and 50 characters')
+        raise InputError(description='name_first is not between 1 and 50 characters')
 
     # is name_last is not between 1 and 50 characters
     if not (1 <= len(name_last) <= 50):
-        raise InputError('name_last is not between 1 and 50 characters')
+        raise InputError(description='name_last is not between 1 and 50 characters')
 
     # if the user has regiestered before
     # which means the email address is already used by another user
     for user in data['class_users']:
         if email == user.email:
-            raise InputError('Email address is already being used')
+            raise InputError(description='Email address is already being used')
 
 
 # create a new u_id
@@ -138,6 +212,29 @@ def create_auth_user_id(u_id):
     return u_id
 
 
+# generate a new session id
+def create_session_id():
+    new_id = data['session_num']
+    data['session_num'] = data['session_num'] + 1
+    return new_id
+
+
+def session_to_token(session_id):
+    return jwt.encode({'sessionID': session_id}, data['secret'], algorithm='HS256')
+
+
+def token_to_session(token):
+    try:
+        decode_session = jwt.decode(token, data['secret'], algorithms=['HS256'])
+        return decode_session
+    except:
+        return None
+
+
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+
 # return a concatenation of a lowercase - only
 # first name and last name. If the concatenation is
 # longer than 20 characters, it is cutoff at 20 characters
@@ -146,6 +243,7 @@ def full_name_20(name_first, name_last):
     if len(full_name) > 20:
         full_name = list(full_name)[:20]
         full_name = ''.join(full_name)
+    full_name = full_name.lower()
     return full_name
 
 
@@ -170,19 +268,19 @@ def create_handle(name_first, name_last):
     # to form a new handle
     else:
         count -= 1
-        count_len = len(str(count))
-        char_len = 20 - count_len
-        name = list(name)[:char_len]
-        name = ''.join(name)
+        # count_len = len(str(count))
+        # char_len = 20 - count_len
+        # name = list(name)[:char_len]
+        # name = ''.join(name)
         handle = name + str(count)
         return handle
 
 
-def create_role(u_id):
+def create_permission(u_id):
     if u_id == 0:
-        return 'global owner'
+        return Permission.global_owner
     else:
-        return 'global member'
+        return Permission.global_member
 
 
 # check the login errors
@@ -191,11 +289,11 @@ def create_role(u_id):
 # and the password is incorrect
 def auth_login_error_check(email, password):
     if not is_email_valid(email):
-        raise InputError('Email address is not valid')
+        raise InputError(description='Email address is not valid')
 
     user = get_user_by_email(email)
     if user is None:
-        raise InputError('Email entered does not belong to a user')
+        raise InputError(description='Email entered does not belong to a user')
 
-    if user.password != password:
-        raise InputError('Password is not correct')
+    if user.hashed_password != hash_password(password):
+        raise InputError(description='Password is not correct')

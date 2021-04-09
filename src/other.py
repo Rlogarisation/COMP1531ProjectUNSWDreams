@@ -1,6 +1,7 @@
-from src.data_file import data
-
-
+from src.data_file import data, DATA, dump_data, Notification
+from src.auth import get_user_by_uid, get_user_by_token
+from src.error import InputError, AccessError
+import re
 """
 Author: Lan Lin
 
@@ -12,17 +13,90 @@ Resets the internal data of the application to it's initial state
 def clear_v1():
     data['class_users'] = []
     data['class_channels'] = []
+    data['class_dms'] = []
+    data['session_num'] = 0
+    data['message_num'] = 0
+    data['channel_num'] = 0
+    data['dm_num'] = 0
+    data['secret'] = 'THIS_IS_SECRET'
+    dump_data(DATA)
     return {}
 
 
-def search_v1(auth_user_id, query_str):
+"""
+Author: Lan Lin
+
+Background: 
+Given a query string, return a collection of messages in all of the channels/DMs 
+that the user has joined that match the query
+
+Input Error: query_str is above 1000 characters
+Access Error: Token is invalid
+"""
+
+
+def search_v1(token, query_str):
+    user = get_user_by_token(token)
+    if user is None:
+        raise AccessError(description="Token is invalid")
+
+    if len(query_str) > 1000:
+        raise InputError(description="query_str is above 1000 characters")
+
+    return_list = []
+    for channel in user.part_of_channel:
+        for chaneel_message in channel.messages:
+            if check_contain_query(query_str, chaneel_message) is True:
+                return_list.append(chaneel_message.return_type_message())
+
+    for dm in user.part_of_dm:
+        for dm_message in dm.dm_messages:
+            if check_contain_query(query_str, dm_message) is True:
+                return_list.append(dm_message.return_type_message())
+
     return {
-        'messages': [
-            {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_created': 1582426789,
-            }
-        ],
+        'messages': return_list
     }
+
+
+"""
+Author: Lan Lin
+Background: Return the user's most recent 20 notifications
+Access Error: Token is invalid
+"""
+
+
+def notification_get_v1(token):
+    user = get_user_by_token(token)
+    if user is None:
+        raise AccessError(description="Token is invalid")
+
+    noti_list = user.notifications
+    return_list = []
+    index = len(noti_list) - 1
+    if len(noti_list) >= 20:
+        for _i in range(20):
+            return_list.append(noti_list[index].return_type_notification())
+            index -= 1
+    else:
+        while index >= 0:
+            return_list.append(noti_list[index].return_type_notification())
+            index -= 1
+
+    return {
+        'notifications': return_list
+    }
+#############################################################################
+#                                                                           #
+#                              Helper function                              #
+#                                                                           #
+#############################################################################
+
+
+# check if the query is contained in the message
+# it is case insensitive
+def check_contain_query(query, _message):
+    if re.search(query, _message.message, re.IGNORECASE):
+        return True
+    else:
+        return False

@@ -1,9 +1,7 @@
-# by Lan Lin
-
 import pytest
 from src.other import clear_v1
-from src.auth import auth_login_v1, auth_register_v1
-from src.error import InputError
+from src.auth import auth_login_v1, auth_register_v1, auth_logout
+from src.error import InputError, AccessError
 from src.channel import channel_details_v1, channel_invite_v1
 from src.channels import channels_create_v1
 
@@ -34,6 +32,7 @@ def test_auth_register_invalid_email():
     clear_v1()
     with pytest.raises(InputError):
         auth_register_v1('123.com', '12345ufd', 'Lan', 'Lin')
+    with pytest.raises(InputError):
         auth_register_v1('abc@@@.com', '0823hdskhji', 'Langley', 'Lin')
 
 
@@ -50,6 +49,7 @@ def test_auth_register_pwd_length():
     clear_v1()
     with pytest.raises(InputError):
         auth_register_v1('haha@gmail.com', '123', 'Tom', 'White')
+    with pytest.raises(InputError):
         auth_register_v1('haha2@gmail.com', 'ab#', 'Peter', 'White')
 
 
@@ -59,6 +59,7 @@ def test_auth_register_firstName_length():
     name = 'a' * 51
     with pytest.raises(InputError):
         auth_register_v1('haha@gmail.com', '123iwuiused', '', 'White')
+    with pytest.raises(InputError):
         auth_register_v1('haha2@gmail.com', 'iwsdrjcio', name, 'White')
 
 
@@ -68,6 +69,7 @@ def test_auth_register_lastName_length():
     name = 'a' * 51
     with pytest.raises(InputError):
         auth_register_v1('haha@gmail.com', '123kjsldfiew', 'Peter', '')
+    with pytest.raises(InputError):
         auth_register_v1('haha2@gmail.com', 'iwsdcio3', 'Tom', name)
 
 
@@ -89,7 +91,10 @@ def test_auth_register_valid_small():
     # test the auth_user_id for different users are different
     auth_user_id1 = register1['auth_user_id']
     auth_user_id2 = register2['auth_user_id']
+    token1 = register1['token']
+    token2 = register2['token']
     assert auth_user_id1 != auth_user_id2
+    assert token1 != token2
 
 
 # test large number of users can register successfully
@@ -115,16 +120,16 @@ def test_auth_register_handle_valid():
     register3 = auth_register_v1('haha2@gmail.com', '123jcqewp2', 'zxcvbnmasdfg', 'hjklqwert')
     register4 = auth_register_v1('haha3@gmail.com', '123jcqewp2', 'zxcvbnmasdfg', 'hjklqwertiowjec')
 
-    auth_user_id1 = register1['auth_user_id']
+    token1 = register1['token']
     user_id2 = register2['auth_user_id']
     user_id3 = register3['auth_user_id']
     user_id4 = register4['auth_user_id']
 
-    channel_id = channels_create_v1(auth_user_id1, 'Zoom', True)['channel_id']
-    channel_invite_v1(auth_user_id1, channel_id, user_id2)
-    channel_invite_v1(auth_user_id1, channel_id, user_id3)
-    channel_invite_v1(auth_user_id1, channel_id, user_id4)
-    channel_members = channel_details_v1(auth_user_id1, channel_id)['all_members']
+    channel_id = channels_create_v1(token1, 'Zoom', True)['channel_id']
+    channel_invite_v1(token1, channel_id, user_id2)
+    channel_invite_v1(token1, channel_id, user_id3)
+    channel_invite_v1(token1, channel_id, user_id4)
+    channel_members = channel_details_v1(token1, channel_id)['all_members']
     member1 = channel_members[0]
     member2 = channel_members[1]
     member3 = channel_members[2]
@@ -139,8 +144,8 @@ def test_auth_register_handle_valid():
 
     assert member1['handle_str'] == 'zxcvbnmasdfghjklqwe'
     assert member2['handle_str'] == 'zxcvbnmasdfghjklqwer'
-    assert member3['handle_str'] == 'zxcvbnmasdfghjklqwe0'
-    assert member4['handle_str'] == 'zxcvbnmasdfghjklqwe1'
+    assert member3['handle_str'] == 'zxcvbnmasdfghjklqwer0'
+    assert member4['handle_str'] == 'zxcvbnmasdfghjklqwer1'
 
 
 """
@@ -156,7 +161,7 @@ Tests content:
 """
 #############################################################################
 #                                                                           #
-#                       Test for auth_login_v1                           #
+#                       Test for auth_login_v1                              #
 #                                                                           #
 #############################################################################
 
@@ -166,7 +171,10 @@ def test_auth_login_invalid_email():
     clear_v1()
     with pytest.raises(InputError):
         auth_login_v1('123.@com', '12345ufd')
+    with pytest.raises(InputError):
         auth_login_v1('a.,#0@test.com', '0823hdskhji')
+    with pytest.raises(InputError):
+        auth_login_v1(None, 'password')
 
 
 # test for email entered does not belong to a user
@@ -201,8 +209,68 @@ def test_auth_login_valid():
 
     # test the auth_user_id returned by login is the same with register
     # test the auth_user_id generated is correct
-    assert register1 == login1
-    assert register2 == login2
-    assert register1['auth_user_id'] == login1['auth_user_id'] == 0
-    assert register2['auth_user_id'] == login2['auth_user_id'] == 1
+    assert register1['auth_user_id'] == login1['auth_user_id']
+    assert register2['auth_user_id'] == login2['auth_user_id']
+    # test that tokens are different
+    assert login1['token'] != register1['token']
+    assert login2['token'] != register2['token']
+
+
+# test for the same user with different sessions
+def test_auth_login_different_sessions():
+    clear_v1()
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+
+    login1 = auth_login_v1('haha@gmail.com', '123123123')
+    login2 = auth_login_v1('haha@gmail.com', '123123123')
+    login3 = auth_login_v1('haha@gmail.com', '123123123')
+    auth_user_id1 = login1['auth_user_id']
+    auth_user_id2 = login2['auth_user_id']
+    auth_user_id3 = login3['auth_user_id']
+    token1 = login1['token']
+    token2 = login2['token']
+    token3 = login3['token']
+    assert auth_user_id1 == auth_user_id2 == auth_user_id3
+    assert token1 != token2 != token3
+#############################################################################
+#                                                                           #
+#                       Test for auth_logout                                #
+#                                                                           #
+#############################################################################
+
+
+def test_auth_logout_invalid_token():
+    clear_v1()
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    token = register1['token']
+    invalid_token = f"{token}123"
+    assert auth_logout(invalid_token) == {'is_success': False}
+    assert auth_logout(None) == {'is_success': False}
+
+
+def test_auth_logout_successfully_emall():
+    clear_v1()
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    token1 = register1['token']
+    # user1 = get_user_by_token(token1)
+    login2 = auth_login_v1('haha@gmail.com', '123123123')
+    # assert len(user1.current_sessions) == 2
+    token2 = login2['token']
+    assert auth_logout(token1) == {'is_success': True}
+    # assert len(user1.current_sessions) == 1
+    assert auth_logout(token2) == {'is_success': True}
+    # assert len(user1.current_sessions) == 0
+
+
+def test_auth_logout_successfully_large():
+    clear_v1()
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    token_list = []
+    for _i in range(20):
+        login = auth_login_v1(f'haha@gmail.com', '123123123')
+        token_list.append(login['token'])
+    for token in token_list:
+        result = auth_logout(token)
+        assert result == {'is_success': True}
+
 
