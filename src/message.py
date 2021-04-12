@@ -590,14 +590,14 @@ def return_message_to_pin(token, message_id, flag):
     if channel_dm is None:
         raise InputError(description="The message is not in any channel or dm")
     if channel_dm[1] == 0:
-        channel = channel_dm[0]  # owner or member???
+        channel = channel_dm[0]
         if is_user_owner_channel(channel.channel_id, user.u_id) is None:
-            raise AccessError(description="The authorised user is not a member of the channel that the message "
+            raise AccessError(description="The authorised user is not the owner of the channel that the message "
                                           "is within")
     if channel_dm[1] == 1:
         dm = channel_dm[0]
         if is_user_owner_dm(dm.dm_id, user.u_id) is None:
-            raise AccessError(description="The authorised user is not a member of the DM that the message is within")
+            raise AccessError(description="The authorised user is not the owner of the DM that the message is within")
 
     return message
 

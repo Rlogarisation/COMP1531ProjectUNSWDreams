@@ -32,7 +32,11 @@ class User:
         self.channels_joined = []
         self.dms_joined = []
         self.messages_sent = []
-        self.image_url = ''
+        self.image_url = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fsto' \
+                         'ck.adobe.com%2Fsk%2Fsearch%2Fimages%3Fk%3Ddefault%2Bprofile' \
+                         '%2Bpicture&psig=AOvVaw1X4P-65HFIrQQZfID-BTG7&ust=1618305715359000&s' \
+                         'ource=images&cd=vfe&ved=0CAIQjRxqFwoTCMD3uNyw-O8CFQAAAAAdAAAAABAD'
+        self.image_path = ''
         self.reset_code = ''
 
     def return_type_user(self):
@@ -45,7 +49,8 @@ class User:
             'email': self.email,
             'name_first': self.name_first,
             'name_last': self.name_last,
-            'handle_str': self.handle_str
+            'handle_str': self.handle_str,
+            'profile_img_url': self.image_url
         }
 
 
