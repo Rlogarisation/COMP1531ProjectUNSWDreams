@@ -5,6 +5,7 @@ from src.error import InputError, AccessError
 from PIL import Image
 import requests
 import os
+from src import config
 import urllib.request
 """
 user.py
@@ -180,7 +181,7 @@ def users_stats_v1(token):
         raise AccessError(description="Token passed in is invalid")
 
     num1 = num_user_in_channel_dm()
-    num2 = len(data['class_users'])
+    num2 = count_active_users()
     utilization_rate = num1/num2
 
     dreams_stats = {
@@ -227,7 +228,9 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     image_cropped = image.crop((x_start, y_start, x_end, y_end))
     # overwrite the original image by the cropped image
     image_cropped.save(path)
-    user.image_url = path
+
+    user.image_path = path
+    user.image_url = config.url + 'static/' + str(user.u_id) + '.jpg'
 
     return user
 #############################################################################
@@ -235,6 +238,14 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 #                              Helper function                              #
 #                                                                           #
 #############################################################################
+
+
+def count_active_users():
+    count = 0
+    for user in data['class_users']:
+        if f"{user.name_first} {user.name_last}" != "Removed user":
+            count += 1
+    return count
 
 
 def count_dream_owner():

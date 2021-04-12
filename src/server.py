@@ -7,7 +7,8 @@ from src.data_file import data, dump_data
 from src.auth import auth_register_v1, auth_login_v1, auth_logout, auth_passwordreset_request_v1, \
     auth_passwordreset_reset_v1
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1, \
-    users_all, admin_user_remove, admin_userpermission_change, user_profile_uploadphoto_v1
+    users_all, admin_user_remove, admin_userpermission_change, user_profile_uploadphoto_v1, user_stats_v1, \
+    users_stats_v1
 from src.other import clear_v1, search_v1, notification_get_v1
 from src.channel import channel_invite_v1, channel_details_v1, channel_messages_v1, channel_join_v1, channel_leave_v1, \
     channel_addowner_v1, channel_removeowner_v1
@@ -15,6 +16,7 @@ from src.channels import channels_create_v1, channels_list_v1, channels_listall_
 from src.message import message_send_v2, message_senddm_v1, message_edit_v2, message_remove_v1, message_share_v1, \
     message_sendlater_v1, message_sendlaterdm_v1, message_react_v1, message_unreact_v1, message_pin_v1, message_unpin_v1
 from src.dm import dm_create_v1, dm_invite_v1, dm_remove_v1, dm_leave_v1, dm_details_v1, dm_list_v1, dm_messages_v1
+from src.standup import standup_start_v1, standup_active_v1, standup_send_v1
 from src.error import InputError, AccessError
 
 
@@ -192,12 +194,30 @@ def admin_userpermission_change_v1():
 def user_profile_uploadphoto():
     info = request.get_json()
     user = user_profile_uploadphoto_v1(info['token'], info['img_url'], info['x_start'], info['y_start'],
-                                         info['x_end'], info['y_end'])
-    path = user.image_url
+                                       info['x_end'], info['y_end'])
+
+    # user.image_url = config.url + 'static/' + str(user.u_id) + '.jpg'
+
     # send_from_directory('', path)
-    send_file(path)
+    send_file(user.image_path)
     dump_data(data)
     return dumps({})
+
+
+@APP.route("/user/stats/v1", methods=['GET'])
+def user_stats():
+    token = request.args.get('token')
+    result = user_stats_v1(token)
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/users/stats/v1", methods=['GET'])
+def users_stats():
+    token = request.args.get('token')
+    result = users_stats_v1(token)
+    dump_data(data)
+    return dumps(result)
 
 
 #############################################################################
@@ -430,6 +450,8 @@ def message_unpin():
     result = message_unpin_v1(info['token'], info['message_id'])
     dump_data(data)
     return dumps(result)
+
+
 #############################################################################
 #                                                                           #
 #                           Server for dm.py by Zheng Luo                   #
@@ -510,6 +532,38 @@ def http_dm_messages_v1():
     except ValueError as error:
         raise InputError(description="start is not int") from error
     result = dm_messages_v1(token, dm_id, start)
+    dump_data(data)
+    return dumps(result)
+
+
+#############################################################################
+#                                                                           #
+#                           Server for standup.py by Lan Lin                #
+#                                                                           #
+#############################################################################
+
+
+@APP.route("/standup/start/v1", methods=['POST'])
+def standup_start():
+    info = request.get_json()
+    result = standup_start_v1(info['token'], info['channel_id'], info['length'])
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/standup/active/v1", methods=['GET'])
+def standup_active():
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
+    result = standup_active_v1(token, channel_id)
+    dump_data(data)
+    return dumps(result)
+
+
+@APP.route("/standup/send/v1", methods=['POST'])
+def standup_send():
+    info = request.get_json()
+    result = standup_send_v1(info['token'], info['channel_id'], info['message'])
     dump_data(data)
     return dumps(result)
 

@@ -326,13 +326,14 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     # new_message = Message(create_message_id(), user.u_id, message_added, created_time, channel_id, dm_id)
 
     # send shared message to the channel or dm
+    message_id = None
     if channel_id != -1:
-        message_send_v2(token, channel_id, message_added)
+        message_id = message_send_v2(token, channel_id, message_added)['message_id']
     if dm_id != -1:
-        message_senddm_v1(token, dm_id, message_added)
+        message_id = message_senddm_v1(token, dm_id, message_added)['message_id']
 
     return {
-        'shared_message_id': message_added
+        'shared_message_id': message_id
     }
 
 
@@ -591,11 +592,16 @@ def return_message_to_pin(token, message_id, flag):
         raise InputError(description="The message is not in any channel or dm")
     if channel_dm[1] == 0:
         channel = channel_dm[0]
+        if is_user_in_channel(channel.channel_id, user.u_id) is None:
+            raise AccessError(description="The authorised user is not the member of the channel that the message "
+                                          "is within")
         if is_user_owner_channel(channel.channel_id, user.u_id) is None:
             raise AccessError(description="The authorised user is not the owner of the channel that the message "
                                           "is within")
     if channel_dm[1] == 1:
         dm = channel_dm[0]
+        if is_user_in_dm(dm.dm_id, user.u_id) is None:
+            raise AccessError(description="The authorised user is not the member of the DM that the message is within")
         if is_user_owner_dm(dm.dm_id, user.u_id) is None:
             raise AccessError(description="The authorised user is not the owner of the DM that the message is within")
 
