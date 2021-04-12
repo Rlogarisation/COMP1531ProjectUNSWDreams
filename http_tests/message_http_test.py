@@ -123,7 +123,7 @@ def test_message_edit_accessError(parameters, parameters1):
     assert status == 403
 #############################################################################
 #                                                                           #
-#                       http test for message_remove Error                    #
+#                     http test for message_remove Error                    #
 #                                                                           #
 #############################################################################
 
@@ -162,7 +162,7 @@ def test_message_remove_accessError(parameters, parameters1):
     assert status == 403
 #############################################################################
 #                                                                           #
-#                       http test for message_share Error                    #
+#                      http test for message_share Error                    #
 #                                                                           #
 #############################################################################
 
@@ -193,7 +193,7 @@ def test_message_share_not_join_http(parameters, parameters1):
     assert status == 403
 #############################################################################
 #                                                                           #
-#                       http test for message_senddm Error                    #
+#                       http test for message_senddm Error                  #
 #                                                                           #
 #############################################################################
 
@@ -230,13 +230,79 @@ def test_message_senddm_not_join_http(parameters, parameters1, parameters2):
     json_input2 = {"token": token2, "dm_id": dm_id, "message": "haha"}
     status = requests.post(config.url + 'message/senddm/v1', json=json_input2).status_code
     assert status == 403
+
+#############################################################################
+#                                                                           #
+#                    http test for message_sendlater Error                  #
+#                                                                           #
+#############################################################################
+
+def test_message_sendlater():
+    
+    def test_invalid_token():
+        pass
+    def test_invalid_channel_id():
+        pass
+    def test_invalid_message():
+        pass
+    def test_invalid_time_sent():
+        pass
+    def test_user_isnot_member_of_channel():
+        pass
+    def test_user_isnot_owner_of_channel():
+        pass
+    # ----------------------------testing------------------------------------
+        # Inputs' normal tests
+    test_invalid_token()
+    test_invalid_channel_id()
+    test_invalid_message()
+    test_invalid_time_sent()
+
+    # InputError Tests
+
+    # AccessError Tests
+    test_user_isnot_member_of_channel()
+    test_user_isnot_owner_of_channel()
+    pass
+
+
+#############################################################################
+#                                                                           #
+#                  http test for message_sendlaterdm Error                  #
+#                                                                           #
+#############################################################################
+
+#############################################################################
+#                                                                           #
+#                      http test for message_react Error                    #
+#                                                                           #
+#############################################################################
+
+#############################################################################
+#                                                                           #
+#                    http test for message_unreact Error                    #
+#                                                                           #
+#############################################################################
+
+#############################################################################
+#                                                                           #
+#                       http test for message_pin Error                     #
+#                                                                           #
+#############################################################################
+
+
+#############################################################################
+#                                                                           #
+#                    http test for message_unpin Error                      #
+#                                                                           #
+#############################################################################
+
+
 #############################################################################
 #                                                                           #
 #                       http test for message successfully                  #
 #                                                                           #
 #############################################################################
-
-
 """
 successful tests for message_send, message_senddm, message_edit,
 message_remove, message_share, channel_messages, dm_messages

@@ -766,11 +766,11 @@ def test_message_sendlater_v1():
 
     # test for the inputs checking
     def test_invalid_token():
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_sendlater_v1("string token", channel_0_id, "I am message.", time_sent)          # token's type is incorrect
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_sendlater_v1(111000, channel_0_id, "I am message.", time_sent)                  # token's range is incorrect
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_sendlater_v1(None, channel_0_id, "I am message.", time_sent)                    # token is None
 
     def test_invalid_channel_id():
@@ -812,7 +812,6 @@ def test_message_sendlater_v1():
 
     # ----------------------------testing------------------------------------
     # Inputs' normal tests
-    test_invalid_token()
     test_invalid_channel_id()
     test_invalid_message()
     test_invalid_time_sent()
@@ -820,6 +819,8 @@ def test_message_sendlater_v1():
     # InputError Tests
 
     # AccessError Tests
+    test_invalid_token()
+
     test_user_isnot_member_of_channel()
     test_user_isnot_owner_of_channel()
 
@@ -869,11 +870,11 @@ def test_message_sendlaterdm_v1():
 
     # test for the inputs checking
     def test_invalid_token():
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_sendlaterdm_v1("string token", dm_0_id, "I am message.", time_sent)         # token's type is incorrect
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_sendlaterdm_v1(111000, dm_0_id, "I am message.", time_sent)                 # token's range is incorrect
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_sendlaterdm_v1(None, dm_0_id, "I am message.", time_sent)                   # token is None
         pass
 
@@ -919,7 +920,6 @@ def test_message_sendlaterdm_v1():
 
     # ----------------------------testing------------------------------------
     # Inputs' normal tests
-    test_invalid_token()
     test_invalid_dm_id()
     test_invalid_message()
     test_invalid_time_sent()
@@ -927,6 +927,8 @@ def test_message_sendlaterdm_v1():
     # InputError Tests
 
     # AccessError Tests
+    test_invalid_token()
+
     test_user_isnot_member_of_dm()
     test_user_isnot_owner_of_dm()
 
@@ -985,11 +987,11 @@ def test_message_react_v1():
 
     # test for the inputs checking
     def test_invalid_token():
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_react_v1("string token", dm_message_0_message_id, 1)               # token's type is incorrect
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_react_v1(111000, dm_message_0_message_id, 1)                       # token's range is incorrect
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_react_v1(None, dm_message_0_message_id, 1)                         # token is None
 
     def test_invalid_message_id():
@@ -1043,7 +1045,6 @@ def test_message_react_v1():
 
     # ----------------------------testing------------------------------------
     # Inputs' normal tests
-    test_invalid_token()
     test_invalid_message_id()
     test_invalid_react_id()
 
@@ -1051,6 +1052,8 @@ def test_message_react_v1():
     test_react_id_already_in_message()
 
     # AccessError Tests
+    test_invalid_token()
+
     test_user_isnot_member_of_channel()
     test_user_isnot_member_of_dm()
 
@@ -1111,11 +1114,11 @@ def test_message_unreact_v1():
 
     # test for the inputs checking
     def test_invalid_token():
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_unreact_v1("string token", dm_message_0_message_id, 1)               # token's type is incorrect
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_unreact_v1(111000, dm_message_0_message_id, 1)                       # token's range is incorrect
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_unreact_v1(None, dm_message_0_message_id, 1)                         # token is None
         pass
 
@@ -1171,7 +1174,6 @@ def test_message_unreact_v1():
 
     # ----------------------------testing------------------------------------
     # Inputs' normal tests
-    test_invalid_token()
     test_invalid_message_id()
     test_invalid_react_id()
 
@@ -1179,6 +1181,8 @@ def test_message_unreact_v1():
     test_react_id_not_in_message()
 
     # AccessError Tests
+    test_invalid_token()
+
     test_user_isnot_member_of_channel()
     test_user_isnot_member_of_dm()
 
@@ -1240,11 +1244,11 @@ def test_message_pin_v1():
 
     # test for the inputs checking
     def test_invalid_token():
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_pin_v1("string token", dm_message_0_message_id)         # token's type is incorrect
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_pin_v1(111000, dm_message_0_message_id)                 # token's range is incorrect
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_pin_v1(None, dm_message_0_message_id)                   # token is None
 
     def test_invalid_message_id():
@@ -1286,13 +1290,14 @@ def test_message_pin_v1():
 
     # ----------------------------testing------------------------------------
     # Inputs' normal tests
-    test_invalid_token()
     test_invalid_message_id()
 
     # InputError Tests
     test_message_id_already_pinned()
 
     # AccessError Tests
+    test_invalid_token()
+
     test_user_isnot_member_of_channel()
     test_user_isnot_member_of_dm()
 
@@ -1355,11 +1360,11 @@ def test_message_unpin_v1():
     # test for the inputs checking
 
     def test_invalid_token():
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_unpin_v1("string token", dm_message_0_message_id)               # token's type is incorrect
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_unpin_v1(111000, dm_message_0_message_id)                       # token's range is incorrect
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_unpin_v1(None, dm_message_0_message_id)                         # token is None
 
     def test_invalid_message_id():
@@ -1400,13 +1405,14 @@ def test_message_unpin_v1():
             message_unpin_v1(token_1, dm_message_1_message_id)
     # ----------------------------testing------------------------------------
     # Inputs' normal tests
-    test_invalid_token()
     test_invalid_message_id()
 
     # InputError Tests
     test_message_id_already_unpinned()
 
     # AccessError Tests
+    test_invalid_token()
+
     test_user_isnot_member_of_channel()
     test_user_isnot_member_of_dm()
 

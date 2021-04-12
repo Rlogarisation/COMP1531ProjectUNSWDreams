@@ -336,6 +336,10 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
 
 def message_sendlater_v1(token, channel_id, message, time_sent):
+    # Type checking
+    if type(token) != str or type(channel_id) != int or type(message) != str or type(time_sent) != float:
+        raise InputError(description="message_sendlater_v1 : incorrect type for your inputs.")
+
     auth_user = get_user_by_token(token)
     if auth_user is None:
         raise AccessError(description='Invalid token.')
@@ -361,6 +365,10 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
 
 
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
+    # Type checking
+    if type(token) != str or type(dm_id) != int or type(message) != str or type(time_sent) != float:
+        raise InputError(description="message_sendlaterdm_v1 : incorrect type for your inputs.")
+
     # InputError 1: invalid token.
     auth_user = get_user_by_token(token)
     if auth_user is None:
@@ -388,6 +396,10 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
 
 
 def message_react_v1(token, message_id, react_id):
+    # Type checking
+    if type(token) != str or type(message_id) != int or type(react_id) != int:
+        raise InputError(description="message_react_v1 : incorrect type for your inputs.")
+
     message, user, channel_dm = return_message_if_valid(token, message_id, react_id)
     message.reacted_users.append(user)
 
@@ -407,18 +419,30 @@ def message_react_v1(token, message_id, react_id):
 
 
 def message_unreact_v1(token, message_id, react_id):
+    # Type checking
+    if type(token) != str or type(message_id) != int or type(react_id) != int:
+        raise InputError(description="message_unreact_v1 : incorrect type for your inputs.")
+
     message, user, channel_dm = return_message_if_valid(token, message_id, react_id)
     message.reacted_users.remove(user)
     return {}
 
 
 def message_pin_v1(token, message_id):
+    # Type checking
+    if type(token) != str or type(message_id) != int:
+        raise InputError(description="message_pin_v1 : incorrect type for your inputs.")
+
     message = return_message_to_pin(token, message_id, 0)
     message.is_pinned = True
     return {}
 
 
 def message_unpin_v1(token, message_id):
+    # Type checking
+    if type(token) != str or type(message_id) != int:
+        raise InputError(description="message_pin_v1 : incorrect type for your inputs.")
+
     message = return_message_to_pin(token, message_id, 1)
     message.is_pinned = False
     return {}
