@@ -1,5 +1,5 @@
 from typing import Dict
-from src.data_file import data, Permission, DM, Notification
+from src.data_file import data, Permission, DM, Notification, current_time
 from src.error import InputError, AccessError
 from src.auth import get_user_by_uid, session_to_token, token_to_session, get_user_by_token
 
@@ -62,9 +62,16 @@ def dm_create_v1(token, u_id_list):
     # Note: inviter is also part of member.
     # As well as,
     # Update part_of_dm and dm_owns inside class User
+    time_join = current_time()
+    update_dm_dreams_stat(time_join)
+
     for invitee in list_dm_invitee:
         dm.dm_members.append(invitee)
         invitee.part_of_dm.append(dm)
+
+        # update invitees' stats about dm
+        update_dm_user_stat(invitee, time_join)
+
         # add notification
         notification_message = f"{inviter.handle_str} added you to {dm.dm_name}"
         notification = Notification(-1, dm.dm_id, notification_message)
@@ -75,6 +82,9 @@ def dm_create_v1(token, u_id_list):
 
     dm.dm_owners.append(inviter)
     inviter.dm_owns.append(dm)
+
+    # update inviter's stats about dm
+    update_dm_user_stat(inviter, time_join)
 
     return {
         'dm_id': dm_id,
@@ -133,6 +143,9 @@ def dm_invite_v1(token, dm_id, u_id):
         notification = Notification(-1, dm.dm_id, notification_message)
         invitee.notifications.append(notification)
 
+    # update inviter's stats about dm
+    update_dm_user_stat(invitee, current_time())
+
     return {}
 
 
@@ -179,6 +192,8 @@ def dm_remove_v1(token, dm_id):
         owner.dm_owns.remove(dm)
 
     data['class_dms'].remove(dm)
+    # update Dream's dm stats
+    update_dm_dreams_stat(current_time())
 
     return {}
 
@@ -230,6 +245,9 @@ def dm_leave_v1(token, dm_id):
             dm_next_owner = dm.dm_members[0]
             dm.dm_owners.append(dm_next_owner)
             dm_next_owner.dm_owns.append(dm)
+
+    # update leaver's stats about dm
+    update_dm_user_stat(leaver, current_time())
 
     return {}
 
@@ -353,7 +371,12 @@ def dm_messages_v1(token, dm_id, start):
         counter_end = 0
         end = -1
     while counter_start >= counter_end:
-        return_message.append(dm.dm_messages[counter_start].return_type_message())
+        msg = dm.dm_messages[counter_start].return_type_message()
+        if user.u_id in msg['reacts']['u_ids']:
+            msg['reacts']['is_this_user_reacted'] = True
+        else:
+            msg['reacts']['is_this_user_reacted'] = False
+        return_message.append(msg)
         counter_start -= 1
 
     return {
@@ -401,3 +424,21 @@ def is_user_in_dm(dm_id, u_id):
         if u_id == user.u_id:
             return user
     return None
+
+
+# update user's stats about channel joined
+def update_dm_user_stat(user, time):
+    stat_dm_user = {
+        'num_dms_joined': len(user.part_of_dm),
+        'time_stamp': time
+    }
+    user.channels_joined.append(stat_dm_user)
+
+
+# update Dreams stats about channels
+def update_dm_dreams_stat(time):
+    stat_dm = {
+        'num_dms_exist': len(data['class_dms']),
+        'time_stamp': time
+    }
+    data['dms_exist'].append(stat_dm)

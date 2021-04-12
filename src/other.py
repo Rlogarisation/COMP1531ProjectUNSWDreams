@@ -14,6 +14,10 @@ def clear_v1():
     data['class_users'] = []
     data['class_channels'] = []
     data['class_dms'] = []
+    data['class_messages'] = []
+    data['channels_exist'] = []
+    data['dms_exist'] = []
+    data['messages_exist'] = []
     data['session_num'] = 0
     data['message_num'] = 0
     data['channel_num'] = 0
@@ -47,12 +51,22 @@ def search_v1(token, query_str):
     for channel in user.part_of_channel:
         for chaneel_message in channel.messages:
             if check_contain_query(query_str, chaneel_message) is True:
-                return_list.append(chaneel_message.return_type_message())
+                msg = chaneel_message.return_type_message()
+                if user.u_id in msg['reacts']['u_ids']:
+                    msg['reacts']['is_this_user_reacted'] = True
+                else:
+                    msg['reacts']['is_this_user_reacted'] = False
+                return_list.append(msg)
 
     for dm in user.part_of_dm:
         for dm_message in dm.dm_messages:
             if check_contain_query(query_str, dm_message) is True:
-                return_list.append(dm_message.return_type_message())
+                msg = dm_message.return_type_message()
+                if user.u_id in msg['reacts']['u_ids']:
+                    msg['reacts']['is_this_user_reacted'] = True
+                else:
+                    msg['reacts']['is_this_user_reacted'] = False
+                return_list.append(msg)
 
     return {
         'messages': return_list

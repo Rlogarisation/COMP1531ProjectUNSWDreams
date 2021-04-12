@@ -1,14 +1,11 @@
 # channels.py is used to implement the functions for channels
 # including channels_list and chennels_listall
 # for 21T1 COMP1531 project
-# Written by Zheng Luo (z5206267@ad.unsw.edu.au) on 02/Mar/2021
-# Written by Lan (channels_create_v1)
-
-
 from src.auth import auth_login_v1, auth_register_v1, session_to_token, token_to_session, \
     get_user_by_token
 from src.error import InputError, AccessError
 from src.data_file import Channel, data
+from src.channel import update_channel_user_stat, update_channel_dreams_stat
 
 #############################################################################
 #                                                                           #
@@ -111,6 +108,11 @@ def channels_create_v1(token, name, is_public):
     owner.channel_owns.append(channel)
     channel.owner_members.append(owner)
     channel.all_members.append(owner)
+
+    # update user's stats
+    update_channel_user_stat(owner)
+    # update Dreams' stats
+    update_channel_dreams_stat()
 
     return {
         'channel_id': channel_id

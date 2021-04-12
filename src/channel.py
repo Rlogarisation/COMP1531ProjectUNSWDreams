@@ -1,4 +1,4 @@
-from src.data_file import data, Permission, Notification
+from src.data_file import data, Permission, Notification, current_time
 from src.error import InputError, AccessError
 from src.auth import session_to_token, token_to_session, get_user_by_token, auth_register_v1, \
     auth_login_v1
@@ -50,6 +50,9 @@ def channel_invite_v1(token, channel_id, u_id):
     notification_message = f"{inviter.handle_str} added you to {channel.name}"
     notification = Notification(channel.channel_id, -1, notification_message)
     invitee.notifications.append(notification)
+
+    # update user's stats
+    update_channel_user_stat(invitee)
     return {}
 
 
@@ -169,7 +172,12 @@ def channel_messages_v1(token, channel_id, start):
         counter_end = 0
         end = -1
     while counter_start >= counter_end:
-        return_message.append(channel.messages[counter_start].return_type_message())
+        msg = channel.messages[counter_start].return_type_message()
+        if user.u_id in msg['reacts']['u_ids']:
+            msg['reacts']['is_this_user_reacted'] = True
+        else:
+            msg['reacts']['is_this_user_reacted'] = False
+        return_message.append(msg)
         counter_start -= 1
 
     return {
@@ -210,6 +218,9 @@ def channel_join_v1(token, channel_id):
         raise (AccessError(description="channel_join_v1 : channel is PRIVATE."))
 
     add_user_into_channel(target_channel, user)
+
+    # update user's stats
+    update_channel_user_stat(user)
     return {}
 
 
@@ -255,6 +266,9 @@ def channel_leave_v1(token, channel_id):
     # Case 3 succesfull function calling
     # Expected outcome is user leaves channel
     user_leaves_channel(channel, user, u_id, channel_id)
+
+    # update user's stats
+    update_channel_user_stat(user)
     return {}
 
 
@@ -469,3 +483,20 @@ def token_into_u_id(token):
     u_id = user.u_id
     return u_id
 
+
+# update user's stats about channel joined
+def update_channel_user_stat(user):
+    stat_channel_user = {
+        'num_channels_joined': len(user.part_of_channel),
+        'time_stamp': current_time()
+    }
+    user.channels_joined.append(stat_channel_user)
+
+
+# update Dreams stats about channels
+def update_channel_dreams_stat():
+    stat_channel = {
+        'num_channels_exist': len(data['class_channels']),
+        'time_stamp': current_time()
+    }
+    data['channels_exist'].append(stat_channel)

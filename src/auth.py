@@ -1,6 +1,8 @@
 import re
 import jwt
 import hashlib
+import random
+import smtplib
 
 from jwt import InvalidSignatureError, InvalidTokenError
 from src.data_file import User, Permission, data
@@ -91,6 +93,40 @@ def auth_logout(token):
 
     return {'is_success': False}
 
+
+def auth_passwordreset_request_v1(email):
+    user = get_user_by_email(email)
+    if user is None:
+        raise InputError(description="The email is invalid")
+
+    # generate the reset code
+    reset_code = create_reset_code()
+    user.reset_code = reset_code
+
+    connection = smtplib.SMTP("smtp.gmail.com")
+    connection.starttls()
+    connection.login(user='cblinker17@gmail.com', password='cs1531f11cblinker')
+    connection.sendmail(
+        from_addr='cblinker17@gmail.com',
+        to_addrs=email,
+        msg=f"Subject:Password Reset Code for Dreams\n\nThe password rest code is {reset_code}"
+    )
+
+    return {}
+
+
+def auth_passwordreset_reset_v1(reset_code, new_password):
+    user = get_user_by_code(reset_code)
+    if user is None:
+        raise InputError(description="reset_code is not a valid reset code")
+
+    if len(new_password) < 6:
+        raise InputError(description="Password entered is less than 6 characters long")
+
+    user.hashed_password = hash_password(new_password)
+    return {}
+
+
 #############################################################################
 #                                                                           #
 #                              Helper function                              #
@@ -107,6 +143,15 @@ def is_email_valid(email):
         return True
     else:
         return False
+
+
+def get_user_by_code(reset_code):
+    if reset_code is None:
+        return None
+    for user in data['class_users']:
+        if user.reset_code == reset_code:
+            return user
+    return None
 
 
 def get_user_by_token(token):
@@ -210,6 +255,13 @@ def create_auth_user_id(u_id):
     return u_id
 
 
+def create_reset_code():
+    code = ''
+    for _i in range(4):
+        code += str(random.randint(0, 9))
+    return code
+
+
 # generate a new session id
 def create_session_id():
     new_id = data['session_num']
@@ -266,10 +318,6 @@ def create_handle(name_first, name_last):
     # to form a new handle
     else:
         count -= 1
-        # count_len = len(str(count))
-        # char_len = 20 - count_len
-        # name = list(name)[:char_len]
-        # name = ''.join(name)
         handle = name + str(count)
         return handle
 

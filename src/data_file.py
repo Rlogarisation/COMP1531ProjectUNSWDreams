@@ -1,4 +1,5 @@
 import pickle
+from datetime import datetime, timezone
 """
 Define different classes: User, Channel, Message
 Define data structure: data
@@ -21,21 +22,18 @@ class User:
         self.handle_str = handle_str
         self.auth_user_id = auth_user_id
         self.permission_id = permission_id
-        # The one who registers the first will be the global owner
-        # The users who register afterward will be a global member
-        # The role does not indicate the 'owner' or
-        # a 'member' of a channel in this part
-        # if self.role not in ['global owner', 'global member']:
-        #     raise Exception("role must be 'owner' or 'member")
-
-        # a list of all channels that the authorised user is part of
-        # including the user is a memeber and the user is an owner of the channel
         self.part_of_channel = []
         self.part_of_dm = []
         self.dm_owns = []
         self.channel_owns = []  # a list of all channels that the user is the owner of the channel
         self.current_sessions = []  # a list of current sessions of the user
         self.notifications = []
+        self.messages = []
+        self.channels_joined = []
+        self.dms_joined = []
+        self.messages_sent = []
+        self.image_url = ''
+        self.reset_code = ''
 
     def return_type_user(self):
         """in 6.1.1 Data Types
@@ -63,6 +61,29 @@ class Channel:
         self.all_members = []  # a list of all members of the channel, including members and owners
         self.owner_members = []  # a list of all owners of the channel
         self.messages = []
+        self.standup = {'is_active': False, 'time_finish': None}
+        self.packaged_messages = []
+
+    def is_standup_active(self):
+        return self.standup['is_active']
+
+    def return_time_finish(self):
+        return self.standup['time_finish']
+
+    def activate_standup(self):
+        self.standup['is_active'] = True
+
+    def deactivate_standup(self):
+        self.standup['is_active'] = False
+
+    def set_time_finish(self, in_time_finish):
+        self.standup['time_finish'] = in_time_finish
+
+    def clear_time_finish(self):
+        self.standup['time_finish'] = None
+
+    def clear_packaged_messages(self):
+        self.packaged_messages = []
 
     def return_type_channel(self):
         """dictionary contains types { channel_id, name }"""
@@ -80,6 +101,8 @@ class Message:
         self.time_created = time_created
         self.channel_id = channel_id
         self.dm_id = dm_id
+        self.is_pinned = False
+        self.reacted_users = []
 
     def return_type_message(self):
         """
@@ -90,7 +113,9 @@ class Message:
             'message_id': self.message_id,
             'u_id': self.u_id,
             'message': self.message,
-            'time_created': self.time_created
+            'time_created': self.time_created,
+            'reacts': {'react_id': 1, 'u_ids': [u.u_id for u in self.reacted_users], 'is_this_user_reacted': False},
+            'is_pinned': self.is_pinned
         }
 
 
@@ -132,6 +157,11 @@ DATA = {
     'class_channels': [],
     # a list of class DM
     'class_dms': [],
+    # a list of class Message
+    'class_messages': [],
+    'channels_exist': [],
+    'dms_exist': [],
+    'messages_exist': [],
     # to record the number of sessions
     'session_num': 0,
     # to record the number of messages
@@ -157,6 +187,10 @@ def load_data():
 def dump_data(dt):
     with open("db.p", "wb") as FILE:
         pickle.dump(dt, FILE)
+
+
+def current_time():
+    return int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
 
 
 data = load_data()
