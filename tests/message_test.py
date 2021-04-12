@@ -274,7 +274,7 @@ AccessError when none of the following are true:
 """
 
 
-def test_invalid_token():
+def test_invalid_token1():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
     u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
@@ -287,7 +287,7 @@ def test_invalid_token():
         message_edit_v2("invalid token", message_0_id, 'Hope it works')
 
 
-def test_invalid_token():
+def test_invalid_token2():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First", "Last")['token']
     auth_login_v1("test_email0@gmail.com", "password")
@@ -435,12 +435,30 @@ AccessError:
 """
 
 
-def test_message_share_channel_normal_case():
+def test_message_share_channel_normal_case1():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
     auth_login_v1("test_email0@gmail.com", "password")
     token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")['token']
     u_id_1 = auth_login_v1("test_email1@gmail.com", "password")['auth_user_id']
+
+    channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
+    og_message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
+
+    all_messages = channel_messages_v1(token_0, channel_0_id, 0)
+    message_0 = all_messages['messages'][0]['message']
+
+    shared_message = message_share_v1(token_0, og_message_0_id, message_0, channel_0_id, -1)
+
+    assert shared_message['shared_message_id'] == 1
+
+
+def test_message_share_channel_normal_case2():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
+    auth_login_v1("test_email0@gmail.com", "password")
+    auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")
+    auth_login_v1("test_email1@gmail.com", "password")
 
     channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
     og_message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
@@ -488,24 +506,6 @@ def test_message_share_user_invalid():
         message_share_v1("invalid token", og_message_0_id, message_0, channel_0_id, -1)
     with pytest.raises(AccessError):
         message_share_v1(None, og_message_0_id, message_0, channel_0_id, -1)
-
-
-def test_message_share_channel_normal_case():
-    clear_v1()
-    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")['token']
-    auth_login_v1("test_email0@gmail.com", "password")
-    auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")
-    auth_login_v1("test_email1@gmail.com", "password")
-
-    channel_0_id = channels_create_v1(token_0, 'channel_0', True)['channel_id']
-    og_message_0_id = message_send_v2(token_0, channel_0_id, 'Hope it works')['message_id']
-
-    all_messages = channel_messages_v1(token_0, channel_0_id, 0)
-    message_0 = all_messages['messages'][0]['message']
-
-    shared_message = message_share_v1(token_0, og_message_0_id, message_0, channel_0_id, -1)
-
-    assert shared_message['shared_message_id'] == 1
 
 
 def test_message_share_dm_normal_case():
