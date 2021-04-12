@@ -2,6 +2,10 @@ from src.data_file import Permission, data
 from src.auth import get_user_by_uid, session_to_token, token_to_session, get_user_by_token, \
     is_email_valid
 from src.error import InputError, AccessError
+from PIL import Image
+import requests
+import os
+import urllib.request
 """
 user.py
 Auther: Lan Lin
@@ -147,6 +151,85 @@ def admin_userpermission_change(token, u_id, permission_id):
 
     user.permission_id = permission_id
     return {}
+
+
+def user_stats_v1(token):
+    user = get_user_by_token(token)
+    if user is None:
+        raise AccessError(description="Token passed in is invalid")
+
+    num1 = len(user.part_of_channel) + len(user.part_of_dm) + len(user.messages)
+    num2 = len(data['class_channels']) + len(data['class_dms']) +len(data['class_messages'])
+    involvement_rate = num1/num2
+
+    user_stats = {
+        'channels_joined': user.channels_joined,
+        'dms_joined': user.dms_joined,
+        'messages_sent': user.messages_sent,
+        'involvement_rate': involvement_rate
+    }
+
+    return {
+        'user_stats': user_stats
+    }
+
+
+def users_stats_v1(token):
+    user = get_user_by_token(token)
+    if user is None:
+        raise AccessError(description="Token passed in is invalid")
+
+    num1 = num_user_in_channel_dm()
+    num2 = len(data['class_users'])
+    utilization_rate = num1/num2
+
+    dreams_stats = {
+        'channels_exist': data['channels_exist'],
+        'dms_exist': data['dms_exist'],
+        'messages_exist': data['messages_exist'],
+        'utilization_rate': utilization_rate
+    }
+
+    return {
+        'dreams_stats': dreams_stats
+    }
+
+
+def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
+    user = get_user_by_token(token)
+    if user is None:
+        raise AccessError(description="Token passed in is invalid")
+
+    # get the image, check the image
+    response = requests.get(img_url, stream=True)
+    if response.status_code != 200:
+        raise InputError(description="img_url returns an HTTP status other than 200.")
+
+    image = Image.open(response.raw)
+    if image.format != 'JPEG':
+        raise InputError(description="Image uploaded is not a JPG")
+
+    width, height = image.size
+    if x_start > width or x_end > width or x_start < 0 or x_end < 0 or x_start >= x_end:
+        raise InputError(description="x_start or x_end are not within the dimensions of the image")
+    if y_start > height or y_end > height or y_start < 0 or y_end < 0 or y_start >= y_end:
+        raise InputError(description="y_start or y_end are not within the dimensions of the image")
+
+    # save the original image locally
+    path = os.getcwd() + '/src/static/'
+    # path = './src/static'
+    if not os.path.exists(path):
+        os.mkdir(path)
+    path = path + str(user.u_id) + '.jpg'
+    # urllib.request.urlretrieve(img_url, path)
+
+    # crop the image
+    image_cropped = image.crop((x_start, y_start, x_end, y_end))
+    # overwrite the original image by the cropped image
+    image_cropped.save(path)
+    user.image_url = path
+
+    return user
 #############################################################################
 #                                                                           #
 #                              Helper function                              #
@@ -161,3 +244,11 @@ def count_dream_owner():
             count += 1
     return count
 
+
+def num_user_in_channel_dm():
+    count = 0
+    for user in data['class_users']:
+        num_channel_dm = len(user.part_of_channel) + len(user.part_of_dm)
+        if num_channel_dm > 0:
+            count += 1
+    return count
