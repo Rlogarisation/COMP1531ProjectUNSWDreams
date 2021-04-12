@@ -1,8 +1,8 @@
-from datetime import datetime
+from threading import Timer
 import re
-from src.data_file import data, Message, Permission
+from src.data_file import data, Message, Permission, current_time
 from src.error import InputError, AccessError
-from src.auth import get_user_by_token, get_user_by_handle
+from src.auth import get_user_by_token, get_user_by_handle, get_user_by_uid
 from src.channel import get_channel_by_channel_id, is_user_owner_channel, is_user_in_channel
 from src.dm import is_user_owner_dm, get_dm_by_dm_id, is_user_in_dm
 from src.other import Notification
@@ -54,9 +54,16 @@ def message_send_v2(token, channel_id, message):
         raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
 
     new_message_id = create_message_id()
-    time_created = datetime.utcnow().isoformat()
+    time_created = current_time()
     message_created = Message(new_message_id, auth_user.u_id, message, time_created, channel.channel_id, -1)
     channel.messages.append(message_created)
+    auth_user.messages.append(message_created)
+    data['class_messages'].append(message_created)
+
+    # update Dreams stats about message
+    update_message_dreams_stat()
+    # update user's stats about message
+    update_message_user_stat(auth_user)
 
     # check and tag user
     tagging_user(message, channel_id, -1, auth_user)
@@ -109,10 +116,17 @@ def message_senddm_v1(token, dm_id, message):
         raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
 
     new_message_id = create_message_id()
-    created_time = datetime.utcnow().isoformat()
+    created_time = current_time()
     message_created = Message(new_message_id, auth_user.u_id, message, created_time, -1, dm.dm_id)
 
     dm.dm_messages.append(message_created)
+    auth_user.messages.append(message_created)
+    data['class_messages'].append(message_created)
+
+    # update Dreams stats about message
+    update_message_dreams_stat()
+    # update user's stats about message
+    update_message_user_stat(auth_user)
 
     # check and tag user
     tagging_user(message, -1, dm_id, auth_user)
@@ -247,6 +261,14 @@ def message_remove_v1(token, message_id):
     if channel_dm[1] == 1:
         channel_dm[0].dm_messages.remove(target_message)
 
+    auth_user.messages.remove(target_message)
+    data['class_messages'].remove(target_message)
+
+    # update Dreams stats about message
+    update_message_dreams_stat()
+    # update user's stats about message
+    update_message_user_stat(auth_user)
+
     return {}
 
 
@@ -299,22 +321,108 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
                     f'"""'
     # message_added = ''.join([message, '\n', '"""', '\n', og_message.message, '\n', '"""'])
     # add og_message to new_message
-    created_time = datetime.utcnow().isoformat()
-    new_message = Message(create_message_id(), user.u_id, message_added, created_time, channel_id, dm_id)
+    # created_time = datetime.utcnow().isoformat() ???
+    # created_time = current_time()
+    # new_message = Message(create_message_id(), user.u_id, message_added, created_time, channel_id, dm_id)
 
     # send shared message to the channel or dm
     if channel_id != -1:
-        message_send_v2(token, channel_id, new_message.message)
-        tagging_user(new_message.message, channel_id, -1, user)
+        message_send_v2(token, channel_id, message_added)
     if dm_id != -1:
-        message_senddm_v1(token, dm_id, new_message.message)
-        tagging_user(new_message.message, -1, dm_id, user)
+        message_senddm_v1(token, dm_id, message_added)
 
     return {
-        'shared_message_id': new_message.message_id
+        'shared_message_id': message_added
     }
 
 
+def message_sendlater_v1(token, channel_id, message, time_sent):
+    auth_user = get_user_by_token(token)
+    if auth_user is None:
+        raise AccessError(description='Invalid token.')
+    # InputError 1: Message is more than 1000 characters
+    if len(message) > 1000:
+        raise InputError(description='message_send_v2 : Message is more than 1000 characters.')
+
+    # AccessError 1: invalid channel_id
+    channel = get_channel_by_channel_id(channel_id)
+    if type(channel_id) != int or channel is None:
+        raise InputError(description='message_send_v2 : Invalid channel_id.')
+
+    # AccessError 2: the authorised user has not joined the channel they are trying to post to
+    if auth_user not in channel.all_members:
+        raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
+
+    cur_time = current_time()
+    if time_sent < cur_time:
+        raise InputError(description="Time sent is a time in the past")
+
+    timer = Timer((time_sent - cur_time), message_send_v2, [token, channel_id, message])
+    timer.start()
+
+
+def message_sendlaterdm_v1(token, dm_id, message, time_sent):
+    # InputError 1: invalid token.
+    auth_user = get_user_by_token(token)
+    if auth_user is None:
+        raise AccessError(description='message_send_v2 : Invalid token.')
+
+    # InputError 1: Message is more than 1000 characters
+    if len(message) > 1000:
+        raise InputError(description='message_send_v2 : Message is more than 1000 characters.')
+
+    # AccessError 1: invalid dm_id
+    dm = get_dm_by_dm_id(dm_id)
+    if type(dm_id) != int or dm is None:
+        raise InputError(description='message_send_v2 : Invalid dm_id.')
+
+    # AccessError 2: the authorised user has not joined the channel they are trying to post to
+    if auth_user not in dm.dm_members:
+        raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
+
+    cur_time = current_time()
+    if time_sent < cur_time:
+        raise InputError(description="Time sent is a time in the past")
+
+    timer = Timer((time_sent - cur_time), message_senddm_v1, [token, dm_id, message])
+    timer.start()
+
+
+def message_react_v1(token, message_id, react_id):
+    message, user, channel_dm = return_message_if_valid(token, message_id, react_id)
+    message.reacted_users.append(user)
+
+    notification = None
+    if channel_dm[1] == 0:
+        channel = channel_dm[0]
+        notification_message = f"{user.handle_str} reacted to your message in {channel.name}"
+        notification = Notification(channel.channel_id, -1, notification_message)
+    if channel_dm[1] == 1:
+        dm = channel_dm[0]
+        notification_message = f"{user.handle_str} reacted to your message in {dm.dm_name}"
+        notification = Notification(-1, dm.dm_id, notification_message)
+
+    sender = get_user_by_message_id(message_id)
+    sender.notifications.append(notification)
+    return {}
+
+
+def message_unreact_v1(token, message_id, react_id):
+    message, user, channel_dm = return_message_if_valid(token, message_id, react_id)
+    message.reacted_users.remove(user)
+    return {}
+
+
+def message_pin_v1(token, message_id):
+    message = return_message_to_pin(token, message_id, 0)
+    message.is_pinned = True
+    return {}
+
+
+def message_unpin_v1(token, message_id):
+    message = return_message_to_pin(token, message_id, 1)
+    message.is_pinned = False
+    return {}
 #############################################################################
 #                                                                           #
 #                              Helper function                              #
@@ -332,6 +440,12 @@ def create_message_id():
 # get the sender's uid by message id
 def get_u_id_by_message_id(message_id):
     return get_message_by_message_id(message_id).u_id
+
+
+def get_user_by_message_id(message_id):
+    uid = get_message_by_message_id(message_id)
+    user = get_user_by_uid(uid)
+    return user
 
 
 # get the class Message by message id
@@ -420,3 +534,87 @@ def tagging_user(message, channel_id, dm_id, sender):
                 notification = Notification(-1, dm_id, notification_message)
                 invitee.notifications.append(notification)
 
+
+def return_message_if_valid(token, message_id, react_id):
+    if react_id != 1:
+        raise InputError(description="react_id is not valid")
+
+    user = get_user_by_token(token)
+    if user is None:
+        raise AccessError(description='message_send_v2 : Invalid token.')
+
+    message = get_message_by_message_id(message_id)
+    if message is None:
+        raise InputError(description="message_id is invalid")
+
+    if user in message.reacted_users:
+        raise InputError(description="Message with ID message_id already contains an active React with ID "
+                                     "react_id from the authorised user")
+
+    channel_dm = get_channel_dm_by_message_id(message_id)
+    if channel_dm is None:
+        raise InputError(description="The message is not in any channel or dm")
+    if channel_dm[1] == 0:
+        channel = channel_dm[0]
+        if is_user_in_channel(channel.channel_id, user.u_id) is None:
+            raise AccessError(description="The authorised user is not a member of the channel that the message "
+                                          "is within")
+    if channel_dm[1] == 1:
+        dm = channel_dm[0]
+        if is_user_in_dm(dm.dm_id, user.u_id) is None:
+            raise AccessError(description="The authorised user is not a member of the DM that the message is within")
+
+    return [message, user, channel_dm]
+
+
+def return_message_to_pin(token, message_id, flag):
+    # InputError 1: invalid token.
+    user = get_user_by_token(token)
+    if user is None:
+        raise AccessError(description='Invalid token.')
+
+    # InputError 2: message_id is invalid
+    message = get_message_by_message_id(message_id)
+    if message is None:
+        raise InputError(description="message_id is invalid")
+
+    # InputError 2: Message with ID message_id is already pinned
+    if flag == 0:
+        if message.is_pinned is True:
+            raise InputError(description="The message is already pinned")
+    if flag == 1:
+        if message.is_pinned is False:
+            raise InputError(description="The message is already unppined")
+
+    channel_dm = get_channel_dm_by_message_id(message_id)
+    if channel_dm is None:
+        raise InputError(description="The message is not in any channel or dm")
+    if channel_dm[1] == 0:
+        channel = channel_dm[0]  # owner or member???
+        if is_user_owner_channel(channel.channel_id, user.u_id) is None:
+            raise AccessError(description="The authorised user is not a member of the channel that the message "
+                                          "is within")
+    if channel_dm[1] == 1:
+        dm = channel_dm[0]
+        if is_user_owner_dm(dm.dm_id, user.u_id) is None:
+            raise AccessError(description="The authorised user is not a member of the DM that the message is within")
+
+    return message
+
+
+# update user's stats about channel joined
+def update_message_user_stat(user):
+    stat_message_user = {
+        'num_messages_sent': len(user.part_of_channel),
+        'time_stamp': current_time()
+    }
+    user.messages_sent.append(stat_message_user)
+
+
+# update Dreams stats about channels
+def update_message_dreams_stat():
+    stat_message = {
+        'num_messages_exist': len(data['class_messages']),
+        'time_stamp': current_time()
+    }
+    data['messages_exist'].append(stat_message)
