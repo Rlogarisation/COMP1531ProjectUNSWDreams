@@ -806,10 +806,6 @@ def test_message_sendlater_v1():
         with pytest.raises(AccessError):
             message_sendlater_v1(token_2, channel_0_id, "I am message.", time_sent)
 
-    def test_user_isnot_owner_of_channel():
-        with pytest.raises(AccessError):
-            message_sendlater_v1(token_1, channel_0_id, "I am message.", time_sent)
-
     # ----------------------------testing------------------------------------
     # Inputs' normal tests
     test_invalid_channel_id()
@@ -822,7 +818,6 @@ def test_message_sendlater_v1():
     test_invalid_token()
 
     test_user_isnot_member_of_channel()
-    test_user_isnot_owner_of_channel()
 
     pass
 
@@ -914,10 +909,6 @@ def test_message_sendlaterdm_v1():
         with pytest.raises(AccessError):
             message_sendlaterdm_v1(token_2, dm_0_id, "I am message.", time_sent)
 
-    def test_user_isnot_owner_of_dm():
-        with pytest.raises(AccessError):
-            message_sendlaterdm_v1(token_1, dm_0_id, "I am message.", time_sent)
-
     # ----------------------------testing------------------------------------
     # Inputs' normal tests
     test_invalid_dm_id()
@@ -930,7 +921,6 @@ def test_message_sendlaterdm_v1():
     test_invalid_token()
 
     test_user_isnot_member_of_dm()
-    test_user_isnot_owner_of_dm()
 
     pass
 
@@ -1030,19 +1020,6 @@ def test_message_react_v1():
         with pytest.raises(AccessError):
             message_react_v1(token_2, dm_message_1_message_id, 1)
 
-    # AccessError: The authorised user is not an owner of the channel or DM
-    def test_user_isnot_owner_of_channel():
-        with pytest.raises(AccessError):
-            message_react_v1(token_1, channel_message_0_message_id, 1)
-        with pytest.raises(AccessError):
-            message_react_v1(token_1, channel_message_1_message_id, 1)
-
-    def test_user_isnot_owner_of_dm():
-        with pytest.raises(AccessError):
-            message_react_v1(token_1, dm_message_0_message_id, 1)
-        with pytest.raises(AccessError):
-            message_react_v1(token_1, dm_message_1_message_id, 1)
-
     # ----------------------------testing------------------------------------
     # Inputs' normal tests
     test_invalid_message_id()
@@ -1057,8 +1034,6 @@ def test_message_react_v1():
     test_user_isnot_member_of_channel()
     test_user_isnot_member_of_dm()
 
-    test_user_isnot_owner_of_channel()
-    test_user_isnot_owner_of_dm()
     pass
 
 
@@ -1159,19 +1134,6 @@ def test_message_unreact_v1():
         with pytest.raises(AccessError):
             message_unreact_v1(token_2, dm_message_1_message_id, 1)
 
-    # AccessError: The authorised user is not an owner of the channel or DM
-    def test_user_isnot_owner_of_channel():
-        with pytest.raises(AccessError):
-            message_unreact_v1(token_1, channel_message_0_message_id, 1)
-        with pytest.raises(AccessError):
-            message_unreact_v1(token_1, channel_message_1_message_id, 1)
-
-    def test_user_isnot_owner_of_dm():
-        with pytest.raises(AccessError):
-            message_unreact_v1(token_1, dm_message_0_message_id, 1)
-        with pytest.raises(AccessError):
-            message_unreact_v1(token_1, dm_message_1_message_id, 1)
-
     # ----------------------------testing------------------------------------
     # Inputs' normal tests
     test_invalid_message_id()
@@ -1186,8 +1148,6 @@ def test_message_unreact_v1():
     test_user_isnot_member_of_channel()
     test_user_isnot_member_of_dm()
 
-    test_user_isnot_owner_of_channel()
-    test_user_isnot_owner_of_dm()
     pass
 
 
@@ -1264,6 +1224,7 @@ def test_message_pin_v1():
         message_pin_v1(token_0, dm_message_0_message_id)
         with pytest.raises(InputError):
             message_pin_v1(token_0, dm_message_0_message_id)
+        message_unpin_v1(token_0, dm_message_0_message_id)
 
     # AccessError: The authorised user is not a member of the channel or DM
     def test_user_isnot_member_of_channel():
@@ -1384,12 +1345,16 @@ def test_message_unpin_v1():
 
     # AccessError: The authorised user is not a member of the channel or DM
     def test_user_isnot_member_of_channel():
+        message_pin_v1(token_0, channel_message_0_message_id)
+        message_pin_v1(token_0, channel_message_1_message_id)
         with pytest.raises(AccessError):
             message_unpin_v1(token_2, channel_message_0_message_id)
         with pytest.raises(AccessError):
             message_unpin_v1(token_2, channel_message_1_message_id)
 
     def test_user_isnot_member_of_dm():
+        message_pin_v1(token_0, dm_message_0_message_id)
+        message_pin_v1(token_0, dm_message_1_message_id)
         with pytest.raises(AccessError):
             message_unpin_v1(token_2, dm_message_0_message_id)
         with pytest.raises(AccessError):
