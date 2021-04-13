@@ -1,0 +1,621 @@
+============================= test session starts ==============================
+platform linux -- Python 3.7.3, pytest-6.2.3, py-1.10.0, pluggy-0.13.1
+rootdir: /tmp_amd/kamen/export/kamen/3/cs1531/automark/tempstore, configfile: pytest.ini
+plugins: forked-1.3.0, xdist-2.2.1, hypothesis-6.1.1, timeout-1.4.2
+collected 247 items
+
+http_tests/admin_tests/test_admin_user_remove.py F.FFFFs....             [  4%]
+http_tests/admin_tests/test_admin_userpermission_change.py ......        [  6%]
+http_tests/auth_tests/test_auth_login.py ....                            [  8%]
+http_tests/auth_tests/test_auth_logout.py .F                             [  9%]
+http_tests/auth_tests/test_auth_register.py ............................ [ 20%]
+.                                                                        [ 21%]
+http_tests/channel_tests/test_channel_addowner.py F.FF..s.F              [ 24%]
+http_tests/channel_tests/test_channel_details.py ....                    [ 26%]
+http_tests/channel_tests/test_channel_invite.py sF.....                  [ 29%]
+http_tests/channel_tests/test_channel_join.py FF.s..                     [ 31%]
+http_tests/channel_tests/test_channel_leave.py ....                      [ 33%]
+http_tests/channel_tests/test_channel_messages.py ........               [ 36%]
+http_tests/channel_tests/test_channel_removeowner.py FFFF..s.F           [ 40%]
+http_tests/channels_tests/test_channels_create.py .....                  [ 42%]
+http_tests/channels_tests/test_channels_list.py .........                [ 45%]
+http_tests/channels_tests/test_channels_listall.py .....                 [ 47%]
+http_tests/dm_tests/test_dm_create.py .....                              [ 49%]
+http_tests/dm_tests/test_dm_details.py ....                              [ 51%]
+http_tests/dm_tests/test_dm_invite.py s.F...                             [ 53%]
+http_tests/dm_tests/test_dm_leave.py ....                                [ 55%]
+http_tests/dm_tests/test_dm_list.py .....                                [ 57%]
+http_tests/dm_tests/test_dm_messages.py ........                         [ 60%]
+http_tests/dm_tests/test_dm_remove.py .....                              [ 62%]
+http_tests/echo_tests/echo_test.py ..                                    [ 63%]
+http_tests/message_tests/test_message_edit.py ........                   [ 66%]
+http_tests/message_tests/test_message_remove.py ......                   [ 69%]
+http_tests/message_tests/test_message_send.py ..s..                      [ 71%]
+http_tests/message_tests/test_message_senddm.py ..s..                    [ 73%]
+http_tests/message_tests/test_message_share.py FFFF..ssssss.             [ 78%]
+http_tests/other_tests/test_clear.py .                                   [ 78%]
+http_tests/other_tests/test_notifications_get.py ...Fsss..ss.F....       [ 85%]
+http_tests/other_tests/test_search.py ........                           [ 89%]
+http_tests/other_tests/test_users_all.py ..                              [ 89%]
+http_tests/user_tests/test_user_profile.py ...                           [ 91%]
+http_tests/user_tests/test_user_profile_setemail.py .........            [ 94%]
+http_tests/user_tests/test_user_profile_sethandle.py .......             [ 97%]
+http_tests/user_tests/test_user_profile_setname.py ......                [100%]
+
+=================================== FAILURES ===================================
+________________________ test_removal_can_do_no_action _________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=1, token=...iOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='lordzerg')
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+ctx = None
+
+    def test_removal_can_do_no_action(user_woody, user_zerg, woodys_public_toybox, ctx):
+        admin_user_remove(user_woody.token, user_zerg.u_id, ctx)
+    
+        # assert auth_logout(user_zerg.token, ctx)['is_success'] is False
+        with pytest.raises(AccessError):
+>           auth_logout(user_zerg.token, ctx)['is_success']
+E           Failed: DID NOT RAISE <class 'http_tests.error.AccessError'>
+
+http_tests/admin_tests/test_admin_user_remove.py:20: Failed
+_____________________ test_removal_profile_still_fetchable _____________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=1, token=...iOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='lordzerg')
+ctx = None
+
+    def test_removal_profile_still_fetchable(user_woody, user_zerg, ctx):
+        admin_user_remove(user_woody.token, user_zerg.u_id, ctx)
+    
+        profile = user_profile(user_woody.token, user_zerg.u_id, ctx)['user']
+    
+>       assert profile['handle_str'] == 'Removed user' or f'{profile["name_first"]}{profile["name_last"]}' == 'Removed user' or f'{profile["name_first"]} {profile["name_last"]}' == 'Removed user'
+E       AssertionError: assert ('sheriffwoody' == 'Removed user'
+E         - Removed user
+E         + sheriffwoody or 'sheriffwoody' == 'Removed user'
+E         - Removed user
+E         + sheriffwoody or 'sheriff woody' == 'Removed user'
+E         - Removed user
+E         + sheriff woody)
+
+http_tests/admin_tests/test_admin_user_remove.py:41: AssertionError
+______________________ test_removal_removed_from_channel _______________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=1, token=...iOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='lordzerg')
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+ctx = None
+
+    def test_removal_removed_from_channel(user_woody, user_zerg, woodys_public_toybox, ctx):
+        channel_join(user_zerg.token, woodys_public_toybox.channel_id, ctx)
+    
+        admin_user_remove(user_woody.token, user_zerg.u_id, ctx)
+    
+        members = channel_details(user_woody.token, woodys_public_toybox.channel_id, ctx)['all_members']
+    
+>       assert user_zerg.u_id not in [m['u_id'] for m in members]
+E       AssertionError: assert 1 not in [0, 1]
+E        +  where 1 = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=1, token=...iOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='lordzerg').u_id
+
+http_tests/admin_tests/test_admin_user_remove.py:51: AssertionError
+_________________________ test_removal_removed_from_dm _________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=1, token=...iOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='lordzerg')
+woody_and_buzz_dm = DM(owner=0, members=[2], name='buzzlightyear, sheriffwoody', dm_id=0)
+ctx = None
+
+    def test_removal_removed_from_dm(user_woody, user_zerg, woody_and_buzz_dm, ctx):
+        dm_invite(user_woody.token, woody_and_buzz_dm.dm_id, user_zerg.u_id, ctx)
+    
+        admin_user_remove(user_woody.token, user_zerg.u_id, ctx)
+    
+        members = dm_details(user_woody.token, woody_and_buzz_dm.dm_id, ctx)['members']
+    
+>       assert user_zerg.u_id not in [m['u_id'] for m in members]
+E       AssertionError: assert 1 not in [2, 0, 1]
+E        +  where 1 = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=1, token=...iOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='lordzerg').u_id
+
+http_tests/admin_tests/test_admin_user_remove.py:61: AssertionError
+________________________ test_removal_not_in_users_all _________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=1, token=...iOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='lordzerg')
+ctx = None
+
+    def test_removal_not_in_users_all(user_woody, user_zerg, ctx):
+        admin_user_remove(user_woody.token, user_zerg.u_id, ctx)
+    
+        users = users_all(user_woody.token, ctx)['users']
+    
+>       assert user_zerg.u_id not in [u['u_id'] for u in users]
+E       AssertionError: assert 1 not in [0, 1]
+E        +  where 1 = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=1, token=...iOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='lordzerg').u_id
+
+http_tests/admin_tests/test_admin_user_remove.py:69: AssertionError
+__________________________ test_not_logged_in_logout ___________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+ctx = None
+
+    def test_not_logged_in_logout(user_woody, ctx):
+        auth_logout(user_woody.token, ctx)
+    
+        # _, is_success = auth_logout(user_woody.token, ctx).popitem()
+    
+        # assert not is_success
+    
+>       with pytest.raises(AccessError):
+E       NameError: name 'AccessError' is not defined
+
+http_tests/auth_tests/test_auth_logout.py:21: NameError
+__________________ test_global_owner_non_member_can_addowner ___________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+zergs_private_lair = Channel(name='zergs lair', is_public=False, channel_id=0, owner_members=[1], all_members=[])
+ctx = None
+
+    def test_global_owner_non_member_can_addowner(user_woody, zergs_private_lair, ctx):
+>       channel_addowner(user_woody.token, zergs_private_lair.channel_id, user_woody.u_id, ctx)
+
+http_tests/channel_tests/test_channel_addowner.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+http_tests/fakepi/channel.py:69: in channel_addowner
+    token=token, channel_id=channel_id, u_id=u_id
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = <Response [400]>
+
+    def parse_response(res):
+        if res.status_code == 200:
+            return res.json()
+        elif res.status_code == 400:
+>           raise error.InputError()
+E           http_tests.error.InputError: 400 Bad Request: None
+
+http_tests/fakepi/util.py:69: InputError
+_______________ test_channel_owner_can_addowner_when_non_member ________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=1, to...V1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='buzzlightyear')
+ctx = None
+
+    def test_channel_owner_can_addowner_when_non_member(user_woody, woodys_public_toybox, user_buzz, ctx):
+>       channel_addowner(user_woody.token, woodys_public_toybox.channel_id, user_buzz.u_id, ctx)
+
+http_tests/channel_tests/test_channel_addowner.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+http_tests/fakepi/channel.py:69: in channel_addowner
+    token=token, channel_id=channel_id, u_id=u_id
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = <Response [400]>
+
+    def parse_response(res):
+        if res.status_code == 200:
+            return res.json()
+        elif res.status_code == 400:
+>           raise error.InputError()
+E           http_tests.error.InputError: 400 Bad Request: None
+
+http_tests/fakepi/util.py:69: InputError
+_______________________ test_non_member_cannot_add_owner _______________________
+
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=1, to...V1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='buzzlightyear')
+ctx = None
+
+    def test_non_member_cannot_add_owner(woodys_public_toybox, user_buzz, ctx):
+        with pytest.raises(AccessError):
+>           channel_addowner(user_buzz.token, woodys_public_toybox.channel_id, user_buzz.u_id, ctx)
+
+http_tests/channel_tests/test_channel_addowner.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+http_tests/fakepi/channel.py:69: in channel_addowner
+    token=token, channel_id=channel_id, u_id=u_id
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = <Response [400]>
+
+    def parse_response(res):
+        if res.status_code == 200:
+            return res.json()
+        elif res.status_code == 400:
+>           raise error.InputError()
+E           http_tests.error.InputError: 400 Bad Request: None
+
+http_tests/fakepi/util.py:69: InputError
+______________________________ test_invalid_token ______________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=1, to...V1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='buzzlightyear')
+ctx = None
+
+    def test_invalid_token(user_woody, woodys_public_toybox, user_buzz, ctx):
+        auth_logout(user_woody.token, ctx)
+        with pytest.raises(AccessError):
+>           channel_addowner(user_buzz.token, woodys_public_toybox.channel_id, user_buzz.u_id, ctx)
+
+http_tests/channel_tests/test_channel_addowner.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+http_tests/fakepi/channel.py:69: in channel_addowner
+    token=token, channel_id=channel_id, u_id=u_id
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = <Response [400]>
+
+    def parse_response(res):
+        if res.status_code == 200:
+            return res.json()
+        elif res.status_code == 400:
+>           raise error.InputError()
+E           http_tests.error.InputError: 400 Bad Request: None
+
+http_tests/fakepi/util.py:69: InputError
+___________________________ test_invite_global_owner ___________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=1, token=...iOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='lordzerg')
+zergs_private_lair = Channel(name='zergs lair', is_public=False, channel_id=0, owner_members=[1], all_members=[])
+ctx = None
+
+    def test_invite_global_owner(user_woody, user_zerg, zergs_private_lair, ctx):
+        channel_invite(user_zerg.token, zergs_private_lair.channel_id, user_woody.u_id, ctx)
+    
+        ch_deets = channel_details(user_woody.token, zergs_private_lair.channel_id, ctx)
+    
+        assert user_woody.u_id in [k['u_id'] for k in ch_deets['all_members']]
+>       assert user_woody.u_id in [k['u_id'] for k in ch_deets['owner_members']]
+E       AssertionError: assert 0 in [1]
+E        +  where 0 = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody').u_id
+
+http_tests/channel_tests/test_channel_invite.py:28: AssertionError
+____________________ test_global_owner_join_channel_public _____________________
+
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=0, to...V1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='buzzlightyear')
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[1], all_members=[])
+ctx = None
+
+    def test_global_owner_join_channel_public(user_buzz, woodys_public_toybox, ctx):
+        channel_join(user_buzz.token, woodys_public_toybox.channel_id, ctx)
+    
+        ch_deets = channel_details(user_buzz.token, woodys_public_toybox.channel_id, ctx)
+    
+        assert user_buzz.u_id in [k['u_id'] for k in ch_deets['all_members']]
+>       assert user_buzz.u_id in [k['u_id'] for k in ch_deets['owner_members']]
+E       AssertionError: assert 0 in [1]
+E        +  where 0 = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=0, to...V1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='buzzlightyear').u_id
+
+http_tests/channel_tests/test_channel_join.py:17: AssertionError
+____________________ test_global_owner_join_channel_private ____________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+zergs_private_lair = Channel(name='zergs lair', is_public=False, channel_id=0, owner_members=[1], all_members=[])
+ctx = None
+
+    def test_global_owner_join_channel_private(user_woody, zergs_private_lair, ctx):
+        channel_join(user_woody.token, zergs_private_lair.channel_id, ctx)
+    
+        ch_deets = channel_details(user_woody.token, zergs_private_lair.channel_id, ctx)
+    
+        assert user_woody.u_id in [k['u_id'] for k in ch_deets['all_members']]
+>       assert user_woody.u_id in [k['u_id'] for k in ch_deets['owner_members']]
+E       AssertionError: assert 0 in [1]
+E        +  where 0 = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody').u_id
+
+http_tests/channel_tests/test_channel_join.py:26: AssertionError
+_________________________ test_owner_can_remove_owner __________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=1, to...V1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='buzzlightyear')
+ctx = None
+
+    def test_owner_can_remove_owner(user_woody, woodys_public_toybox, user_buzz, ctx):
+>       channel_addowner(user_woody.token, woodys_public_toybox.channel_id, user_buzz.u_id, ctx)
+
+http_tests/channel_tests/test_channel_removeowner.py:12: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+http_tests/fakepi/channel.py:69: in channel_addowner
+    token=token, channel_id=channel_id, u_id=u_id
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = <Response [400]>
+
+    def parse_response(res):
+        if res.status_code == 200:
+            return res.json()
+        elif res.status_code == 400:
+>           raise error.InputError()
+E           http_tests.error.InputError: 400 Bad Request: None
+
+http_tests/fakepi/util.py:69: InputError
+______________________ test_global_owner_can_remove_owner ______________________
+
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=0, token=...iOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='lordzerg')
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='sheriffwoody')
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[1], all_members=[])
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=2, to...V1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjJ9.3Mmom--Q72L0chR2xd74Wm6IUmJyvipXQy5FLqagMCU', handle_str='buzzlightyear')
+ctx = None
+
+    def test_global_owner_can_remove_owner(user_zerg, user_woody, woodys_public_toybox, user_buzz, ctx):
+>       channel_addowner(user_woody.token, woodys_public_toybox.channel_id, user_buzz.u_id, ctx)
+
+http_tests/channel_tests/test_channel_removeowner.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+http_tests/fakepi/channel.py:69: in channel_addowner
+    token=token, channel_id=channel_id, u_id=u_id
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = <Response [400]>
+
+    def parse_response(res):
+        if res.status_code == 200:
+            return res.json()
+        elif res.status_code == 400:
+>           raise error.InputError()
+E           http_tests.error.InputError: 400 Bad Request: None
+
+http_tests/fakepi/util.py:69: InputError
+______________________ test_nonmember_cannot_remove_owner ______________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=1, to...V1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='buzzlightyear')
+ctx = None
+
+    def test_nonmember_cannot_remove_owner(user_woody, woodys_public_toybox, user_buzz, ctx):
+        with pytest.raises(AccessError):
+>           channel_removeowner(user_buzz.token, woodys_public_toybox.channel_id, user_woody.u_id, ctx)
+
+http_tests/channel_tests/test_channel_removeowner.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+http_tests/fakepi/channel.py:80: in channel_removeowner
+    token=token, channel_id=channel_id, u_id=u_id
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = <Response [400]>
+
+    def parse_response(res):
+        if res.status_code == 200:
+            return res.json()
+        elif res.status_code == 400:
+>           raise error.InputError()
+E           http_tests.error.InputError: 400 Bad Request: None
+
+http_tests/fakepi/util.py:69: InputError
+_______________________ test_member_cannot_remove_owner ________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=1, to...V1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='buzzlightyear')
+ctx = None
+
+    def test_member_cannot_remove_owner(user_woody, woodys_public_toybox, user_buzz, ctx):
+        channel_join(user_buzz.token, woodys_public_toybox.channel_id, ctx)
+        with pytest.raises(AccessError):
+>           channel_removeowner(user_buzz.token, woodys_public_toybox.channel_id, user_woody.u_id, ctx)
+
+http_tests/channel_tests/test_channel_removeowner.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+http_tests/fakepi/channel.py:80: in channel_removeowner
+    token=token, channel_id=channel_id, u_id=u_id
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = <Response [400]>
+
+    def parse_response(res):
+        if res.status_code == 200:
+            return res.json()
+        elif res.status_code == 400:
+>           raise error.InputError()
+E           http_tests.error.InputError: 400 Bad Request: None
+
+http_tests/fakepi/util.py:69: InputError
+____________________________ test_invalidated_token ____________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=1, to...V1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='buzzlightyear')
+ctx = None
+
+    def test_invalidated_token(user_woody, woodys_public_toybox, user_buzz, ctx):
+        auth_logout(user_woody.token, ctx)
+        with pytest.raises(AccessError):
+>           channel_removeowner(user_woody.token, woodys_public_toybox.channel_id, user_buzz.u_id, ctx)
+
+http_tests/channel_tests/test_channel_removeowner.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+http_tests/fakepi/channel.py:80: in channel_removeowner
+    token=token, channel_id=channel_id, u_id=u_id
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = <Response [400]>
+
+    def parse_response(res):
+        if res.status_code == 200:
+            return res.json()
+        elif res.status_code == 400:
+>           raise error.InputError()
+E           http_tests.error.InputError: 400 Bad Request: None
+
+http_tests/fakepi/util.py:69: InputError
+______________________ test_invitation_from_non_dm_member ______________________
+
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=0, token=...iOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='lordzerg')
+woody_and_buzz_dm = DM(owner=1, members=[2], name='buzzlightyear, sheriffwoody', dm_id=0)
+ctx = None
+
+    def test_invitation_from_non_dm_member(user_zerg, woody_and_buzz_dm, ctx):
+        with pytest.raises(AccessError):
+>           dm_invite(user_zerg.token, woody_and_buzz_dm.dm_id, user_zerg.u_id, ctx)
+E           Failed: DID NOT RAISE <class 'http_tests.error.AccessError'>
+
+http_tests/dm_tests/test_dm_invite.py:32: Failed
+_______________________ test_successful_share_to_channel _______________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+message_factory = <function message_factory.<locals>.make_message at 0x7f680e29be18>
+ctx = None
+
+    def test_successful_share_to_channel(user_woody, woodys_public_toybox, message_factory, ctx):
+        a_msg = message_factory(user_woody, woodys_public_toybox, 'hi')
+    
+        shared_msg = message_share(user_woody.token, a_msg.message_id, 'amazing', woodys_public_toybox.channel_id, -1, ctx)
+    
+        assert 'shared_message_id' in shared_msg
+    
+        ch_msgs = channel_messages(user_woody.token, woodys_public_toybox.channel_id, 0, ctx)
+    
+>       assert shared_msg['shared_message_id'] in [m['message_id'] for m in ch_msgs['messages']]
+E       assert 1 in [2, 0]
+
+http_tests/message_tests/test_message_share.py:23: AssertionError
+_________________________ test_successful_share_to_dm __________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+woody_and_buzz_dm = DM(owner=0, members=[1], name='buzzlightyear, sheriffwoody', dm_id=0)
+message_factory = <function message_factory.<locals>.make_message at 0x7f680e273620>
+ctx = None
+
+    def test_successful_share_to_dm(user_woody, woody_and_buzz_dm, message_factory, ctx):
+        a_msg = message_factory(user_woody, woody_and_buzz_dm, 'hi')
+    
+        shared_msg = message_share(user_woody.token, a_msg.message_id, 'amazing', -1, woody_and_buzz_dm.dm_id, ctx)
+    
+        assert 'shared_message_id' in shared_msg
+    
+        dm_msgs = dm_messages(user_woody.token, woody_and_buzz_dm.dm_id, 0, ctx)
+    
+>       assert shared_msg['shared_message_id'] in [m['message_id'] for m in dm_msgs['messages']]
+E       assert 1 in [2, 0]
+
+http_tests/message_tests/test_message_share.py:35: AssertionError
+______________________ test_successful_cross_share[True] _______________________
+
+to_ch = True
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+woody_and_buzz_dm = DM(owner=0, members=[1], name='buzzlightyear, sheriffwoody', dm_id=0)
+message_factory = <function message_factory.<locals>.make_message at 0x7f680e23f378>
+ctx = None
+
+    @pytest.mark.parametrize('to_ch', [True, False])
+    def test_successful_cross_share(to_ch, user_woody, woodys_public_toybox, woody_and_buzz_dm, message_factory, ctx):
+        if to_ch:
+            a_msg = message_factory(user_woody, woody_and_buzz_dm, 'hi')
+            cross = message_share(user_woody.token, a_msg.message_id, 'amazing', woodys_public_toybox.channel_id, -1, ctx)
+            msgs = channel_messages(user_woody.token, woodys_public_toybox.channel_id, 0, ctx)
+        else:
+            a_msg = message_factory(user_woody, woodys_public_toybox, 'hi')
+            cross = message_share(user_woody.token, a_msg.message_id, 'amazing', -1, woody_and_buzz_dm.dm_id, ctx)
+            msgs = dm_messages(user_woody.token, woody_and_buzz_dm.dm_id, 0, ctx)
+    
+        assert 'shared_message_id' in cross
+>       assert cross['shared_message_id'] in [m['message_id'] for m in msgs['messages']]
+E       assert 1 in [2]
+
+http_tests/message_tests/test_message_share.py:50: AssertionError
+______________________ test_successful_cross_share[False] ______________________
+
+to_ch = False
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+woody_and_buzz_dm = DM(owner=0, members=[1], name='buzzlightyear, sheriffwoody', dm_id=0)
+message_factory = <function message_factory.<locals>.make_message at 0x7f680e2a2f28>
+ctx = None
+
+    @pytest.mark.parametrize('to_ch', [True, False])
+    def test_successful_cross_share(to_ch, user_woody, woodys_public_toybox, woody_and_buzz_dm, message_factory, ctx):
+        if to_ch:
+            a_msg = message_factory(user_woody, woody_and_buzz_dm, 'hi')
+            cross = message_share(user_woody.token, a_msg.message_id, 'amazing', woodys_public_toybox.channel_id, -1, ctx)
+            msgs = channel_messages(user_woody.token, woodys_public_toybox.channel_id, 0, ctx)
+        else:
+            a_msg = message_factory(user_woody, woodys_public_toybox, 'hi')
+            cross = message_share(user_woody.token, a_msg.message_id, 'amazing', -1, woody_and_buzz_dm.dm_id, ctx)
+            msgs = dm_messages(user_woody.token, woody_and_buzz_dm.dm_id, 0, ctx)
+    
+        assert 'shared_message_id' in cross
+>       assert cross['shared_message_id'] in [m['message_id'] for m in msgs['messages']]
+E       assert 1 in [2]
+
+http_tests/message_tests/test_message_share.py:50: AssertionError
+______________ test_tag_thru_message_share_triggers_notification _______________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+message_factory = <function message_factory.<locals>.make_message at 0x7f680e2e0e18>
+ctx = None
+
+    def test_tag_thru_message_share_triggers_notification(user_woody, woodys_public_toybox, message_factory, ctx):
+        a_msg = message_factory(user_woody, woodys_public_toybox)
+    
+        message_share(user_woody.token, a_msg.message_id, f'@{user_woody.handle_str}', woodys_public_toybox.channel_id, -1,
+                      ctx)
+    
+        notifs = notifications_get(user_woody.token, ctx)['notifications']
+    
+>       assert len(notifs) == 1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+http_tests/other_tests/test_notifications_get.py:65: AssertionError
+_______________ test_add_thru_ch_addowner_triggers_notification ________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=0, token=...KV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU', handle_str='sheriffwoody')
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=1, to...V1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjF9.BrsJT9qSW90mU4VWJMuQ0QEEkz58kwfvQ1PbkrXspOA', handle_str='buzzlightyear')
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=0, owner_members=[0], all_members=[])
+message_factory = <function message_factory.<locals>.make_message at 0x7f680e26ec80>
+ctx = None
+
+    def test_add_thru_ch_addowner_triggers_notification(user_woody, user_buzz, woodys_public_toybox, message_factory, ctx):
+>       channel_addowner(user_woody.token, woodys_public_toybox.channel_id, user_buzz.u_id, ctx)
+
+http_tests/other_tests/test_notifications_get.py:175: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+http_tests/fakepi/channel.py:69: in channel_addowner
+    token=token, channel_id=channel_id, u_id=u_id
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+res = <Response [400]>
+
+    def parse_response(res):
+        if res.status_code == 200:
+            return res.json()
+        elif res.status_code == 400:
+>           raise error.InputError()
+E           http_tests.error.InputError: 400 Bad Request: None
+
+http_tests/fakepi/util.py:69: InputError
+=========================== short test summary info ============================
+FAILED http_tests/admin_tests/test_admin_user_remove.py::test_removal_can_do_no_action
+FAILED http_tests/admin_tests/test_admin_user_remove.py::test_removal_profile_still_fetchable
+FAILED http_tests/admin_tests/test_admin_user_remove.py::test_removal_removed_from_channel
+FAILED http_tests/admin_tests/test_admin_user_remove.py::test_removal_removed_from_dm
+FAILED http_tests/admin_tests/test_admin_user_remove.py::test_removal_not_in_users_all
+FAILED http_tests/auth_tests/test_auth_logout.py::test_not_logged_in_logout
+FAILED http_tests/channel_tests/test_channel_addowner.py::test_global_owner_non_member_can_addowner
+FAILED http_tests/channel_tests/test_channel_addowner.py::test_channel_owner_can_addowner_when_non_member
+FAILED http_tests/channel_tests/test_channel_addowner.py::test_non_member_cannot_add_owner
+FAILED http_tests/channel_tests/test_channel_addowner.py::test_invalid_token
+FAILED http_tests/channel_tests/test_channel_invite.py::test_invite_global_owner
+FAILED http_tests/channel_tests/test_channel_join.py::test_global_owner_join_channel_public
+FAILED http_tests/channel_tests/test_channel_join.py::test_global_owner_join_channel_private
+FAILED http_tests/channel_tests/test_channel_removeowner.py::test_owner_can_remove_owner
+FAILED http_tests/channel_tests/test_channel_removeowner.py::test_global_owner_can_remove_owner
+FAILED http_tests/channel_tests/test_channel_removeowner.py::test_nonmember_cannot_remove_owner
+FAILED http_tests/channel_tests/test_channel_removeowner.py::test_member_cannot_remove_owner
+FAILED http_tests/channel_tests/test_channel_removeowner.py::test_invalidated_token
+FAILED http_tests/dm_tests/test_dm_invite.py::test_invitation_from_non_dm_member
+FAILED http_tests/message_tests/test_message_share.py::test_successful_share_to_channel
+FAILED http_tests/message_tests/test_message_share.py::test_successful_share_to_dm
+FAILED http_tests/message_tests/test_message_share.py::test_successful_cross_share[True]
+FAILED http_tests/message_tests/test_message_share.py::test_successful_cross_share[False]
+FAILED http_tests/other_tests/test_notifications_get.py::test_tag_thru_message_share_triggers_notification
+FAILED http_tests/other_tests/test_notifications_get.py::test_add_thru_ch_addowner_triggers_notification
+================== 25 failed, 203 passed, 19 skipped in 9.32s ==================

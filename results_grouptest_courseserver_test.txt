@@ -1,0 +1,483 @@
+============================= test session starts ==============================
+platform linux -- Python 3.7.3, pytest-6.2.3, py-1.10.0, pluggy-0.13.1
+rootdir: /tmp_amd/kamen/export/kamen/3/cs1531/automark/tempstore, configfile: pytest.ini
+plugins: forked-1.3.0, xdist-2.2.1, hypothesis-6.1.1, timeout-1.4.2
+collected 237 items
+
+http_tests/auth_http_test.py .........F                                  [  4%]
+http_tests/channel_channels_http_test.py ............F.................  [ 16%]
+http_tests/dm_http_test.py ..FFF.F.F.F..F                                [ 22%]
+http_tests/echo_http_test.py F                                           [ 23%]
+http_tests/message_http_test.py ....F..F.F                               [ 27%]
+http_tests/other_http_test.py ..F.                                       [ 29%]
+http_tests/user_http_test.py .................F.                         [ 37%]
+tests/auth_test.py ................                                      [ 43%]
+tests/channel_test.py ...........................................        [ 62%]
+tests/channels_test.py ...............                                   [ 68%]
+tests/dm_test.py .......                                                 [ 71%]
+tests/echo_test.py ..                                                    [ 72%]
+tests/message_test.py ............................                       [ 83%]
+tests/other_test.py ..                                                   [ 84%]
+tests/user_test.py ....................................                  [100%]
+
+=================================== FAILURES ===================================
+______________________ test_auth_logout_successfully_http ______________________
+
+parameters = {'email': 'haha@gmail.com', 'name_first': 'Lan', 'name_last': 'Lin', 'password': '123iwuiused'}
+
+    def test_auth_logout_successfully_http(parameters):
+        requests.delete(config.url + 'clear/v1')
+        resp = requests.post(config.url + 'auth/register/v2', json=parameters)
+        parameters2 = {
+            "email": "haha@gmail.com",
+            "password": "123iwuiused"
+        }
+        resp2 = requests.post(config.url + 'auth/login/v2', json=parameters2)
+        auth_user_id0 = json.loads(resp.text).get('auth_user_id')
+        auth_user_id1 = json.loads(resp2.text).get('auth_user_id')
+        token0 = json.loads(resp.text).get('token')
+        token1 = json.loads(resp2.text).get('token')
+>       assert auth_user_id0 == 0
+E       assert 9 == 0
+
+http_tests/auth_http_test.py:172: AssertionError
+___________________ test_channel_addowner_current_owner_http ___________________
+
+user1 = {'email': 'haha@gmail.com', 'name_first': 'Peter', 'name_last': 'White', 'password': '123123123'}
+user2 = {'email': 'test@testexample.com', 'name_first': 'Tom', 'name_last': 'Green', 'password': 'wp01^#$dp1o23'}
+
+    def test_channel_addowner_current_owner_http(user1,user2):
+        requests.delete(config.url + 'clear/v1')
+        requests.post(config.url + 'auth/register/v2', json=user1)
+        requests.post(config.url + 'auth/register/v2', json=user2)
+        user1_login = requests.post(config.url + 'auth/login/v2', json=user1)
+        user2_login = requests.post(config.url + 'auth/login/v2', json=user2)
+        token1 = json.loads(user1_login.text).get('token')
+        token2 = json.loads(user2_login.text).get('token')
+        u_id2 = json.loads(user2_login.text).get('auth_user_id')
+        channel = requests.post(config.url + 'channels/create/v2', json={"token":token1,"name":"channelone","is_public":True})
+        channel_id = json.loads(channel.text).get('channel_id')
+        requests.post(config.url + 'channels/join/v2', json={"token":token2,"channel_id":channel_id})
+        requests.post(config.url + 'channel/addowner/v2', json={"token":token1,"channel_id":channel_id,"u_id":u_id2})
+        output = requests.post(config.url + 'channel/addowner/v1', json={"token":token1,"channel_id":channel_id,"u_id":u_id2}).status_code
+>       assert output == 400
+E       assert 200 == 400
+
+http_tests/channel_channels_http_test.py:272: AssertionError
+_____________________ test_dm_invite_v1_invaild_dm_id_http _____________________
+
+parameters0 = {'email': 'ZhengRogerLuo@gmail.com', 'name_first': 'Aheng', 'name_last': 'Luo', 'password': 'TrimesterIsTheBest2021!'}
+parameters1 = {'email': 'z5206267@gmail.com', 'name_first': 'Roger', 'name_last': 'Luo', 'password': 'IHateSemester2019!'}
+parameters2 = {'email': 'hahahaah2@gmail.com', 'name_first': 'James', 'name_last': 'Brown', 'password': 'IHateSemester2020!'}
+
+    def test_dm_invite_v1_invaild_dm_id_http(parameters0, parameters1, parameters2):
+        requests.delete(config.url + 'clear/v1')
+        # Create(register) two users: user0 and user1.
+        user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
+        user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
+        user2 = requests.post(config.url + 'auth/register/v2', json=parameters2)
+        # Obtain tokens based on registered users.
+        token0 = json.loads(user0.text).get('token')
+        u_id_1 = json.loads(user1.text).get('auth_user_id')
+        u_id_2 = json.loads(user2.text).get('auth_user_id')
+        input0 = {
+            'token': token0,
+            'u_ids': [u_id_1]
+        }
+        requests.post(config.url + 'dm/create/v1', json=input0)
+        incorrect_input = {
+            'token': token0,
+            'dm_id': 'incorrect_dm_id',
+            'u_id': u_id_2
+        }
+        status = requests.post(config.url + 'dm/invite/v1', json=incorrect_input).status_code
+>       assert status == 400
+E       assert 500 == 400
+
+http_tests/dm_http_test.py:156: AssertionError
+_____________________ test_dm_invite_v1_already_user_http ______________________
+
+parameters0 = {'email': 'ZhengRogerLuo@gmail.com', 'name_first': 'Aheng', 'name_last': 'Luo', 'password': 'TrimesterIsTheBest2021!'}
+parameters1 = {'email': 'z5206267@gmail.com', 'name_first': 'Roger', 'name_last': 'Luo', 'password': 'IHateSemester2019!'}
+
+    def test_dm_invite_v1_already_user_http(parameters0, parameters1):
+        requests.delete(config.url + 'clear/v1')
+        # Create(register) two users: user0 and user1.
+        user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
+        user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
+        # Obtain tokens based on registered users.
+        token0 = json.loads(user0.text).get('token')
+        u_id_1 = json.loads(user1.text).get('auth_user_id')
+        input0 = {
+            'token': token0,
+            'u_ids': [u_id_1]
+        }
+        dm_info = requests.post(config.url + 'dm/create/v1', json=input0)
+        dm_id = json.loads(dm_info.text).get('dm_id')
+        incorrect_input = {
+            'token': token0,
+            'dm_id': dm_id,
+            'u_id': u_id_1
+        }
+        status = requests.post(config.url + 'dm/invite/v1', json=incorrect_input).status_code
+>       assert status == 403
+E       assert 400 == 403
+
+http_tests/dm_http_test.py:180: AssertionError
+_____________________ test_dm_remove_v1_invaild_dm_id_http _____________________
+
+parameters0 = {'email': 'ZhengRogerLuo@gmail.com', 'name_first': 'Aheng', 'name_last': 'Luo', 'password': 'TrimesterIsTheBest2021!'}
+parameters1 = {'email': 'z5206267@gmail.com', 'name_first': 'Roger', 'name_last': 'Luo', 'password': 'IHateSemester2019!'}
+
+    def test_dm_remove_v1_invaild_dm_id_http(parameters0, parameters1):
+        requests.delete(config.url + 'clear/v1')
+        user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
+        user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
+        # Obtain tokens based on registered users.
+        token0 = json.loads(user0.text).get('token')
+        u_id_1 = json.loads(user1.text).get('auth_user_id')
+        input0 = {
+            'token': token0,
+            'u_ids': [u_id_1]
+        }
+        requests.post(config.url + 'dm/create/v1', json=input0)
+        incorrect_input = {
+            'token': token0,
+            'dm_id': 'incorrect_value'
+        }
+        status = requests.delete(config.url + 'dm/remove/v1', json=incorrect_input).status_code
+>       assert status == 400
+E       assert 500 == 400
+
+http_tests/dm_http_test.py:227: AssertionError
+_____________________ test_dm_leave_v1_invaild_dm_id_http ______________________
+
+parameters0 = {'email': 'ZhengRogerLuo@gmail.com', 'name_first': 'Aheng', 'name_last': 'Luo', 'password': 'TrimesterIsTheBest2021!'}
+parameters1 = {'email': 'z5206267@gmail.com', 'name_first': 'Roger', 'name_last': 'Luo', 'password': 'IHateSemester2019!'}
+
+    def test_dm_leave_v1_invaild_dm_id_http(parameters0, parameters1):
+        requests.delete(config.url + 'clear/v1')
+        user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
+        user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
+        # Obtain tokens based on registered users.
+        token0 = json.loads(user0.text).get('token')
+        u_id_1 = json.loads(user1.text).get('auth_user_id')
+        input0 = {
+            'token': token0,
+            'u_ids': [u_id_1]
+        }
+        requests.post(config.url + 'dm/create/v1', json=input0)
+        incorrect_input = {
+            'token': token0,
+            'dm_id': "invalid_dm_id"
+        }
+        status = requests.post(config.url + 'dm/leave/v1', json=incorrect_input).status_code
+>       assert status == 400
+E       assert 500 == 400
+
+http_tests/dm_http_test.py:297: AssertionError
+____________________ test_dm_details_v1_invaild_dm_id_http _____________________
+
+parameters0 = {'email': 'ZhengRogerLuo@gmail.com', 'name_first': 'Aheng', 'name_last': 'Luo', 'password': 'TrimesterIsTheBest2021!'}
+parameters1 = {'email': 'z5206267@gmail.com', 'name_first': 'Roger', 'name_last': 'Luo', 'password': 'IHateSemester2019!'}
+
+    def test_dm_details_v1_invaild_dm_id_http(parameters0, parameters1):
+        requests.delete(config.url + 'clear/v1')
+        user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
+        user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
+        # Obtain tokens based on registered users.
+        token0 = json.loads(user0.text).get('token')
+        u_id_1 = json.loads(user1.text).get('auth_user_id')
+        input0 = {
+            'token': token0,
+            'u_ids': [u_id_1]
+        }
+        assert requests.post(config.url + 'dm/create/v1', json=input0).status_code == 200
+        status = requests.get(config.url + 'dm/details/v1?token=' + token0 + '&dm_id=invalid_token').status_code
+>       assert status == 400
+E       assert 500 == 400
+
+http_tests/dm_http_test.py:365: AssertionError
+____________________ test_dm_message_v1_invaild_dm_id_http _____________________
+
+parameters0 = {'email': 'ZhengRogerLuo@gmail.com', 'name_first': 'Aheng', 'name_last': 'Luo', 'password': 'TrimesterIsTheBest2021!'}
+
+    def test_dm_message_v1_invaild_dm_id_http(parameters0):
+        requests.delete(config.url + 'clear/v1')
+        user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
+        # Obtain tokens based on registered users.
+        token0 = json.loads(user0.text).get('token')
+        status = requests.get(config.url + 'dm/messages/v1?token=' + token0 + '&dm_id=invalid_dm_id&start=0').status_code
+>       assert status == 400
+E       assert 500 == 400
+
+http_tests/dm_http_test.py:443: AssertionError
+________________________ test_dm_all_normal_cases_http _________________________
+
+parameters0 = {'email': 'ZhengRogerLuo@gmail.com', 'name_first': 'Aheng', 'name_last': 'Luo', 'password': 'TrimesterIsTheBest2021!'}
+parameters1 = {'email': 'z5206267@gmail.com', 'name_first': 'Roger', 'name_last': 'Luo', 'password': 'IHateSemester2019!'}
+parameters2 = {'email': 'hahahaah2@gmail.com', 'name_first': 'James', 'name_last': 'Brown', 'password': 'IHateSemester2020!'}
+
+    def test_dm_all_normal_cases_http(parameters0, parameters1, parameters2):
+        requests.delete(config.url + 'clear/v1')
+        user0 = requests.post(config.url + 'auth/register/v2', json=parameters0)
+        user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
+        user2 = requests.post(config.url + 'auth/register/v2', json=parameters2)
+        # Obtain tokens based on registered users.
+        token0 = json.loads(user0.text).get('token')
+        token1 = json.loads(user1.text).get('token')
+        token2 = json.loads(user2.text).get('token')
+>       assert token0 == "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU"
+E       AssertionError: assert 'eyJ0eXAiOiJK...aN-pHh8tHboN0' == 'eyJ0eXAiOiJK...LvOCArCwam1rU'
+E         - eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSUQiOjB9.luCeqtVJ2ZTm-XXyKAY1xjityV36gZLvOCArCwam1rU
+E         + eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJnaWQiOjEzOCwibG9naW5fdGltZSI6MTYxODI0OTEzMiwic2FsdCI6IjJiMTA2ODg3LTdjYjYtNDg5Yi05NjlhLWJiNzZjZmFhODQ1NyJ9.2IvkfFMeeYV_TbUtIMfatH7Ez5frQzaN-pHh8tHboN0
+
+http_tests/dm_http_test.py:500: AssertionError
+__________________________________ test_echo ___________________________________
+
+    def test_echo():
+        """
+        A simple test to check echo
+        """
+        resp = requests.get(config.url + 'echo', params={'data': 'hello'})
+>       assert json.loads(resp.text) == {'data': 'hello'}
+
+http_tests/echo_http_test.py:12: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.7/json/__init__.py:348: in loads
+    return _default_decoder.decode(s)
+/usr/lib/python3.7/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f5db6b860f0>
+s = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n'
+idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib/python3.7/json/decoder.py:355: JSONDecodeError
+______________________ test_message_remove_invalid_msg_id ______________________
+
+parameters = {'email': 'haha@gmail.com', 'name_first': 'Lan', 'name_last': 'Lin', 'password': '123iwuiused'}
+
+    def test_message_remove_invalid_msg_id(parameters):
+        requests.delete(config.url + 'clear/v1')
+        user = requests.post(config.url + 'auth/register/v2', json=parameters)
+        token = json.loads(user.text).get('token')
+        json_input1 = {"token": token, "name": "channel0", "is_public": True}
+        requests.post(config.url + 'channels/create/v2', json=json_input1)
+    
+        json_input2 = {"token": token, "message_id": "haha"}
+        status = requests.delete(config.url + 'message/remove/v1', json=json_input2).status_code
+>       assert status == 400
+E       assert 500 == 400
+
+http_tests/message_http_test.py:140: AssertionError
+___________________ test_message_senddm_invalid_length_http ____________________
+
+parameters = {'email': 'haha@gmail.com', 'name_first': 'Lan', 'name_last': 'Lin', 'password': '123iwuiused'}
+
+    def test_message_senddm_invalid_length_http(parameters):
+        requests.delete(config.url + 'clear/v1')
+        user0 = requests.post(config.url + 'auth/register/v2', json=parameters)
+        token0 = json.loads(user0.text).get('token')
+        user1 = requests.post(config.url + 'auth/register/v2', json=parameters)
+>       uid1 = json.loads(user1.text).get('auth_user_id')
+
+http_tests/message_http_test.py:206: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.7/json/__init__.py:348: in loads
+    return _default_decoder.decode(s)
+/usr/lib/python3.7/json/decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <json.decoder.JSONDecoder object at 0x7f5db6b860f0>
+s = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">\n<title>400 Bad Request</title>\n<h1>Bad Request</h1>\n<p>haha@gmail.com already taken</p>\n'
+idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+/usr/lib/python3.7/json/decoder.py:355: JSONDecodeError
+___________________________ test_message_valid_http ____________________________
+
+parameters = {'email': 'haha@gmail.com', 'name_first': 'Lan', 'name_last': 'Lin', 'password': '123iwuiused'}
+parameters1 = {'email': 'haha1@gmail.com', 'name_first': 'Lan', 'name_last': 'Lin', 'password': '123iwuiused'}
+parameters2 = {'email': 'haha2@gmail.com', 'name_first': 'Lan', 'name_last': 'Lin', 'password': '123iwuiused'}
+
+    def test_message_valid_http(parameters, parameters1, parameters2):
+        requests.delete(config.url + 'clear/v1')
+        user0 = requests.post(config.url + 'auth/register/v2', json=parameters)
+        token0 = json.loads(user0.text).get('token')
+        user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
+        uid1 = json.loads(user1.text).get('auth_user_id')
+        user2 = requests.post(config.url + 'auth/register/v2', json=parameters2)
+        token2 = json.loads(user2.text).get('token')
+    
+        # create a dm, users in dm are user0, 1
+        json_input1 = {"token": token0, "u_ids": [uid1]}
+        dm = requests.post(config.url + 'dm/create/v1', json=json_input1)
+        dm_id = json.loads(dm.text).get('dm_id')
+    
+        # create a channel by user2
+        json_input2 = {"token": token2, "name": "channel0", "is_public": True}
+        channel = requests.post(config.url + 'channels/create/v2', json=json_input2)
+        channel_id = json.loads(channel.text).get('channel_id')
+    
+        # send a message to the dm
+        json_input3 = {"token": token0, "dm_id": dm_id, "message": "haha0"}
+        requests.post(config.url + 'message/senddm/v1', json=json_input3)
+    
+        # check the message in the dm
+        dm_msg = requests.get(config.url + 'dm/messages/v1?token=' + token0 + '&dm_id=' + str(dm_id) + '&start=0')
+        dm_msg = json.loads(dm_msg.text).get('messages')[0]
+        assert dm_msg['message'] == "haha0"
+        message_id = dm_msg['message_id']
+    
+        # edit the message in the dm
+        # check the edited message in the dm
+        json_input7 = {"token": token0, "message_id": message_id, "message": "haha1"}
+        requests.put(config.url + 'message/edit/v2', json=json_input7)
+        dm_msg = requests.get(config.url + 'dm/messages/v1?token=' + token0 + '&dm_id=' + str(dm_id) + '&start=0')
+        dm_msg = json.loads(dm_msg.text).get('messages')[0]
+        assert dm_msg['message'] == "haha1"
+    
+        # remove the message in the dm
+        json_input8 = {"token": token0, "message_id": message_id}
+        requests.delete(config.url + 'message/remove/v1', json=json_input8)
+        # check that the message has been removed
+        dm_msg = requests.get(config.url + 'dm/messages/v1?token=' + token0 + '&dm_id=' + str(dm_id) + '&start=0')
+        dm_msg = json.loads(dm_msg.text).get('messages')
+        assert len(dm_msg) == 0
+    
+        # send 60 messages to the channel
+        for _i in range(60):
+            json_input4 = {"token": token2, "channel_id": channel_id, "message": f"good{_i}"}
+            requests.post(config.url + 'message/send/v2', json=json_input4)
+    
+        # check if the message are sent successfully
+        channel_msg = requests.get(config.url + 'channel/messages/v2?token=' + token2 + '&channel_id=' +
+                                   str(channel_id) + '&start=5')
+        channel_msg = json.loads(channel_msg.text)
+        message_list = channel_msg.get('messages')
+        start = channel_msg.get('start')
+        end = channel_msg.get('end')
+        assert message_list[0]['message'] == "good54"
+        assert len(message_list) == 50
+        assert start == 5
+        assert end == 55
+    
+        # share the first message in the channel to the dm
+        json_input9 = {
+            "token": token0,
+            "og_message_id": 1,
+            "message": "this is comment",
+            "channel_id": -1,
+            "dm_id": 0
+        }
+>       assert requests.post(config.url + 'message/share/v1', json=json_input9).status_code == 200
+E       AssertionError: assert 400 == 200
+E        +  where 400 = <Response [400]>.status_code
+E        +    where <Response [400]> = <function post at 0x7f5db5508d08>(('http://localhost:60811/' + 'message/share/v1'), json={'channel_id': -1, 'dm_id': 0, 'message': 'this is comment', 'og_message_id': 1, ...})
+E        +      where <function post at 0x7f5db5508d08> = requests.post
+E        +      and   'http://localhost:60811/' = config.url
+
+http_tests/message_http_test.py:316: AssertionError
+______________________________ test_search_valid _______________________________
+
+parameters = {'email': 'haha@gmail.com', 'name_first': 'Lan', 'name_last': 'Lin', 'password': '123iwuiused'}
+parameters1 = {'email': 'haha1@gmail.com', 'name_first': 'Lan', 'name_last': 'Lin', 'password': '123iwuiused'}
+
+    def test_search_valid(parameters, parameters1):
+        requests.delete(config.url + 'clear/v1')
+        user0 = requests.post(config.url + 'auth/register/v2', json=parameters)
+        token0 = json.loads(user0.text).get('token')
+        user1 = requests.post(config.url + 'auth/register/v2', json=parameters1)
+        uid1 = json.loads(user1.text).get('auth_user_id')
+        # create a dm, users in dm are user0, 1
+        json_input1 = {"token": token0, "u_ids": [uid1]}
+        dm = requests.post(config.url + 'dm/create/v1', json=json_input1)
+        dm_id = json.loads(dm.text).get('dm_id')
+        # send 3 messages to the dm
+        json_input3 = {"token": token0, "dm_id": dm_id, "message": "haha0"}
+        json_input4 = {"token": token0, "dm_id": dm_id, "message": "you know HAHA"}
+        json_input5 = {"token": token0, "dm_id": dm_id, "message": "ha is not invalid"}
+        requests.post(config.url + 'message/senddm/v1', json=json_input3)
+        requests.post(config.url + 'message/senddm/v1', json=json_input4)
+        requests.post(config.url + 'message/senddm/v1', json=json_input5)
+    
+        message_list = requests.get(config.url + 'search/v2?token=' + token0 + '&query_str=haha')
+        message_list = json.loads(message_list.text).get('messages')
+        assert message_list[0]['message'] == "haha0"
+>       assert message_list[1]['message'] == "you know HAHA"
+E       IndexError: list index out of range
+
+http_tests/other_http_test.py:112: IndexError
+____________________ test_users_all_admin_remove_user_valid ____________________
+
+parameters = {'email': 'haha9@gmail.com', 'name_first': 'Lan', 'name_last': 'Lin', 'password': '123iwuiused'}
+
+    def test_users_all_admin_remove_user_valid(parameters):
+        requests.delete(config.url + 'clear/v1')
+        resp = requests.post(config.url + 'auth/register/v2', json=parameters)
+        token = json.loads(resp.text).get('token')
+        resp_n = None
+        for i in range(10):
+            parameters['email'] = f"haha{i}@gmail.com"
+            resp_n = requests.post(config.url + 'auth/register/v2', json=parameters)
+    
+        token_n = json.loads(resp_n.text).get('token')
+        uid_n = json.loads(resp_n.text).get('auth_user_id')
+    
+        resp_users_all = requests.get(config.url + 'users/all/v1?token=' + token)
+        users_all_list = json.loads(resp_users_all.text)['users']
+        assert len(users_all_list) == 11
+        status = requests.delete(config.url + 'admin/user/remove/v1', json={'token': token, 'u_id': 10}).status_code
+>       assert status == 200
+E       assert 400 == 200
+
+http_tests/user_http_test.py:304: AssertionError
+=========================== short test summary info ============================
+FAILED http_tests/auth_http_test.py::test_auth_logout_successfully_http - ass...
+FAILED http_tests/channel_channels_http_test.py::test_channel_addowner_current_owner_http
+FAILED http_tests/dm_http_test.py::test_dm_invite_v1_invaild_dm_id_http - ass...
+FAILED http_tests/dm_http_test.py::test_dm_invite_v1_already_user_http - asse...
+FAILED http_tests/dm_http_test.py::test_dm_remove_v1_invaild_dm_id_http - ass...
+FAILED http_tests/dm_http_test.py::test_dm_leave_v1_invaild_dm_id_http - asse...
+FAILED http_tests/dm_http_test.py::test_dm_details_v1_invaild_dm_id_http - as...
+FAILED http_tests/dm_http_test.py::test_dm_message_v1_invaild_dm_id_http - as...
+FAILED http_tests/dm_http_test.py::test_dm_all_normal_cases_http - AssertionE...
+FAILED http_tests/echo_http_test.py::test_echo - json.decoder.JSONDecodeError...
+FAILED http_tests/message_http_test.py::test_message_remove_invalid_msg_id - ...
+FAILED http_tests/message_http_test.py::test_message_senddm_invalid_length_http
+FAILED http_tests/message_http_test.py::test_message_valid_http - AssertionEr...
+FAILED http_tests/other_http_test.py::test_search_valid - IndexError: list in...
+FAILED http_tests/user_http_test.py::test_users_all_admin_remove_user_valid
+======================== 15 failed, 222 passed in 4.01s ========================
