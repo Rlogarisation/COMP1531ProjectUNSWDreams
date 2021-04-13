@@ -1,6 +1,6 @@
 import pytest
 from src.other import clear_v1
-from src.auth import auth_login_v1, auth_register_v1, auth_logout, get_user_by_token
+from src.auth import auth_login_v1, auth_register_v1, auth_logout, auth_passwordreset_request_v1, auth_passwordreset_v1
 from src.error import InputError, AccessError
 from src.channel import channel_details_v1, channel_invite_v1
 from src.channels import channels_create_v1
@@ -32,6 +32,7 @@ def test_auth_register_invalid_email():
     clear_v1()
     with pytest.raises(InputError):
         auth_register_v1('123.com', '12345ufd', 'Lan', 'Lin')
+    with pytest.raises(InputError):
         auth_register_v1('abc@@@.com', '0823hdskhji', 'Langley', 'Lin')
 
 
@@ -48,6 +49,7 @@ def test_auth_register_pwd_length():
     clear_v1()
     with pytest.raises(InputError):
         auth_register_v1('haha@gmail.com', '123', 'Tom', 'White')
+    with pytest.raises(InputError):
         auth_register_v1('haha2@gmail.com', 'ab#', 'Peter', 'White')
 
 
@@ -57,6 +59,7 @@ def test_auth_register_firstName_length():
     name = 'a' * 51
     with pytest.raises(InputError):
         auth_register_v1('haha@gmail.com', '123iwuiused', '', 'White')
+    with pytest.raises(InputError):
         auth_register_v1('haha2@gmail.com', 'iwsdrjcio', name, 'White')
 
 
@@ -66,6 +69,7 @@ def test_auth_register_lastName_length():
     name = 'a' * 51
     with pytest.raises(InputError):
         auth_register_v1('haha@gmail.com', '123kjsldfiew', 'Peter', '')
+    with pytest.raises(InputError):
         auth_register_v1('haha2@gmail.com', 'iwsdcio3', 'Tom', name)
 
 
@@ -140,8 +144,8 @@ def test_auth_register_handle_valid():
 
     assert member1['handle_str'] == 'zxcvbnmasdfghjklqwe'
     assert member2['handle_str'] == 'zxcvbnmasdfghjklqwer'
-    assert member3['handle_str'] == 'zxcvbnmasdfghjklqwe0'
-    assert member4['handle_str'] == 'zxcvbnmasdfghjklqwe1'
+    assert member3['handle_str'] == 'zxcvbnmasdfghjklqwer0'
+    assert member4['handle_str'] == 'zxcvbnmasdfghjklqwer1'
 
 
 """
@@ -157,7 +161,7 @@ Tests content:
 """
 #############################################################################
 #                                                                           #
-#                       Test for auth_login_v1                           #
+#                       Test for auth_login_v1                              #
 #                                                                           #
 #############################################################################
 
@@ -167,7 +171,10 @@ def test_auth_login_invalid_email():
     clear_v1()
     with pytest.raises(InputError):
         auth_login_v1('123.@com', '12345ufd')
+    with pytest.raises(InputError):
         auth_login_v1('a.,#0@test.com', '0823hdskhji')
+    with pytest.raises(InputError):
+        auth_login_v1(None, 'password')
 
 
 # test for email entered does not belong to a user
@@ -238,9 +245,10 @@ def test_auth_logout_invalid_token():
     token = register1['token']
     invalid_token = f"{token}123"
     assert auth_logout(invalid_token) == {'is_success': False}
+    assert auth_logout(None) == {'is_success': False}
 
 
-def test_auth_logout_successfully_small():
+def test_auth_logout_successfully_emall():
     clear_v1()
     register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
     token1 = register1['token']
@@ -258,10 +266,49 @@ def test_auth_logout_successfully_large():
     clear_v1()
     auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
     token_list = []
-    for i in range(20):
-        login = auth_login_v1('haha@gmail.com', '123123123')
+    for _i in range(20):
+        login = auth_login_v1(f'haha@gmail.com', '123123123')
         token_list.append(login['token'])
     for token in token_list:
         result = auth_logout(token)
         assert result == {'is_success': True}
 
+
+"""
+Author : Emir Aditya Zen
+
+Test for auth_passwordreset_request_v1 and auth_passwordreset_reset_v1 function implementation
+
+Tests content:
+1. Succesful implementation of both functions
+3. Invalid reset_code
+4. New password less than 6 characters
+"""
+#############################################################################
+#                                                                           #
+#   Test for auth_passwordreset_request_v1 and auth_passwordreset_reset_v1  #
+#                                                                           #
+#############################################################################
+
+def test_auth_passwordreset_successful():
+    clear_v1()
+    id_check = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')['auth_user_id']
+    reset_code = auth_passwordreset_request_v1('haha@gmail.com')['reset_code']
+    auth_passwordreset_reset_v1(reset_code, 'TheNewPassword')
+    assert auth_login_v1('haha@gmail.com','TheNewPassword')['auth_user_id'] == id_check
+
+def test_auth_passwordreset_reset_invalid_password():
+    clear_v1()
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    reset_code = auth_passwordreset_request_v1('haha@gmail.com')['reset_code']
+    invalid_password = '123'
+    with pytest.raises(InputError):
+        auth_passwordreset_reset_v1(reset_code, invalid_password)
+
+def test_auth_passwordreset_reset_invalid_reset_code():
+    clear_v1()
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    reset_code = auth_passwordreset_request_v1('haha@gmail.com')['reset_code']
+    invalid_reset_code = reset_code + '123'
+    with pytest.raises(InputError):
+        auth_passwordreset_reset_v1(invalid_reset_code, 'TheNewPassword')
