@@ -306,7 +306,7 @@ def test_message_valid_http(parameters, parameters1, parameters2):
 #############################################################################
 
 
-def http_test_message_sendlater(parameters, parameters1, parameters2):
+def test_message_sendlater(parameters, parameters1, parameters2):
     requests.delete(config.url + "clear/v1")
     user0 = requests.post(config.url + "auth/register/v2", json=parameters)
     user1 = requests.post(config.url + "auth/register/v2", json=parameters1)
@@ -331,9 +331,9 @@ def http_test_message_sendlater(parameters, parameters1, parameters2):
         input2 = {"token": 111000, "channel_id": channel_0_id, "message": "I am message.", "time_sent": time_sent}
         input3 = {"token": None, "channel_id": channel_0_id, "message": "I am message.", "time_sent": time_sent}
 
-        status1 = requests.post(config.url + "message/sendlater/v1", json=input1)
-        status2 = requests.post(config.url + "message/sendlater/v1", json=input2)
-        status3 = requests.post(config.url + "message/sendlater/v1", json=input3)
+        status1 = requests.post(config.url + "message/sendlater/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/sendlater/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/sendlater/v1", json=input3).status_code
 
         assert status1 == 403
         assert status2 == 403
@@ -344,9 +344,9 @@ def http_test_message_sendlater(parameters, parameters1, parameters2):
         input2 = {"token": token_0, "channel_id": 99999, "message": "I am message.", "time_sent": time_sent}
         input3 = {"token": token_0, "channel_id": None, "message": "I am message.", "time_sent": time_sent}
 
-        status1 = requests.post(config.url + "message/sendlater/v1", json=input1)
-        status2 = requests.post(config.url + "message/sendlater/v1", json=input2)
-        status3 = requests.post(config.url + "message/sendlater/v1", json=input3)
+        status1 = requests.post(config.url + "message/sendlater/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/sendlater/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/sendlater/v1", json=input3).status_code
 
         assert status1 == 400
         assert status2 == 400
@@ -357,9 +357,9 @@ def http_test_message_sendlater(parameters, parameters1, parameters2):
         input2 = {"token": token_0, "channel_id": channel_0_id, "message": "a" * 2000, "time_sent": time_sent}
         input3 = {"token": token_0, "channel_id": channel_0_id, "message": None, "time_sent": time_sent}
 
-        status1 = requests.post(config.url + "message/sendlater/v1", json=input1)
-        status2 = requests.post(config.url + "message/sendlater/v1", json=input2)
-        status3 = requests.post(config.url + "message/sendlater/v1", json=input3)
+        status1 = requests.post(config.url + "message/sendlater/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/sendlater/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/sendlater/v1", json=input3).status_code
 
         assert status1 == 400
         assert status2 == 400
@@ -372,10 +372,10 @@ def http_test_message_sendlater(parameters, parameters1, parameters2):
         input3 = {"token": token_0, "channel_id": channel_0_id, "message": "I am message.", "time_sent": None}
         input4 = {"token": token_0, "channel_id": channel_0_id, "message": "I am message.", "time_sent": past_time_sent}
 
-        status1 = requests.post(config.url + "message/sendlater/v1", json=input1)
-        status2 = requests.post(config.url + "message/sendlater/v1", json=input2)
-        status3 = requests.post(config.url + "message/sendlater/v1", json=input3)
-        status4 = requests.post(config.url + "message/sendlater/v1", json=input4)
+        status1 = requests.post(config.url + "message/sendlater/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/sendlater/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/sendlater/v1", json=input3).status_code
+        status4 = requests.post(config.url + "message/sendlater/v1", json=input4).status_code
 
         assert status1 == 400
         assert status2 == 400
@@ -385,7 +385,7 @@ def http_test_message_sendlater(parameters, parameters1, parameters2):
     def test_user_isnot_member_of_channel():
         input1 = {"token": token_2, "channel_id": channel_0_id, "message": "I am message.", "time_sent": time_sent}
 
-        status1 = requests.post(config.url + "message/sendlater/v1", json=input1)
+        status1 = requests.post(config.url + "message/sendlater/v1", json=input1).status_code
 
         assert status1 == 403
 
@@ -406,7 +406,7 @@ def http_test_message_sendlater(parameters, parameters1, parameters2):
 #                  http test for message_sendlaterdm Error                  #
 #                                                                           #
 #############################################################################
-def http_test_message_sendlaterdm(parameters, parameters1, parameters2):
+def test_message_sendlaterdm(parameters, parameters1, parameters2):
     requests.delete(config.url + "clear/v1")
     user0 = requests.post(config.url + "auth/register/v2", json=parameters)
     user1 = requests.post(config.url + "auth/register/v2", json=parameters1)
@@ -430,9 +430,9 @@ def http_test_message_sendlaterdm(parameters, parameters1, parameters2):
         input2 = {"token": 111000, "dm_id": dm_0_id, "message": "I am message.", "time_sent": time_sent}
         input3 = {"token": None, "dm_id": dm_0_id, "message": "I am message.", "time_sent": time_sent}
 
-        status1 = requests.post(config.url + "message/sendlaterdm/v1", json=input1)
-        status2 = requests.post(config.url + "message/sendlaterdm/v1", json=input2)
-        status3 = requests.post(config.url + "message/sendlaterdm/v1", json=input3)
+        status1 = requests.post(config.url + "message/sendlaterdm/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/sendlaterdm/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/sendlaterdm/v1", json=input3).status_code
 
         assert status1 == 403
         assert status2 == 403
@@ -443,9 +443,9 @@ def http_test_message_sendlaterdm(parameters, parameters1, parameters2):
         input2 = {"token": token_0, "channel_id": 99999, "message": "I am message.", "time_sent": time_sent}
         input3 = {"token": token_0, "channel_id": None, "message": "I am message.", "time_sent": time_sent}
 
-        status1 = requests.post(config.url + "message/sendlaterdm/v1", json=input1)
-        status2 = requests.post(config.url + "message/sendlaterdm/v1", json=input2)
-        status3 = requests.post(config.url + "message/sendlaterdm/v1", json=input3)
+        status1 = requests.post(config.url + "message/sendlaterdm/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/sendlaterdm/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/sendlaterdm/v1", json=input3).status_code
 
         assert status1 == 400
         assert status2 == 400
@@ -456,9 +456,9 @@ def http_test_message_sendlaterdm(parameters, parameters1, parameters2):
         input2 = {"token": token_0, "channel_id": dm_0_id, "message": "a" * 2000, "time_sent": time_sent}
         input3 = {"token": token_0, "channel_id": dm_0_id, "message": None, "time_sent": time_sent}
 
-        status1 = requests.post(config.url + "message/sendlaterdm/v1", json=input1)
-        status2 = requests.post(config.url + "message/sendlaterdm/v1", json=input2)
-        status3 = requests.post(config.url + "message/sendlaterdm/v1", json=input3)
+        status1 = requests.post(config.url + "message/sendlaterdm/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/sendlaterdm/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/sendlaterdm/v1", json=input3).status_code
 
         assert status1 == 400
         assert status2 == 400
@@ -471,10 +471,10 @@ def http_test_message_sendlaterdm(parameters, parameters1, parameters2):
         input3 = {"token": token_0, "channel_id": dm_0_id, "message": "I am message.", "time_sent": None}
         input4 = {"token": token_0, "channel_id": dm_0_id, "message": "I am message.", "time_sent": past_time_sent}
 
-        status1 = requests.post(config.url + "message/sendlaterdm/v1", json=input1)
-        status2 = requests.post(config.url + "message/sendlaterdm/v1", json=input2)
-        status3 = requests.post(config.url + "message/sendlaterdm/v1", json=input3)
-        status4 = requests.post(config.url + "message/sendlaterdm/v1", json=input4)
+        status1 = requests.post(config.url + "message/sendlaterdm/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/sendlaterdm/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/sendlaterdm/v1", json=input3).status_code
+        status4 = requests.post(config.url + "message/sendlaterdm/v1", json=input4).status_code
 
         assert status1 == 400
         assert status2 == 400
@@ -484,7 +484,7 @@ def http_test_message_sendlaterdm(parameters, parameters1, parameters2):
     def test_user_isnot_member_of_dm():
         input1 = {"token": token_2, "channel_id": dm_0_id, "message": "I am message.", "time_sent": time_sent}
 
-        status1 = requests.post(config.url + "message/sendlaterdm/v1", json=input1)
+        status1 = requests.post(config.url + "message/sendlaterdm/v1", json=input1).status_code
 
         assert status1 == 403
 
@@ -507,7 +507,7 @@ def http_test_message_sendlaterdm(parameters, parameters1, parameters2):
 #############################################################################
 
 
-def http_test_message_react(parameters, parameters1, parameters2):
+def test_message_react(parameters, parameters1, parameters2):
     requests.delete(config.url + "clear/v1")
     user0 = requests.post(config.url + "auth/register/v2", json=parameters)
     user1 = requests.post(config.url + "auth/register/v2", json=parameters1)
@@ -543,9 +543,9 @@ def http_test_message_react(parameters, parameters1, parameters2):
         input2 = {"token": 111000, "message_id": dm_message_0_message_id, "react_id": 1}
         input3 = {"token": None, "message_id": dm_message_0_message_id, "react_id": 1}
 
-        status1 = requests.post(config.url + "message/react/v1", json=input1)
-        status2 = requests.post(config.url + "message/react/v1", json=input2)
-        status3 = requests.post(config.url + "message/react/v1", json=input3)
+        status1 = requests.post(config.url + "message/react/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/react/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/react/v1", json=input3).status_code
 
         assert status1 == 403
         assert status2 == 403
@@ -556,9 +556,9 @@ def http_test_message_react(parameters, parameters1, parameters2):
         input2 = {"token": token_0, "message_id": 99999999, "react_id": 1}
         input3 = {"token": token_0, "message_id": None, "react_id": 1}
 
-        status1 = requests.post(config.url + "message/react/v1", json=input1)
-        status2 = requests.post(config.url + "message/react/v1", json=input2)
-        status3 = requests.post(config.url + "message/react/v1", json=input3)
+        status1 = requests.post(config.url + "message/react/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/react/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/react/v1", json=input3).status_code
 
         assert status1 == 400
         assert status2 == 400
@@ -569,9 +569,9 @@ def http_test_message_react(parameters, parameters1, parameters2):
         input2 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": 9999}
         input3 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": None}
 
-        status1 = requests.post(config.url + "message/react/v1", json=input1)
-        status2 = requests.post(config.url + "message/react/v1", json=input2)
-        status3 = requests.post(config.url + "message/react/v1", json=input3)
+        status1 = requests.post(config.url + "message/react/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/react/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/react/v1", json=input3).status_code
 
         assert status1 == 400
         assert status2 == 400
@@ -584,9 +584,9 @@ def http_test_message_react(parameters, parameters1, parameters2):
         input2 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": 1}
         input3 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": 1}
 
-        status1 = requests.post(config.url + "message/react/v1", json=input1)
-        status2 = requests.post(config.url + "message/react/v1", json=input2)
-        status3 = requests.post(config.url + "message/unreact/v1", json=input3)
+        status1 = requests.post(config.url + "message/react/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/react/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/unreact/v1", json=input3).status_code
 
         assert status1 == 200
         assert status2 == 403
@@ -598,8 +598,8 @@ def http_test_message_react(parameters, parameters1, parameters2):
         input1 = {"token": token_2, "message_id": channel_message_0_message_id, "react_id": 1}
         input2 = {"token": token_2, "message_id": channel_message_1_message_id, "react_id": 1}
 
-        status1 = requests.post(config.url + "message/react/v1", json=input1)
-        status2 = requests.post(config.url + "message/react/v1", json=input2)
+        status1 = requests.post(config.url + "message/react/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/react/v1", json=input2).status_code
 
         assert status1 == 403
         assert status2 == 403
@@ -608,8 +608,8 @@ def http_test_message_react(parameters, parameters1, parameters2):
         input1 = {"token": token_2, "message_id": dm_message_0_message_id, "react_id": 1}
         input2 = {"token": token_2, "message_id": dm_message_1_message_id, "react_id": 1}
 
-        status1 = requests.post(config.url + "message/react/v1", json=input1)
-        status2 = requests.post(config.url + "message/react/v1", json=input2)
+        status1 = requests.post(config.url + "message/react/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/react/v1", json=input2).status_code
 
         assert status1 == 403
         assert status2 == 403
@@ -634,7 +634,7 @@ def http_test_message_react(parameters, parameters1, parameters2):
 #############################################################################
 
 
-def http_test_message_unreact(parameters, parameters1, parameters2):
+def test_message_unreact(parameters, parameters1, parameters2):
     requests.delete(config.url + "clear/v1")
     user0 = requests.post(config.url + "auth/register/v2", json=parameters)
     user1 = requests.post(config.url + "auth/register/v2", json=parameters1)
@@ -670,9 +670,9 @@ def http_test_message_unreact(parameters, parameters1, parameters2):
         input2 = {"token": 111000, "message_id": dm_message_0_message_id, "react_id": 1}
         input3 = {"token": None, "message_id": dm_message_0_message_id, "react_id": 1}
 
-        status1 = requests.post(config.url + "message/unreact/v1", json=input1)
-        status2 = requests.post(config.url + "message/unreact/v1", json=input2)
-        status3 = requests.post(config.url + "message/unreact/v1", json=input3)
+        status1 = requests.post(config.url + "message/unreact/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/unreact/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/unreact/v1", json=input3).status_code
 
         assert status1 == 403
         assert status2 == 403
@@ -683,9 +683,9 @@ def http_test_message_unreact(parameters, parameters1, parameters2):
         input2 = {"token": token_0, "message_id": 99999999, "react_id": 1}
         input3 = {"token": token_0, "message_id": None, "react_id": 1}
 
-        status1 = requests.post(config.url + "message/unreact/v1", json=input1)
-        status2 = requests.post(config.url + "message/unreact/v1", json=input2)
-        status3 = requests.post(config.url + "message/unreact/v1", json=input3)
+        status1 = requests.post(config.url + "message/unreact/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/unreact/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/unreact/v1", json=input3).status_code
 
         assert status1 == 400
         assert status2 == 400
@@ -696,9 +696,9 @@ def http_test_message_unreact(parameters, parameters1, parameters2):
         input2 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": 9999}
         input3 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": None}
 
-        status1 = requests.post(config.url + "message/unreact/v1", json=input1)
-        status2 = requests.post(config.url + "message/unreact/v1", json=input2)
-        status3 = requests.post(config.url + "message/unreact/v1", json=input3)
+        status1 = requests.post(config.url + "message/unreact/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/unreact/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/unreact/v1", json=input3).status_code
 
         assert status1 == 400
         assert status2 == 400
@@ -711,9 +711,9 @@ def http_test_message_unreact(parameters, parameters1, parameters2):
         input2 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": 1}
         input3 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": 1}
 
-        status1 = requests.post(config.url + "message/react/v1", json=input1)
-        status2 = requests.post(config.url + "message/unreact/v1", json=input2)
-        status3 = requests.post(config.url + "message/unreact/v1", json=input3)
+        status1 = requests.post(config.url + "message/react/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/unreact/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/unreact/v1", json=input3).status_code
 
         assert status1 == 200
         assert status2 == 200
@@ -727,16 +727,19 @@ def http_test_message_unreact(parameters, parameters1, parameters2):
         input3 = {"token": token_2, "message_id": channel_message_0_message_id, "react_id": 1}
         input4 = {"token": token_2, "message_id": channel_message_1_message_id, "react_id": 1}
 
-        status1 = requests.post(config.url + "message/react/v1", json=input1)
-        status2 = requests.post(config.url + "message/react/v1", json=input2)
-        status3 = requests.post(config.url + "message/unreact/v1", json=input3)
-        status4 = requests.post(config.url + "message/unreact/v1", json=input4)
-        status5 = requests.post(config.url + "message/unreact/v1", json=input1)
-        status6 = requests.post(config.url + "message/unreact/v1", json=input2)
+        status1 = requests.post(config.url + "message/react/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/react/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/unreact/v1", json=input3).status_code
+        status4 = requests.post(config.url + "message/unreact/v1", json=input4).status_code
+        status5 = requests.post(config.url + "message/unreact/v1", json=input1).status_code
+        status6 = requests.post(config.url + "message/unreact/v1", json=input2).status_code
 
-        assert status1 == 200, status2 == 200
-        assert status3 == 403, status4 == 403
-        assert status5 == 200, status6 == 200
+        assert status1 == 200
+        assert status2 == 200
+        assert status3 == 403
+        assert status4 == 403
+        assert status5 == 200
+        assert status6 == 200
 
     def test_user_isnot_member_of_dm():
         input1 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": 1}
@@ -744,16 +747,19 @@ def http_test_message_unreact(parameters, parameters1, parameters2):
         input3 = {"token": token_2, "message_id": dm_message_0_message_id, "react_id": 1}
         input4 = {"token": token_2, "message_id": dm_message_1_message_id, "react_id": 1}
 
-        status1 = requests.post(config.url + "message/react/v1", json=input1)
-        status2 = requests.post(config.url + "message/react/v1", json=input2)
-        status3 = requests.post(config.url + "message/unreact/v1", json=input3)
-        status4 = requests.post(config.url + "message/unreact/v1", json=input4)
-        status5 = requests.post(config.url + "message/unreact/v1", json=input1)
-        status6 = requests.post(config.url + "message/unreact/v1", json=input2)
+        status1 = requests.post(config.url + "message/react/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/react/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/unreact/v1", json=input3).status_code
+        status4 = requests.post(config.url + "message/unreact/v1", json=input4).status_code
+        status5 = requests.post(config.url + "message/unreact/v1", json=input1).status_code
+        status6 = requests.post(config.url + "message/unreact/v1", json=input2).status_code
 
-        assert status1 == 200, status2 == 200
-        assert status3 == 403, status4 == 403
-        assert status5 == 200, status6 == 200
+        assert status1 == 200
+        assert status2 == 200
+        assert status3 == 403
+        assert status4 == 403
+        assert status5 == 200
+        assert status6 == 200
 
     # ----------------------------testing------------------------------------
     # InputError Tests
@@ -775,7 +781,7 @@ def http_test_message_unreact(parameters, parameters1, parameters2):
 #############################################################################
 
 
-def http_test_message_pin(parameters, parameters1, parameters2):
+def test_message_pin(parameters, parameters1, parameters2):
     requests.delete(config.url + "clear/v1")
     user0 = requests.post(config.url + "auth/register/v2", json=parameters)
     user1 = requests.post(config.url + "auth/register/v2", json=parameters1)
@@ -811,9 +817,9 @@ def http_test_message_pin(parameters, parameters1, parameters2):
         input2 = {"token": 111000, "message_id": dm_message_0_message_id}
         input3 = {"token": None, "message_id": dm_message_0_message_id}
 
-        status1 = requests.post(config.url + "message/pin/v1", json=input1)
-        status2 = requests.post(config.url + "message/pin/v1", json=input2)
-        status3 = requests.post(config.url + "message/pin/v1", json=input3)
+        status1 = requests.post(config.url + "message/pin/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/pin/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/pin/v1", json=input3).status_code
 
         assert status1 == 403
         assert status2 == 403
@@ -824,9 +830,9 @@ def http_test_message_pin(parameters, parameters1, parameters2):
         input2 = {"token": token_0, "message_id": 99999999}
         input3 = {"token": token_0, "message_id": None}
 
-        status1 = requests.post(config.url + "message/pin/v1", json=input1)
-        status2 = requests.post(config.url + "message/pin/v1", json=input2)
-        status3 = requests.post(config.url + "message/pin/v1", json=input3)
+        status1 = requests.post(config.url + "message/pin/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/pin/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/pin/v1", json=input3).status_code
 
         assert status1 == 400
         assert status2 == 400
@@ -837,11 +843,12 @@ def http_test_message_pin(parameters, parameters1, parameters2):
     def test_message_id_already_pinned():
         input1 = {"token": token_0, "message_id": dm_message_0_message_id}
 
-        status1 = requests.post(config.url + "message/pin/v1", json=input1)
-        status2 = requests.post(config.url + "message/pin/v1", json=input1)
-        status3 = requests.post(config.url + "message/unpin/v1", json=input1)
+        status1 = requests.post(config.url + "message/pin/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/pin/v1", json=input1).status_code
+        status3 = requests.post(config.url + "message/unpin/v1", json=input1).status_code
 
-        assert status1 == 200, status3 == 200
+        assert status1 == 200
+        assert status3 == 200
         assert status2 == 400
 
     # AccessError: The authorised user is not a member of the channel or DM
@@ -850,8 +857,8 @@ def http_test_message_pin(parameters, parameters1, parameters2):
         input1 = {"token": token_2, "message_id": channel_message_0_message_id}
         input2 = {"token": token_2, "message_id": channel_message_1_message_id}
 
-        status1 = requests.post(config.url + "message/pin/v1", json=input1)
-        status2 = requests.post(config.url + "message/pin/v1", json=input2)
+        status1 = requests.post(config.url + "message/pin/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/pin/v1", json=input2).status_code
 
         assert status1 == 403
         assert status2 == 403
@@ -860,8 +867,8 @@ def http_test_message_pin(parameters, parameters1, parameters2):
         input1 = {"token": token_2, "message_id": dm_message_0_message_id}
         input2 = {"token": token_2, "message_id": dm_message_1_message_id}
 
-        status1 = requests.post(config.url + "message/pin/v1", json=input1)
-        status2 = requests.post(config.url + "message/pin/v1", json=input2)
+        status1 = requests.post(config.url + "message/pin/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/pin/v1", json=input2).status_code
 
         assert status1 == 403
         assert status2 == 403
@@ -871,14 +878,14 @@ def http_test_message_pin(parameters, parameters1, parameters2):
     def test_user_isnot_owner_of_channel():
         input1 = {"token": token_1, "message_id": channel_message_0_message_id}
 
-        status1 = requests.post(config.url + "message/pin/v1", json=input1)
+        status1 = requests.post(config.url + "message/pin/v1", json=input1).status_code
 
         assert status1 == 403
 
     def test_user_isnot_owner_of_dm():
         input1 = {"token": token_1, "message_id": dm_message_1_message_id}
 
-        status1 = requests.post(config.url + "message/pin/v1", json=input1)
+        status1 = requests.post(config.url + "message/pin/v1", json=input1).status_code
 
         assert status1 == 403
 
@@ -904,7 +911,7 @@ def http_test_message_pin(parameters, parameters1, parameters2):
 #############################################################################
 
 
-def http_test_message_unpin(parameters, parameters1, parameters2):
+def test_message_unpin(parameters, parameters1, parameters2):
     requests.delete(config.url + "clear/v1")
     user0 = requests.post(config.url + "auth/register/v2", json=parameters)
     user1 = requests.post(config.url + "auth/register/v2", json=parameters1)
@@ -940,9 +947,9 @@ def http_test_message_unpin(parameters, parameters1, parameters2):
         input2 = {"token": 111000, "message_id": dm_message_0_message_id}
         input3 = {"token": None, "message_id": dm_message_0_message_id}
 
-        status1 = requests.post(config.url + "message/unpin/v1", json=input1)
-        status2 = requests.post(config.url + "message/unpin/v1", json=input2)
-        status3 = requests.post(config.url + "message/unpin/v1", json=input3)
+        status1 = requests.post(config.url + "message/unpin/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/unpin/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/unpin/v1", json=input3).status_code
 
         assert status1 == 403
         assert status2 == 403
@@ -953,9 +960,9 @@ def http_test_message_unpin(parameters, parameters1, parameters2):
         input2 = {"token": token_0, "message_id": 99999999}
         input3 = {"token": token_0, "message_id": None}
 
-        status1 = requests.post(config.url + "message/unpin/v1", json=input1)
-        status2 = requests.post(config.url + "message/unpin/v1", json=input2)
-        status3 = requests.post(config.url + "message/unpin/v1", json=input3)
+        status1 = requests.post(config.url + "message/unpin/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/unpin/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/unpin/v1", json=input3).status_code
 
         assert status1 == 400
         assert status2 == 400
@@ -966,11 +973,12 @@ def http_test_message_unpin(parameters, parameters1, parameters2):
     def test_message_id_already_unpinned():
         input1 = {"token": token_0, "message_id": dm_message_0_message_id}
 
-        status1 = requests.post(config.url + "message/pin/v1", json=input1)
-        status2 = requests.post(config.url + "message/unpin/v1", json=input1)
-        status3 = requests.post(config.url + "message/unpin/v1", json=input1)
+        status1 = requests.post(config.url + "message/pin/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/unpin/v1", json=input1).status_code
+        status3 = requests.post(config.url + "message/unpin/v1", json=input1).status_code
 
-        assert status1 == 200, status2 == 200
+        assert status1 == 200
+        assert status2 == 200
         assert status3 == 400
 
     # AccessError: The authorised user is not a member of the channel or DM
@@ -981,13 +989,15 @@ def http_test_message_unpin(parameters, parameters1, parameters2):
         input3 = {"token": token_2, "message_id": channel_message_0_message_id}
         input4 = {"token": token_2, "message_id": channel_message_1_message_id}
 
-        status1 = requests.post(config.url + "message/pin/v1", json=input1)
-        status2 = requests.post(config.url + "message/pin/v1", json=input2)
-        status3 = requests.post(config.url + "message/unpin/v1", json=input3)
-        status4 = requests.post(config.url + "message/unpin/v1", json=input4)
+        status1 = requests.post(config.url + "message/pin/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/pin/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/unpin/v1", json=input3).status_code
+        status4 = requests.post(config.url + "message/unpin/v1", json=input4).status_code
 
-        assert status1 == 200, status2 == 200
-        assert status3 == 403, status4 == 403
+        assert status1 == 200
+        assert status2 == 200
+        assert status3 == 403
+        assert status4 == 403
 
     def test_user_isnot_member_of_dm():
         input1 = {"token": token_0, "message_id": dm_message_0_message_id}
@@ -995,27 +1005,29 @@ def http_test_message_unpin(parameters, parameters1, parameters2):
         input3 = {"token": token_2, "message_id": dm_message_0_message_id}
         input4 = {"token": token_2, "message_id": dm_message_1_message_id}
 
-        status1 = requests.post(config.url + "message/pin/v1", json=input1)
-        status2 = requests.post(config.url + "message/pin/v1", json=input2)
-        status3 = requests.post(config.url + "message/unpin/v1", json=input3)
-        status4 = requests.post(config.url + "message/unpin/v1", json=input4)
+        status1 = requests.post(config.url + "message/pin/v1", json=input1).status_code
+        status2 = requests.post(config.url + "message/pin/v1", json=input2).status_code
+        status3 = requests.post(config.url + "message/unpin/v1", json=input3).status_code
+        status4 = requests.post(config.url + "message/unpin/v1", json=input4).status_code
 
-        assert status1 == 200, status2 == 200
-        assert status3 == 403, status4 == 403
+        assert status1 == 200
+        assert status2 == 200
+        assert status3 == 403
+        assert status4 == 403
 
     # AccessError: The authorised user is not an owner of the channel or DM
 
     def test_user_isnot_owner_of_channel():
         input1 = {"token": token_1, "message_id": channel_message_0_message_id}
 
-        status1 = requests.post(config.url + "message/unpin/v1", json=input1)
+        status1 = requests.post(config.url + "message/unpin/v1", json=input1).status_code
 
         assert status1 == 403
 
     def test_user_isnot_owner_of_dm():
         input1 = {"token": token_1, "message_id": dm_message_1_message_id}
 
-        status1 = requests.post(config.url + "message/unpin/v1", json=input1)
+        status1 = requests.post(config.url + "message/unpin/v1", json=input1).status_code
 
         assert status1 == 403
 
