@@ -397,11 +397,7 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
 
 
 def message_react_v1(token, message_id, react_id):
-    # Type checking
-    if type(message_id) != int or type(react_id) != int:
-        raise InputError(description="message_react_v1 : incorrect type for your inputs.")
-
-    message, user, channel_dm = return_message_if_valid(token, message_id, react_id)
+    message, user, channel_dm = return_message_if_valid(token, message_id, react_id, 0)
     message.reacted_users.append(user)
 
     notification = None
@@ -420,11 +416,7 @@ def message_react_v1(token, message_id, react_id):
 
 
 def message_unreact_v1(token, message_id, react_id):
-    # Type checking
-    if type(message_id) != int or type(react_id) != int:
-        raise InputError(description="message_unreact_v1 : incorrect type for your inputs.")
-
-    message, user, channel_dm = return_message_if_valid(token, message_id, react_id)
+    message, user, channel_dm = return_message_if_valid(token, message_id, react_id, 1)
     message.reacted_users.remove(user)
     return {}
 
@@ -559,7 +551,7 @@ def tagging_user(message, channel_id, dm_id, sender):
                 invitee.notifications.append(notification)
 
 
-def return_message_if_valid(token, message_id, react_id):
+def return_message_if_valid(token, message_id, react_id, flag):
     if react_id != 1:
         raise InputError(description="react_id is not valid")
 
@@ -571,9 +563,14 @@ def return_message_if_valid(token, message_id, react_id):
     if message is None:
         raise InputError(description="message_id is invalid")
 
-    if user in message.reacted_users:
-        raise InputError(description="Message with ID message_id already contains an active React with ID "
-                                     "react_id from the authorised user")
+    if flag == 0:
+        if user in message.reacted_users:
+            raise InputError(description="Message with ID message_id already contains an active React with ID "
+                                         "react_id from the authorised user")
+    if flag == 1:
+        if user not in message.reacted_users:
+            raise InputError(description="Message with ID message_id does not contain an active React with ID "
+                                         "react_id from the authorised user")
 
     channel_dm = get_channel_dm_by_message_id(message_id)
     if channel_dm is None:
