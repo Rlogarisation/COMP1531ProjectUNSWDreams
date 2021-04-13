@@ -707,8 +707,19 @@ def http_test_message_unreact(parameters, parameters1, parameters2):
     # InputError : React_id is not contained in the message
 
     def test_react_id_not_in_message():
+        input1 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": 1}
+        input2 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": 1}
+        input3 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": 1}
 
-        # AccessError: The authorised user is not a member of the channel or DM
+        status1 = requests.post(config.url + "message/react/v1", json=input1)
+        status2 = requests.post(config.url + "message/unreact/v1", json=input2)
+        status3 = requests.post(config.url + "message/unreact/v1", json=input3)
+
+        assert status1 == 200
+        assert status2 == 200
+        assert status3 == 403
+
+    # AccessError: The authorised user is not a member of the channel or DM
 
     def test_user_isnot_member_of_channel():
         input1 = {"token": token_0, "message_id": channel_message_0_message_id, "react_id": 1}
