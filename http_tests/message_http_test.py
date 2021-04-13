@@ -412,7 +412,7 @@ def http_test_message_sendlater(parameters, parameters1, parameters2):
 #                  http test for message_sendlaterdm Error                  #
 #                                                                           #
 #############################################################################
-def http_test_message_sendlaterdm():
+def http_test_message_sendlaterdm(parameters, parameters1, parameters2):
     requests.delete(config.url + "clear/v1")
     user0 = requests.post(config.url + "auth/register/v2", json=parameters)
     user1 = requests.post(config.url + "auth/register/v2", json=parameters1)
@@ -520,7 +520,7 @@ def http_test_message_sendlaterdm():
 #############################################################################
 
 
-def http_test_message_react():
+def http_test_message_react(parameters, parameters1, parameters2):
     requests.delete(config.url + "clear/v1")
     user0 = requests.post(config.url + "auth/register/v2", json=parameters)
     user1 = requests.post(config.url + "auth/register/v2", json=parameters1)
@@ -653,7 +653,7 @@ def http_test_message_react():
 #############################################################################
 
 
-def http_test_message_unreact():
+def http_test_message_unreact(parameters, parameters1, parameters2):
     requests.delete(config.url + "clear/v1")
     user0 = requests.post(config.url + "auth/register/v2", json=parameters)
     user1 = requests.post(config.url + "auth/register/v2", json=parameters1)
@@ -788,7 +788,7 @@ def http_test_message_unreact():
 #############################################################################
 
 
-def http_test_message_pin():
+def http_test_message_pin(parameters, parameters1, parameters2):
     requests.delete(config.url + "clear/v1")
     user0 = requests.post(config.url + "auth/register/v2", json=parameters)
     user1 = requests.post(config.url + "auth/register/v2", json=parameters1)
@@ -922,7 +922,7 @@ def http_test_message_pin():
 #############################################################################
 
 
-def http_test_message_unpin():
+def http_test_message_unpin(parameters, parameters1, parameters2):
     requests.delete(config.url + "clear/v1")
     user0 = requests.post(config.url + "auth/register/v2", json=parameters)
     user1 = requests.post(config.url + "auth/register/v2", json=parameters1)
