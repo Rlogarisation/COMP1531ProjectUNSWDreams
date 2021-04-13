@@ -338,7 +338,6 @@ def http_test_message_sendlater(parameters, parameters1, parameters2):
         assert status1 == 403
         assert status2 == 403
         assert status3 == 403
-        pass
 
     def test_invalid_channel_id():
         input1 = {"token": token_0, "channel_id": "invalid channel_id", "message": "I am message.", "time_sent": time_sent}
@@ -352,7 +351,6 @@ def http_test_message_sendlater(parameters, parameters1, parameters2):
         assert status1 == 400
         assert status2 == 400
         assert status3 == 400
-        pass
 
     def test_invalid_message():
         input1 = {"token": token_0, "channel_id": channel_0_id, "message": 123456, "time_sent": time_sent}
@@ -366,7 +364,6 @@ def http_test_message_sendlater(parameters, parameters1, parameters2):
         assert status1 == 400
         assert status2 == 400
         assert status3 == 400
-        pass
 
     def test_invalid_time_sent():
         past_time_sent = datetime(1999, 1, 2).replace(tzinfo=timezone.utc).timestamp()
@@ -384,7 +381,6 @@ def http_test_message_sendlater(parameters, parameters1, parameters2):
         assert status2 == 400
         assert status3 == 400
         assert status4 == 400
-        pass
 
     def test_user_isnot_member_of_channel():
         input1 = {"token": token_2, "channel_id": channel_0_id, "message": "I am message.", "time_sent": time_sent}
@@ -392,7 +388,6 @@ def http_test_message_sendlater(parameters, parameters1, parameters2):
         status1 = requests.post(config.url + "message/sendlater/v1", json=input1)
 
         assert status1 == 403
-        pass
 
     # ----------------------------testing------------------------------------
     # InputError Tests
@@ -404,7 +399,6 @@ def http_test_message_sendlater(parameters, parameters1, parameters2):
     test_invalid_token()
 
     test_user_isnot_member_of_channel()
-    pass
 
 
 #############################################################################
@@ -443,7 +437,6 @@ def http_test_message_sendlaterdm(parameters, parameters1, parameters2):
         assert status1 == 403
         assert status2 == 403
         assert status3 == 403
-        pass
 
     def test_invalid_dm_id():
         input1 = {"token": token_0, "channel_id": "invalid channel_id", "message": "I am message.", "time_sent": time_sent}
@@ -457,7 +450,6 @@ def http_test_message_sendlaterdm(parameters, parameters1, parameters2):
         assert status1 == 400
         assert status2 == 400
         assert status3 == 400
-        pass
 
     def test_invalid_message():
         input1 = {"token": token_0, "channel_id": dm_0_id, "message": 123456, "time_sent": time_sent}
@@ -471,7 +463,6 @@ def http_test_message_sendlaterdm(parameters, parameters1, parameters2):
         assert status1 == 400
         assert status2 == 400
         assert status3 == 400
-        pass
 
     def test_invalid_time_sent():
         past_time_sent = datetime(1999, 1, 2).replace(tzinfo=timezone.utc).timestamp()
@@ -489,7 +480,6 @@ def http_test_message_sendlaterdm(parameters, parameters1, parameters2):
         assert status2 == 400
         assert status3 == 400
         assert status4 == 400
-        pass
 
     def test_user_isnot_member_of_dm():
         input1 = {"token": token_2, "channel_id": dm_0_id, "message": "I am message.", "time_sent": time_sent}
@@ -497,7 +487,6 @@ def http_test_message_sendlaterdm(parameters, parameters1, parameters2):
         status1 = requests.post(config.url + "message/sendlaterdm/v1", json=input1)
 
         assert status1 == 403
-        pass
 
     # ----------------------------testing------------------------------------
     # InputError Tests
@@ -509,8 +498,6 @@ def http_test_message_sendlaterdm(parameters, parameters1, parameters2):
     test_invalid_token()
 
     test_user_isnot_member_of_dm()
-
-    pass
 
 
 #############################################################################
@@ -563,7 +550,6 @@ def http_test_message_react(parameters, parameters1, parameters2):
         assert status1 == 403
         assert status2 == 403
         assert status3 == 403
-        pass
 
     def test_invalid_message_id():
         input1 = {"token": token_0, "message_id": "string message_id", "react_id": 1}
@@ -577,7 +563,6 @@ def http_test_message_react(parameters, parameters1, parameters2):
         assert status1 == 400
         assert status2 == 400
         assert status3 == 400
-        pass
 
     def test_invalid_react_id():
         input1 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": "string react_id"}
@@ -591,9 +576,9 @@ def http_test_message_react(parameters, parameters1, parameters2):
         assert status1 == 400
         assert status2 == 400
         assert status3 == 400
-        pass
 
     # InputError : React_id is already contained in the message
+
     def test_react_id_already_in_message():
         input1 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": 1}
         input2 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": 1}
@@ -606,9 +591,9 @@ def http_test_message_react(parameters, parameters1, parameters2):
         assert status1 == 200
         assert status2 == 403
         assert status3 == 200
-        pass
 
     # AccessError: The authorised user is not a member of the channel or DM
+
     def test_user_isnot_member_of_channel():
         input1 = {"token": token_2, "message_id": channel_message_0_message_id, "react_id": 1}
         input2 = {"token": token_2, "message_id": channel_message_1_message_id, "react_id": 1}
@@ -618,7 +603,6 @@ def http_test_message_react(parameters, parameters1, parameters2):
 
         assert status1 == 403
         assert status2 == 403
-        pass
 
     def test_user_isnot_member_of_dm():
         input1 = {"token": token_2, "message_id": dm_message_0_message_id, "react_id": 1}
@@ -629,7 +613,6 @@ def http_test_message_react(parameters, parameters1, parameters2):
 
         assert status1 == 403
         assert status2 == 403
-        pass
 
     # ----------------------------testing------------------------------------
     # InputError Tests
@@ -642,8 +625,6 @@ def http_test_message_react(parameters, parameters1, parameters2):
 
     test_user_isnot_member_of_channel()
     test_user_isnot_member_of_dm()
-
-    pass
 
 
 #############################################################################
@@ -696,7 +677,6 @@ def http_test_message_unreact(parameters, parameters1, parameters2):
         assert status1 == 403
         assert status2 == 403
         assert status3 == 403
-        pass
 
     def test_invalid_message_id():
         input1 = {"token": token_0, "message_id": "string message_id", "react_id": 1}
@@ -710,7 +690,6 @@ def http_test_message_unreact(parameters, parameters1, parameters2):
         assert status1 == 400
         assert status2 == 400
         assert status3 == 400
-        pass
 
     def test_invalid_react_id():
         input1 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": "string react_id"}
@@ -724,13 +703,13 @@ def http_test_message_unreact(parameters, parameters1, parameters2):
         assert status1 == 400
         assert status2 == 400
         assert status3 == 400
-        pass
 
     # InputError : React_id is not contained in the message
-    def test_react_id_not_in_message():
-        pass
 
-    # AccessError: The authorised user is not a member of the channel or DM
+    def test_react_id_not_in_message():
+
+        # AccessError: The authorised user is not a member of the channel or DM
+
     def test_user_isnot_member_of_channel():
         input1 = {"token": token_0, "message_id": channel_message_0_message_id, "react_id": 1}
         input2 = {"token": token_0, "message_id": channel_message_1_message_id, "react_id": 1}
@@ -747,7 +726,6 @@ def http_test_message_unreact(parameters, parameters1, parameters2):
         assert status1 == 200, status2 == 200
         assert status3 == 403, status4 == 403
         assert status5 == 200, status6 == 200
-        pass
 
     def test_user_isnot_member_of_dm():
         input1 = {"token": token_0, "message_id": dm_message_0_message_id, "react_id": 1}
@@ -765,7 +743,6 @@ def http_test_message_unreact(parameters, parameters1, parameters2):
         assert status1 == 200, status2 == 200
         assert status3 == 403, status4 == 403
         assert status5 == 200, status6 == 200
-        pass
 
     # ----------------------------testing------------------------------------
     # InputError Tests
@@ -778,7 +755,6 @@ def http_test_message_unreact(parameters, parameters1, parameters2):
 
     test_user_isnot_member_of_channel()
     test_user_isnot_member_of_dm()
-    pass
 
 
 #############################################################################
@@ -831,7 +807,6 @@ def http_test_message_pin(parameters, parameters1, parameters2):
         assert status1 == 403
         assert status2 == 403
         assert status3 == 403
-        pass
 
     def test_invalid_message_id():
         input1 = {"token": token_0, "message_id": "string message_id"}
@@ -845,9 +820,9 @@ def http_test_message_pin(parameters, parameters1, parameters2):
         assert status1 == 400
         assert status2 == 400
         assert status3 == 400
-        pass
 
     # InputError : Message with ID message_id is already pinned
+
     def test_message_id_already_pinned():
         input1 = {"token": token_0, "message_id": dm_message_0_message_id}
 
@@ -857,9 +832,9 @@ def http_test_message_pin(parameters, parameters1, parameters2):
 
         assert status1 == 200, status3 == 200
         assert status2 == 400
-        pass
 
     # AccessError: The authorised user is not a member of the channel or DM
+
     def test_user_isnot_member_of_channel():
         input1 = {"token": token_2, "message_id": channel_message_0_message_id}
         input2 = {"token": token_2, "message_id": channel_message_1_message_id}
@@ -869,7 +844,6 @@ def http_test_message_pin(parameters, parameters1, parameters2):
 
         assert status1 == 403
         assert status2 == 403
-        pass
 
     def test_user_isnot_member_of_dm():
         input1 = {"token": token_2, "message_id": dm_message_0_message_id}
@@ -880,16 +854,15 @@ def http_test_message_pin(parameters, parameters1, parameters2):
 
         assert status1 == 403
         assert status2 == 403
-        pass
 
     # AccessError: The authorised user is not an owner of the channel or DM
+
     def test_user_isnot_owner_of_channel():
         input1 = {"token": token_1, "message_id": channel_message_0_message_id}
 
         status1 = requests.post(config.url + "message/pin/v1", json=input1)
 
         assert status1 == 403
-        pass
 
     def test_user_isnot_owner_of_dm():
         input1 = {"token": token_1, "message_id": dm_message_1_message_id}
@@ -897,7 +870,6 @@ def http_test_message_pin(parameters, parameters1, parameters2):
         status1 = requests.post(config.url + "message/pin/v1", json=input1)
 
         assert status1 == 403
-        pass
 
     # ----------------------------testing------------------------------------
     # InputError Tests
@@ -912,7 +884,6 @@ def http_test_message_pin(parameters, parameters1, parameters2):
 
     test_user_isnot_owner_of_channel()
     test_user_isnot_owner_of_dm()
-    pass
 
 
 #############################################################################
@@ -965,7 +936,6 @@ def http_test_message_unpin(parameters, parameters1, parameters2):
         assert status1 == 403
         assert status2 == 403
         assert status3 == 403
-        pass
 
     def test_invalid_message_id():
         input1 = {"token": token_0, "message_id": "string message_id"}
@@ -979,9 +949,9 @@ def http_test_message_unpin(parameters, parameters1, parameters2):
         assert status1 == 400
         assert status2 == 400
         assert status3 == 400
-        pass
 
     # InputError : Message with ID message_id is already unpinned
+
     def test_message_id_already_unpinned():
         input1 = {"token": token_0, "message_id": dm_message_0_message_id}
 
@@ -991,9 +961,9 @@ def http_test_message_unpin(parameters, parameters1, parameters2):
 
         assert status1 == 200, status2 == 200
         assert status3 == 400
-        pass
 
     # AccessError: The authorised user is not a member of the channel or DM
+
     def test_user_isnot_member_of_channel():
         input1 = {"token": token_0, "message_id": channel_message_0_message_id}
         input2 = {"token": token_0, "message_id": channel_message_1_message_id}
@@ -1007,7 +977,6 @@ def http_test_message_unpin(parameters, parameters1, parameters2):
 
         assert status1 == 200, status2 == 200
         assert status3 == 403, status4 == 403
-        pass
 
     def test_user_isnot_member_of_dm():
         input1 = {"token": token_0, "message_id": dm_message_0_message_id}
@@ -1022,16 +991,15 @@ def http_test_message_unpin(parameters, parameters1, parameters2):
 
         assert status1 == 200, status2 == 200
         assert status3 == 403, status4 == 403
-        pass
 
     # AccessError: The authorised user is not an owner of the channel or DM
+
     def test_user_isnot_owner_of_channel():
         input1 = {"token": token_1, "message_id": channel_message_0_message_id}
 
         status1 = requests.post(config.url + "message/unpin/v1", json=input1)
 
         assert status1 == 403
-        pass
 
     def test_user_isnot_owner_of_dm():
         input1 = {"token": token_1, "message_id": dm_message_1_message_id}
@@ -1039,7 +1007,6 @@ def http_test_message_unpin(parameters, parameters1, parameters2):
         status1 = requests.post(config.url + "message/unpin/v1", json=input1)
 
         assert status1 == 403
-        pass
 
     # ----------------------------testing------------------------------------
     # InputError Tests
@@ -1054,4 +1021,3 @@ def http_test_message_unpin(parameters, parameters1, parameters2):
 
     test_user_isnot_owner_of_channel()
     test_user_isnot_owner_of_dm()
-    pass
