@@ -565,11 +565,11 @@ def return_message_if_valid(token, message_id, react_id, flag):
 
     if flag == 0:
         if user in message.reacted_users:
-            raise InputError(description="Message with ID message_id already contains an active React with ID "
+            raise AccessError(description="Message with ID message_id already contains an active React with ID "
                                          "react_id from the authorised user")
     if flag == 1:
         if user not in message.reacted_users:
-            raise InputError(description="Message with ID message_id does not contain an active React with ID "
+            raise AccessError(description="Message with ID message_id does not contain an active React with ID "
                                          "react_id from the authorised user")
 
     channel_dm = get_channel_dm_by_message_id(message_id)

@@ -1003,7 +1003,7 @@ def test_message_react_v1():
     # InputError : React_id is already contained in the message
     def test_react_id_already_in_message():
         message_react_v1(token_0, dm_message_0_message_id, 1)
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_react_v1(token_0, dm_message_0_message_id, 1)
         message_unreact_v1(token_0, dm_message_0_message_id, 1)
 
@@ -1118,21 +1118,29 @@ def test_message_unreact_v1():
     def test_react_id_not_in_message():
         message_react_v1(token_0, dm_message_0_message_id, 1)
         message_unreact_v1(token_0, dm_message_0_message_id, 1)
-        with pytest.raises(InputError):
+        with pytest.raises(AccessError):
             message_unreact_v1(token_0, dm_message_0_message_id, 1)
 
     # AccessError: The authorised user is not a member of the channel or DM
     def test_user_isnot_member_of_channel():
+        message_react_v1(token_0, channel_message_0_message_id, 1)
+        message_react_v1(token_0, channel_message_1_message_id, 1)
         with pytest.raises(AccessError):
             message_unreact_v1(token_2, channel_message_0_message_id, 1)
         with pytest.raises(AccessError):
             message_unreact_v1(token_2, channel_message_1_message_id, 1)
+        message_unreact_v1(token_0, channel_message_0_message_id, 1)
+        message_unreact_v1(token_0, channel_message_1_message_id, 1)
 
     def test_user_isnot_member_of_dm():
+        message_react_v1(token_0, dm_message_0_message_id, 1)
+        message_react_v1(token_0, dm_message_1_message_id, 1)
         with pytest.raises(AccessError):
             message_unreact_v1(token_2, dm_message_0_message_id, 1)
         with pytest.raises(AccessError):
             message_unreact_v1(token_2, dm_message_1_message_id, 1)
+        message_unreact_v1(token_0, dm_message_0_message_id, 1)
+        message_unreact_v1(token_0, dm_message_1_message_id, 1)
 
     # ----------------------------testing------------------------------------
     # Inputs' normal tests
