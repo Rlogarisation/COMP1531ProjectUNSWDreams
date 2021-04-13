@@ -201,15 +201,17 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     if user is None:
         raise AccessError(description="Token passed in is invalid")
 
-    # get the image, check the image
+    # get the image from url
     response = requests.get(img_url, stream=True)
     if response.status_code != 200:
         raise InputError(description="img_url returns an HTTP status other than 200.")
 
+    # check the format of the image
     image = Image.open(response.raw)
     if image.format != 'JPEG':
         raise InputError(description="Image uploaded is not a JPG")
 
+    # check whether the input bounds are valid
     width, height = image.size
     if x_start > width or x_end > width or x_start < 0 or x_end < 0 or x_start >= x_end:
         raise InputError(description="x_start or x_end are not within the dimensions of the image")
@@ -217,11 +219,12 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         raise InputError(description="y_start or y_end are not within the dimensions of the image")
 
     # save the original image locally
-    path = os.getcwd() + '/src/static/'
+    path = 'src/static'
     # path = './src/static'
     if not os.path.exists(path):
         os.mkdir(path)
     path = path + str(user.u_id) + '.jpg'
+    user.image_path = path
     # urllib.request.urlretrieve(img_url, path)
 
     # crop the image
@@ -229,10 +232,10 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     # overwrite the original image by the cropped image
     image_cropped.save(path)
 
-    user.image_path = path
-    user.image_url = config.url + 'static/' + str(user.u_id) + '.jpg'
+    # generate the image_url
+    user.image_url = config.url + path
 
-    return user
+    return {}
 #############################################################################
 #                                                                           #
 #                              Helper function                              #
