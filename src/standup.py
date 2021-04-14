@@ -20,8 +20,8 @@ def standup_start_v1(token, channel_id, length):
     if type(channel_id) != int or channel is None:
         raise InputError(description='Invalid channel_id.')
 
-    if is_user_in_channel(channel_id, user.u_id) is None:
-        raise AccessError(description='Authorised user is not in the channel.')
+    if user not in channel.all_members:
+        raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
 
     if channel.is_standup_active() is True:
         raise InputError(description='An active standup is currently running in this channel')
@@ -31,7 +31,7 @@ def standup_start_v1(token, channel_id, length):
     channel.activate_standup()
     channel.set_time_finish(finish_time)
 
-    timer = Timer(length, standup_send_packaged_message, [user, channel])
+    timer = Timer(length, standup_send_packaged_message, [token, channel])
     timer.start()
 
     return {
@@ -63,8 +63,8 @@ def standup_send_v1(token, channel_id, message):
     if type(channel_id) != int or channel is None:
         raise InputError(description='Invalid channel_id.')
 
-    if is_user_in_channel(channel_id, user.u_id) is None:
-        raise AccessError(description='Authorised user is not in the channel.')
+    if user not in channel.all_members:
+        raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
 
     if channel.is_standup_active() is False:
         raise InputError(description='An active standup is not currently running in this channel')

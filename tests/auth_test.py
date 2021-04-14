@@ -4,7 +4,6 @@ from src.auth import auth_login_v1, auth_register_v1, auth_logout, auth_password
 from src.error import InputError, AccessError
 from src.channel import channel_details_v1, channel_invite_v1
 from src.channels import channels_create_v1
-
 """
 Author: Lan Lin
 
@@ -274,6 +273,44 @@ def test_auth_logout_successfully_large():
     for token in token_list:
         result = auth_logout(token)
         assert result == {'is_success': True}
+#############################################################################
+#                                                                           #
+#   Test for auth_passwordreset_request_v1 and auth_passwordreset_reset_v1  #
+#                                                                           #
+#############################################################################
+
+
+def test_auth_passwordreset_successful():
+    clear_v1()
+    id_check = auth_register_v1('cblinker17@gmail.com', '123123123', 'Peter', 'White')['auth_user_id']
+    reset_code = auth_passwordreset_request_v1('cblinker17@gmail.com')['reset_code']
+    auth_passwordreset_reset_v1(reset_code, 'TheNewPassword')
+    assert auth_login_v1('cblinker17@gmail.com', 'TheNewPassword')['auth_user_id'] == id_check
+
+
+def test_auth_passwordrequest_invalid_email():
+    clear_v1()
+    auth_register_v1('cblinker17@gmail.com', '123123123', 'Peter', 'White')
+    with pytest.raises(InputError):
+        auth_passwordreset_request_v1('cblinker@gmail.com')
+
+
+def test_auth_passwordreset_reset_invalid_password():
+    clear_v1()
+    auth_register_v1('cblinker17@gmail.com', '123123123', 'Peter', 'White')
+    reset_code = auth_passwordreset_request_v1('cblinker17@gmail.com')['reset_code']
+    invalid_password = '123'
+    with pytest.raises(InputError):
+        auth_passwordreset_reset_v1(reset_code, invalid_password)
+
+
+def test_auth_passwordreset_reset_invalid_reset_code():
+    clear_v1()
+    auth_register_v1('cblinker17@gmail.com', '123123123', 'Peter', 'White')
+    reset_code = auth_passwordreset_request_v1('cblinker17@gmail.com')['reset_code']
+    invalid_reset_code = reset_code + '123'
+    with pytest.raises(InputError):
+        auth_passwordreset_reset_v1(invalid_reset_code, 'TheNewPassword')
 
 
 # """

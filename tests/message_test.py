@@ -1,8 +1,6 @@
 from datetime import datetime, timezone
 from threading import Timer
 from src.data_file import data
-from _pytest.compat import ascii_escaped
-from jwt import InvalidAlgorithmError
 from src.channel import channel_invite_v1, channel_messages_v1
 import pytest
 from src.dm import dm_create_v1, dm_invite_v1, dm_messages_v1, dm_remove_v1
@@ -737,8 +735,6 @@ def test_message_senddm_v1():
     test_failed_case2_with_at()
     test_failed_case3_with_at()
     pass
-
-
 #############################################################################
 #                                                                           #
 #                      Test for message_sendlater_v1                        #

@@ -102,8 +102,7 @@ def auth_passwordreset_request_v1(email):
     # generate the reset code
     reset_code = create_reset_code()
     user.reset_code = reset_code
-
-    connection = smtplib.SMTP("smtp.gmail.com")
+    connection = smtplib.SMTP("smtp.gmail.com", 587)
     connection.starttls()
     connection.login(user='cblinker17@gmail.com', password='cs1531f11cblinker')
     connection.sendmail(
@@ -112,7 +111,9 @@ def auth_passwordreset_request_v1(email):
         msg=f"Subject:Password Reset Code for Dreams\n\nThe password rest code is {reset_code}"
     )
 
-    return {}
+    return {
+        'reset_code': reset_code
+    }
 
 
 def auth_passwordreset_reset_v1(reset_code, new_password):
@@ -343,3 +344,8 @@ def auth_login_error_check(email, password):
 
     if user.hashed_password != hash_password(password):
         raise InputError(description='Password is not correct')
+
+
+# if __name__ == "__main__":
+#     auth_register_v1("cblinker17@gmail.com", '497152365', 'Lan', 'Lin')
+#     auth_passwordreset_request_v1('cblinker17@gmail.com')

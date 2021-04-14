@@ -36,38 +36,8 @@ AccessError:
 
 
 def message_send_v2(token, channel_id, message):
-    # InputError 1: invalid token.
-    auth_user = get_user_by_token(token)
-    if auth_user is None:
-        raise AccessError(description='message_send_v2 : Invalid token.')
-
-    # InputError 1: Message is more than 1000 characters
-    if len(message) > 1000:
-        raise InputError(description='message_send_v2 : Message is more than 1000 characters.')
-
-    # AccessError 1: invalid channel_id
-    channel = get_channel_by_channel_id(channel_id)
-    if type(channel_id) != int or channel is None:
-        raise InputError(description='message_send_v2 : Invalid channel_id.')
-
-    # AccessError 2: the authorised user has not joined the channel they are trying to post to
-    if auth_user not in channel.all_members:
-        raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
-
     new_message_id = create_message_id()
-    time_created = current_time()
-    message_created = Message(new_message_id, auth_user.u_id, message, time_created, channel.channel_id, -1)
-    channel.messages.append(message_created)
-    auth_user.messages.append(message_created)
-    data['class_messages'].append(message_created)
-
-    # update Dreams stats about message
-    update_message_dreams_stat()
-    # update user's stats about message
-    update_message_user_stat(auth_user)
-
-    # check and tag user
-    tagging_user(message, channel_id, -1, auth_user)
+    helper_message_send_v2(token, channel_id, message, new_message_id)
 
     return {
         'message_id': new_message_id,
@@ -98,39 +68,8 @@ AccessError:
 
 
 def message_senddm_v1(token, dm_id, message):
-    # InputError 1: invalid token.
-    auth_user = get_user_by_token(token)
-    if auth_user is None:
-        raise AccessError(description='message_send_v2 : Invalid token.')
-
-    # InputError 1: Message is more than 1000 characters
-    if len(message) > 1000:
-        raise InputError(description='message_send_v2 : Message is more than 1000 characters.')
-
-    # AccessError 1: invalid dm_id
-    dm = get_dm_by_dm_id(dm_id)
-    if type(dm_id) != int or dm is None:
-        raise InputError(description='message_send_v2 : Invalid dm_id.')
-
-    # AccessError 2: the authorised user has not joined the channel they are trying to post to
-    if auth_user not in dm.dm_members:
-        raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
-
     new_message_id = create_message_id()
-    created_time = current_time()
-    message_created = Message(new_message_id, auth_user.u_id, message, created_time, -1, dm.dm_id)
-
-    dm.dm_messages.append(message_created)
-    auth_user.messages.append(message_created)
-    data['class_messages'].append(message_created)
-
-    # update Dreams stats about message
-    update_message_dreams_stat()
-    # update user's stats about message
-    update_message_user_stat(auth_user)
-
-    # check and tag user
-    tagging_user(message, -1, dm_id, auth_user)
+    helper_message_senddm_v1(token, dm_id, message, new_message_id)
 
     return {
         'message_id': new_message_id,
@@ -386,11 +325,13 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
     if time_sent < cur_time:
         raise InputError(description="Time sent is a time in the past")
 
-    thread_sendlater = My_sendlater(token, channel_id, message, (time_sent - cur_time), 0)
-    thread_sendlater.start()
-    data['threads'].append(thread_sendlater)
+    new_message_id = create_message_id()
+    timer = Timer((time_sent - cur_time), helper_message_send_v2, [token, channel_id, message, new_message_id])
+    timer.start()
 
-    return thread_sendlater.get_result()
+    return {
+        'message_id': new_message_id
+    }
 
 
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
@@ -420,11 +361,13 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     if time_sent < cur_time:
         raise InputError(description="Time sent is a time in the past")
 
-    thread_sendlater = My_sendlater(token, dm_id, message, (time_sent - cur_time), 1)
-    thread_sendlater.start()
-    data['threads'].append(thread_sendlater)
+    new_message_id = create_message_id()
+    timer = Timer((time_sent - cur_time), helper_message_senddm_v1, [token, dm_id, message, new_message_id])
+    timer.start()
 
-    return thread_sendlater.get_result()
+    return {
+        'message_id': new_message_id
+    }
 
 
 def message_react_v1(token, message_id, react_id):
@@ -480,7 +423,7 @@ def message_unpin_v1(token, message_id):
 # generate a new session id
 def create_message_id():
     new_id = data['message_num']
-    data['message_num'] = data['message_num'] + 1
+
     return new_id
 
 
@@ -597,11 +540,11 @@ def return_message_if_valid(token, message_id, react_id, flag):
     if flag == 0:
         if user in message.reacted_users:
             raise AccessError(description="Message with ID message_id already contains an active React with ID "
-                              "react_id from the authorised user")
+                                          "react_id from the authorised user")
     if flag == 1:
         if user not in message.reacted_users:
             raise AccessError(description="Message with ID message_id does not contain an active React with ID "
-                              "react_id from the authorised user")
+                                          "react_id from the authorised user")
 
     channel_dm = get_channel_dm_by_message_id(message_id)
     if channel_dm is None:
@@ -675,3 +618,73 @@ def update_message_dreams_stat():
         'time_stamp': current_time()
     }
     data['messages_exist'].append(stat_message)
+
+
+def helper_message_send_v2(token, channel_id, message, message_id):
+    # InputError 1: invalid token.
+    auth_user = get_user_by_token(token)
+    if auth_user is None:
+        raise AccessError(description='message_send_v2 : Invalid token.')
+
+    # InputError 1: Message is more than 1000 characters
+    if len(message) > 1000:
+        raise InputError(description='message_send_v2 : Message is more than 1000 characters.')
+
+    # AccessError 1: invalid channel_id
+    channel = get_channel_by_channel_id(channel_id)
+    if type(channel_id) != int or channel is None:
+        raise InputError(description='message_send_v2 : Invalid channel_id.')
+
+    # AccessError 2: the authorised user has not joined the channel they are trying to post to
+    if auth_user not in channel.all_members:
+        raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
+
+    time_created = current_time()
+    message_created = Message(message_id, auth_user.u_id, message, time_created, channel.channel_id, -1)
+    data['message_num'] = data['message_num'] + 1
+    channel.messages.append(message_created)
+    auth_user.messages.append(message_created)
+    data['class_messages'].append(message_created)
+
+    # update Dreams stats about message
+    update_message_dreams_stat()
+    # update user's stats about message
+    update_message_user_stat(auth_user)
+
+    # check and tag user
+    tagging_user(message, channel_id, -1, auth_user)
+
+
+def helper_message_senddm_v1(token, dm_id, message, message_id):
+    # InputError 1: invalid token.
+    auth_user = get_user_by_token(token)
+    if auth_user is None:
+        raise AccessError(description='message_send_v2 : Invalid token.')
+
+    # InputError 1: Message is more than 1000 characters
+    if len(message) > 1000:
+        raise InputError(description='message_send_v2 : Message is more than 1000 characters.')
+
+    # AccessError 1: invalid dm_id
+    dm = get_dm_by_dm_id(dm_id)
+    if type(dm_id) != int or dm is None:
+        raise InputError(description='message_send_v2 : Invalid dm_id.')
+
+    # AccessError 2: the authorised user has not joined the channel they are trying to post to
+    if auth_user not in dm.dm_members:
+        raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
+
+    created_time = current_time()
+    message_created = Message(message_id, auth_user.u_id, message, created_time, -1, dm.dm_id)
+    data['message_num'] = data['message_num'] + 1
+    dm.dm_messages.append(message_created)
+    auth_user.messages.append(message_created)
+    data['class_messages'].append(message_created)
+
+    # update Dreams stats about message
+    update_message_dreams_stat()
+    # update user's stats about message
+    update_message_user_stat(auth_user)
+
+    # check and tag user
+    tagging_user(message, -1, dm_id, auth_user)
