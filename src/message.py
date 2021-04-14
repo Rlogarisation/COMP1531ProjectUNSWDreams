@@ -276,30 +276,6 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     }
 
 
-class My_sendlater(Thread):
-    def __init__(self, token, id, message, time_sleep, channel_dm):
-        Thread.__init__(self)
-        self.token = token
-        self.id = id
-        self.message = message
-        self.time_sleep = time_sleep
-        self.channel_dm = channel_dm
-
-    def run(self):
-        sleep(self.time_sleep)
-        if self.channel_dm == 0:
-            self.result = message_send_v2(self.token, self.id, self.message)
-        else:
-            self.result = message_senddm_v1(self.token, self.id, self.message)
-
-    def get_result(self):
-        Thread.join(self)
-        try:
-            return self.result
-        except Exception:
-            return None
-
-
 def message_sendlater_v1(token, channel_id, message, time_sent):
     # Type checking
     if type(channel_id) != int or type(message) != str or type(time_sent) != int:
