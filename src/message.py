@@ -1,5 +1,6 @@
 from threading import Timer
 import re
+from time import time
 from src.data_file import data, Message, Permission, current_time
 from src.error import InputError, AccessError
 from src.auth import get_user_by_token, get_user_by_handle, get_user_by_uid
@@ -363,6 +364,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
 
     timer = Timer((time_sent - cur_time), message_send_v2, [token, channel_id, message])
     timer.start()
+    timer.join()
 
 
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
@@ -394,6 +396,7 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
 
     timer = Timer((time_sent - cur_time), message_senddm_v1, [token, dm_id, message])
     timer.start()
+    timer.join()
 
 
 def message_react_v1(token, message_id, react_id):
@@ -566,11 +569,11 @@ def return_message_if_valid(token, message_id, react_id, flag):
     if flag == 0:
         if user in message.reacted_users:
             raise AccessError(description="Message with ID message_id already contains an active React with ID "
-                                         "react_id from the authorised user")
+                              "react_id from the authorised user")
     if flag == 1:
         if user not in message.reacted_users:
             raise AccessError(description="Message with ID message_id does not contain an active React with ID "
-                                         "react_id from the authorised user")
+                              "react_id from the authorised user")
 
     channel_dm = get_channel_dm_by_message_id(message_id)
     if channel_dm is None:
