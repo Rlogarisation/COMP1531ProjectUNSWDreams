@@ -734,7 +734,6 @@ def test_message_senddm_v1():
     test_failed_case_with_at()
     test_failed_case2_with_at()
     test_failed_case3_with_at()
-    pass
 
 
 #############################################################################
@@ -887,7 +886,6 @@ def test_message_sendlater_v1():
     # normal tests
     test_normal_case01()
     test_normal_case02()
-    pass
 
 
 #############################################################################
@@ -939,7 +937,6 @@ def test_message_sendlaterdm_v1():
             message_sendlaterdm_v1(111000, dm_0_id, "I am message.", time_sent)  # token's range is incorrect
         with pytest.raises(AccessError):
             message_sendlaterdm_v1(None, dm_0_id, "I am message.", time_sent)  # token is None
-        pass
 
     def test_invalid_dm_id():
         with pytest.raises(InputError):
@@ -948,7 +945,6 @@ def test_message_sendlaterdm_v1():
             message_sendlaterdm_v1(token_0, 99999, "I am message.", time_sent)  # type matches, but dm_id not exist
         with pytest.raises(InputError):
             message_sendlaterdm_v1(token_0, None, "I am message.", time_sent)  # dm_id is None
-        pass
 
     def test_invalid_message():
         with pytest.raises(InputError):
@@ -957,7 +953,6 @@ def test_message_sendlaterdm_v1():
             message_sendlaterdm_v1(token_0, dm_0_id, "a" * 2000, time_sent)  # message is over_length
         with pytest.raises(InputError):
             message_sendlaterdm_v1(token_0, dm_0_id, None, time_sent)  # message is None
-        pass
 
     def test_invalid_time_sent():
         with pytest.raises(InputError):
@@ -970,9 +965,9 @@ def test_message_sendlaterdm_v1():
         past_time_sent = datetime(1999, 1, 2).replace(tzinfo=timezone.utc).timestamp()
         with pytest.raises(InputError):
             message_sendlaterdm_v1(token_0, dm_0_id, "I am message.", past_time_sent)  # time_sent is a time in the past
-        pass
 
     # AccessError: the authorised user is not a member or owner of the DM
+
     def test_user_isnot_member_of_dm():
         with pytest.raises(AccessError):
             message_sendlaterdm_v1(token_2, dm_0_id, "I am message.", time_sent)
@@ -1043,8 +1038,6 @@ def test_message_sendlaterdm_v1():
     # normal tests
     test_normal_case01()
     test_normal_case02()
-
-    pass
 
 
 #############################################################################
@@ -1144,7 +1137,10 @@ def test_message_react_v1():
 
     # normal tests
     def test_normal_test01():
-        pass
+        message_react_v1(token_0, channel_message_0_message_id, 1)
+        message_react_v1(token_0, channel_message_1_message_id, 1)
+        message_react_v1(token_0, dm_message_0_message_id, 1)
+        message_react_v1(token_0, dm_message_1_message_id, 1)
 
     # ----------------------------testing------------------------------------
     # InputError Tests
@@ -1160,8 +1156,6 @@ def test_message_react_v1():
 
     # normal tests
     test_normal_test01()
-
-    pass
 
 
 #############################################################################
@@ -1222,7 +1216,6 @@ def test_message_unreact_v1():
             message_unreact_v1(111000, dm_message_0_message_id, 1)  # token's range is incorrect
         with pytest.raises(AccessError):
             message_unreact_v1(None, dm_message_0_message_id, 1)  # token is None
-        pass
 
     def test_invalid_message_id():
         with pytest.raises(InputError):
@@ -1231,7 +1224,6 @@ def test_message_unreact_v1():
             message_unreact_v1(token_0, 99999999, 1)  # message_id's range is incorrect
         with pytest.raises(InputError):
             message_unreact_v1(token_0, None, 1)  # message_id is None
-        pass
 
     def test_invalid_react_id():
         with pytest.raises(InputError):
@@ -1271,7 +1263,26 @@ def test_message_unreact_v1():
 
     # normal tests
     def test_normal_test01():
-        pass
+        message_react_v1(token_0, channel_message_0_message_id, 1)
+        message_react_v1(token_0, channel_message_1_message_id, 1)
+        message_react_v1(token_0, dm_message_0_message_id, 1)
+        message_react_v1(token_0, dm_message_1_message_id, 1)
+
+        message_unreact_v1(token_0, channel_message_0_message_id, 1)
+        message_unreact_v1(token_0, channel_message_1_message_id, 1)
+        message_unreact_v1(token_0, dm_message_0_message_id, 1)
+        message_unreact_v1(token_0, dm_message_1_message_id, 1)
+
+    def test_normal_test02():
+        message_react_v1(token_1, channel_message_0_message_id, 1)
+        message_react_v1(token_1, channel_message_1_message_id, 1)
+        message_react_v1(token_1, dm_message_0_message_id, 1)
+        message_react_v1(token_1, dm_message_1_message_id, 1)
+
+        message_unreact_v1(token_1, channel_message_0_message_id, 1)
+        message_unreact_v1(token_1, channel_message_1_message_id, 1)
+        message_unreact_v1(token_1, dm_message_0_message_id, 1)
+        message_unreact_v1(token_1, dm_message_1_message_id, 1)
 
     # ----------------------------testing------------------------------------
     # InputError Tests
@@ -1287,7 +1298,7 @@ def test_message_unreact_v1():
 
     # normal tests
     test_normal_test01()
-    pass
+    test_normal_test02()
 
 
 #############################################################################
@@ -1391,7 +1402,6 @@ def test_message_pin_v1():
     # normal tests
     def test_normal_test01():
         pass
-
     # ----------------------------testing------------------------------------
     # InputError Tests
     test_invalid_message_id()
@@ -1408,8 +1418,6 @@ def test_message_pin_v1():
 
     # normal tests
     test_normal_test01()
-
-    pass
 
 
 #############################################################################
@@ -1517,7 +1525,6 @@ def test_message_unpin_v1():
     # normal tests
     def test_normal_test01():
         pass
-
     # ----------------------------testing------------------------------------
     # InputError Tests
     test_invalid_message_id()
@@ -1534,8 +1541,6 @@ def test_message_unpin_v1():
 
     # normal tests
     test_normal_test01()
-
-    pass
 
 
 #############################################################################
