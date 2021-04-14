@@ -823,6 +823,7 @@ def test_message_sendlater_v1():
 
     # normal tests
     def test_normal_case01():
+        # two late_send messages
         time_sent_1 = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
 
         channel_msgs = channel_messages_v1(token_0, channel_0_id, 0)
@@ -845,7 +846,32 @@ def test_message_sendlater_v1():
         assert message_id_0 == 0
         assert message_id_1 == 1
 
-        pass
+    def test_normal_case02():
+        # three late_send messages, with time crosses
+        time_sent_1 = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
+
+        channel_msgs = channel_messages_v1(token_0, channel_0_id, 0)
+        assert len(channel_msgs['messages']) == 2
+
+        message_id_3 = message_sendlater_v1(token_0, channel_0_id, "Here is message 03.", time_sent_1 + 2)['message_id']
+        message_id_4 = message_sendlater_v1(token_0, channel_0_id, "Here is message 04.", time_sent_1 + 8)['message_id']
+        message_id_5 = message_sendlater_v1(token_0, channel_0_id, "Here is message 05.", time_sent_1 + 5)['message_id']
+
+        channel_msgs = channel_messages_v1(token_0, channel_0_id, 0)
+        assert len(channel_msgs['messages']) == 2
+
+        for i in data['threads']:
+            i.join()
+
+        channel_msgs = channel_messages_v1(token_0, channel_0_id, 0)
+        assert len(channel_msgs['messages']) == 5
+        assert channel_msgs['messages'][0]['message'] == "Here is message 04."
+        assert channel_msgs['messages'][1]['message'] == "Here is message 05."
+        assert channel_msgs['messages'][2]['message'] == "Here is message 03."
+
+        assert message_id_3 == 2
+        assert message_id_4 == 3
+        assert message_id_5 == 4
 
     # ----------------------------testing------------------------------------
     # InputError Tests
@@ -860,6 +886,7 @@ def test_message_sendlater_v1():
 
     # normal tests
     test_normal_case01()
+    test_normal_case02()
     pass
 
 
