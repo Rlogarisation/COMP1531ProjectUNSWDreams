@@ -240,12 +240,12 @@ def message_remove_v1(token, message_id):
     if channel_dm is None:
         raise InputError(description="The message is not in any channel or dm")
     # if the message is in a channel
-    if channel_dm[1] == 0:
+    elif channel_dm[1] == 0:
         channel = channel_dm[0]
         # check if the authorised user is the owner of the channel
         check_owner = is_user_owner_channel(channel.channel_id, auth_user.u_id)
     # if the message is in a dm
-    if channel_dm[1] == 1:
+    elif channel_dm[1] == 1:
         dm = channel_dm[0]
         # check if the authorised user is the owner of the dm
         check_owner = is_user_owner_dm(dm.dm_id, auth_user.u_id)
@@ -305,8 +305,6 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         raise InputError(description="message_share_v1 : neither channel_id nor dm_id is -1.")
     elif channel_id == -1 and dm_id == -1:
         raise InputError(description="message_share_v1 : both channel_id and dm_id is -1.")
-    else:
-        raise InputError(description="message_share_v1 : invalid input.")
 
     user = get_user_by_token(token)
     if user is None:
@@ -460,7 +458,7 @@ def get_u_id_by_message_id(message_id):
 
 
 def get_user_by_message_id(message_id):
-    uid = get_message_by_message_id(message_id)
+    uid = get_u_id_by_message_id(message_id)
     user = get_user_by_uid(uid)
     return user
 
@@ -475,7 +473,7 @@ def get_message_by_message_id(message_id):
         for j in i.dm_messages:
             if j.message_id == message_id:
                 return j
-    raise InputError(description="get_message_by_message_id : can not find target message.")
+    return None
 
 
 # return class channel or dm by message id
@@ -505,7 +503,7 @@ def delete_message_by_message_id(message_id):
             if j.message_id == target_msg.message_id:
                 i.dm_messages.remove(j)
                 return
-    raise AccessError(description="delete_message_by_message_id : can not find target message.")
+    return None
 
 
 # tagging user if the message include @handle
@@ -543,7 +541,6 @@ def tagging_user(message, channel_id, dm_id, sender):
                 invitee.notifications.append(notification)
 
             if dm_id != -1:
-
                 if is_user_in_dm(dm_id, invitee.u_id) is None:
                     continue
                 # add notification
@@ -566,12 +563,12 @@ def return_message_if_valid(token, message_id, react_id, flag):
 
     if flag == 0:
         if user in message.reacted_users:
-            raise InputError(description="Message with ID message_id already contains an active React with ID "
-                                         "react_id from the authorised user")
+            raise AccessError(description="Message with ID message_id already contains an active React with ID "
+                                          "react_id from the authorised user")
     if flag == 1:
         if user not in message.reacted_users:
-            raise InputError(description="Message with ID message_id does not contain an active React with ID "
-                                         "react_id from the authorised user")
+            raise AccessError(description="Message with ID message_id does not contain an active React with ID "
+                                          "react_id from the authorised user")
 
     channel_dm = get_channel_dm_by_message_id(message_id)
     if channel_dm is None:

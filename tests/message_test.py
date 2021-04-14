@@ -1,11 +1,26 @@
+from datetime import datetime, timezone
+from jwt import InvalidAlgorithmError
 from src.channel import channel_invite_v1, channel_messages_v1
 import pytest
-from src.dm import dm_create_v1, dm_messages_v1, dm_remove_v1
+from src.dm import dm_create_v1, dm_invite_v1, dm_messages_v1, dm_remove_v1
 from src.error import InputError, AccessError
 from src.channels import channels_create_v1
 from src.auth import auth_register_v1, auth_login_v1
 from src.other import clear_v1
-from src.message import message_send_v2, message_edit_v2, message_remove_v1, message_share_v1, message_senddm_v1
+from src.message import (
+    message_send_v2,
+    message_edit_v2,
+    message_remove_v1,
+    message_share_v1,
+    message_senddm_v1,
+    message_sendlater_v1,
+    message_sendlaterdm_v1,
+    message_react_v1,
+    message_unreact_v1,
+    message_pin_v1,
+    message_unpin_v1,
+)
+
 
 #############################################################################
 #                                                                           #
@@ -614,4 +629,663 @@ def test_message_senddm_v1():
     test_failed_case_with_at()
     test_failed_case2_with_at()
     test_failed_case3_with_at()
+    pass
+#############################################################################
+#                                                                           #
+#                      Test for message_sendlater_v1                        #
+#                                                                           #
+#############################################################################
+"""
+Author: Shi Tong Yuan
+
+message/sendlater/v1
+
+Background:
+Send a message from authorised_user to the channel specified by channel_id automatically at a specified time in the future
+
+Parameters: (token, channel_id, message, time_sent)
+Return Type: { message_id }
+HTTP Method: POST
+
+InputError:
+    - Channel ID is not a valid channel
+    - Message is more than 1000 characters
+    - Time sent is a time in the past
+AccessError:
+    - the authorised user has not joined the channel they are trying to post to
+
+"""
+
+
+def test_message_sendlater_v1():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")["token"]
+    token_2 = auth_register_v1("test_email2@gmail.com", "password", "First2", "Last2")["token"]
+
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")["auth_user_id"]
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")["auth_user_id"]
+    u_id_2 = auth_login_v1("test_email2@gmail.com", "password")["auth_user_id"]
+
+    channel_0_id = channels_create_v1(token_0, "channel_0", True)["channel_id"]
+    channel_invite_v1(token_0, channel_0_id, u_id_1)
+
+    time_sent = datetime(2021, 4, 9).replace(tzinfo=timezone.utc).timestamp()
+
+    # test for the inputs checking
+    def test_invalid_token():
+        with pytest.raises(AccessError):
+            message_sendlater_v1("string token", channel_0_id, "I am message.", time_sent)  # token's type is incorrect
+        with pytest.raises(AccessError):
+            message_sendlater_v1(111000, channel_0_id, "I am message.", time_sent)  # token's range is incorrect
+        with pytest.raises(AccessError):
+            message_sendlater_v1(None, channel_0_id, "I am message.", time_sent)  # token is None
+
+    def test_invalid_channel_id():
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, "invalid channel_id", "I am message.", time_sent)  # channel_id's type is incorrect
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, 99999, "I am message.", time_sent)  # type matches, but channel_id not exist
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, None, "I am message.", time_sent)  # channel_id is None
+
+    def test_invalid_message():
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, channel_0_id, 123456, time_sent)  # message's type is incorrect
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, channel_0_id, "a" * 2000, time_sent)  # message is over_length
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, channel_0_id, None, time_sent)  # message is None
+
+    def test_invalid_time_sent():
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, channel_0_id, "I am message.", "string time_sent")  # time_sent's type is incorrect
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, channel_0_id, "I am message.", 123456)  # time_sent's range is incorrect
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, channel_0_id, "I am message.", None)  # time_sent is None
+
+        past_time_sent = datetime(1999, 1, 2).replace(tzinfo=timezone.utc).timestamp()
+        with pytest.raises(InputError):
+            message_sendlater_v1(token_0, channel_0_id, "I am message.", past_time_sent)  # time_sent is a time in the past
+
+    # AccessError: the authorised user has not joined the channel they are trying to post to
+    def test_user_isnot_member_of_channel():
+        with pytest.raises(AccessError):
+            message_sendlater_v1(token_2, channel_0_id, "I am message.", time_sent)
+
+    # ----------------------------testing------------------------------------
+    # InputError Tests
+    test_invalid_channel_id()
+    test_invalid_message()
+    test_invalid_time_sent()
+
+    # AccessError Tests
+    test_invalid_token()
+
+    test_user_isnot_member_of_channel()
+
+    pass
+
+
+#############################################################################
+#                                                                           #
+#                     Test for message_sendlaterdm_v1                       #
+#                                                                           #
+#############################################################################
+"""
+Author: Shi Tong Yuan
+
+message/sendlaterdm/v1
+
+Background:
+Send a message from authorised_user to the DM specified by dm_id automatically at a specified time in the future
+
+Parameters: (token, dm_id, message, time_sent)
+Return Type: { message_id }
+HTTP Method: POST
+
+InputError:
+    - DM ID is not a valid DM
+    - Message is more than 1000 characters
+    - Time sent is a time in the past
+AccessError:
+    - the authorised user is not a member of the DM they are trying to post to
+
+"""
+
+
+def test_message_sendlaterdm_v1():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")["token"]
+    token_2 = auth_register_v1("test_email2@gmail.com", "password", "First2", "Last2")["token"]
+
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")["auth_user_id"]
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")["auth_user_id"]
+    u_id_2 = auth_login_v1("test_email2@gmail.com", "password")["auth_user_id"]
+
+    dm_0_id = dm_create_v1(token_0, [u_id_1])["dm_id"]
+
+    time_sent = datetime(2021, 4, 9).replace(tzinfo=timezone.utc).timestamp()
+
+    # test for the inputs checking
+    def test_invalid_token():
+        with pytest.raises(AccessError):
+            message_sendlaterdm_v1("string token", dm_0_id, "I am message.", time_sent)  # token's type is incorrect
+        with pytest.raises(AccessError):
+            message_sendlaterdm_v1(111000, dm_0_id, "I am message.", time_sent)  # token's range is incorrect
+        with pytest.raises(AccessError):
+            message_sendlaterdm_v1(None, dm_0_id, "I am message.", time_sent)  # token is None
+        pass
+
+    def test_invalid_dm_id():
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, "invalid dm_id", "I am message.", time_sent)  # dm_id's type is incorrect
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, 99999, "I am message.", time_sent)  # type matches, but dm_id not exist
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, None, "I am message.", time_sent)  # dm_id is None
+        pass
+
+    def test_invalid_message():
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, dm_0_id, 123456, time_sent)  # message's type is incorrect
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, dm_0_id, "a" * 2000, time_sent)  # message is over_length
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, dm_0_id, None, time_sent)  # message is None
+        pass
+
+    def test_invalid_time_sent():
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, dm_0_id, "I am message.", "string time_sent")  # time_sent's type is incorrect
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, dm_0_id, "I am message.", 123456)  # time_sent's range is incorrect
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, dm_0_id, "I am message.", None)  # time_sent is None
+
+        past_time_sent = datetime(1999, 1, 2).replace(tzinfo=timezone.utc).timestamp()
+        with pytest.raises(InputError):
+            message_sendlaterdm_v1(token_0, dm_0_id, "I am message.", past_time_sent)  # time_sent is a time in the past
+        pass
+
+    # AccessError: the authorised user is not a member or owner of the DM
+    def test_user_isnot_member_of_dm():
+        with pytest.raises(AccessError):
+            message_sendlaterdm_v1(token_2, dm_0_id, "I am message.", time_sent)
+
+    # ----------------------------testing------------------------------------
+    # InputError Tests
+    test_invalid_dm_id()
+    test_invalid_message()
+    test_invalid_time_sent()
+
+    # AccessError Tests
+    test_invalid_token()
+
+    test_user_isnot_member_of_dm()
+
+    pass
+
+
+#############################################################################
+#                                                                           #
+#                        Test for message_react_v1                          #
+#                                                                           #
+#############################################################################
+"""
+Author: Shi Tong Yuan
+
+message/react/v1
+
+Background:
+Given a message within a channel or DM the authorised user is part of, add a "react" to that particular message
+
+Parameters: (token, message_id, react_id)
+Return Type: {}
+HTTP Method: POST
+
+InputError:
+    - message_id is not a valid message within a channel or DM that the authorised user has joined
+    - react_id is not a valid React ID. The only valid react ID the frontend has is 1
+    - Message with ID message_id already contains an active React with ID react_id from the authorised user
+AccessError:
+    - The authorised user is not a member of the channel or DM that the message is within
+
+"""
+
+
+def test_message_react_v1():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")["token"]
+    token_2 = auth_register_v1("test_email2@gmail.com", "password", "First2", "Last2")["token"]
+
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")["auth_user_id"]
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")["auth_user_id"]
+
+    dm_0_id = dm_create_v1(token_0, [u_id_1])["dm_id"]
+    channel_0_id = channels_create_v1(token_0, "channel_0", True)["channel_id"]
+    channel_invite_v1(token_0, channel_0_id, u_id_1)
+
+    dm_message_0 = message_senddm_v1(token_0, dm_0_id, "I am message.")
+    dm_message_0_message_id = dm_message_0["message_id"]
+    dm_message_1 = message_senddm_v1(token_0, dm_0_id, "@first1last1 I am message.")
+    dm_message_1_message_id = dm_message_1["message_id"]
+
+    channel_message_0 = message_send_v2(token_0, channel_0_id, "I am message.")
+    channel_message_0_message_id = channel_message_0["message_id"]
+    channel_message_1 = message_send_v2(token_0, channel_0_id, "@first0last0 I am message.")
+    channel_message_1_message_id = channel_message_1["message_id"]
+
+    # test for the inputs checking
+    def test_invalid_token():
+        with pytest.raises(AccessError):
+            message_react_v1("string token", dm_message_0_message_id, 1)  # token's type is incorrect
+        with pytest.raises(AccessError):
+            message_react_v1(111000, dm_message_0_message_id, 1)  # token's range is incorrect
+        with pytest.raises(AccessError):
+            message_react_v1(None, dm_message_0_message_id, 1)  # token is None
+
+    def test_invalid_message_id():
+        with pytest.raises(InputError):
+            message_react_v1(token_0, "string message_id", 1)  # message_id's type is incorrect
+        with pytest.raises(InputError):
+            message_react_v1(token_0, 99999999, 1)  # message_id's range is incorrect
+        with pytest.raises(InputError):
+            message_react_v1(token_0, None, 1)  # message_id is None
+
+    def test_invalid_react_id():
+        with pytest.raises(InputError):
+            message_react_v1(token_0, dm_message_0_message_id, "string react_id")  # react_id type is incorrect
+        with pytest.raises(InputError):
+            message_react_v1(token_0, dm_message_0_message_id, 9999)  # react_id is int, but not 1
+        with pytest.raises(InputError):
+            message_react_v1(token_0, dm_message_0_message_id, None)  # react_id is None
+
+    # InputError : React_id is already contained in the message
+    def test_react_id_already_in_message():
+        message_react_v1(token_0, dm_message_0_message_id, 1)
+        with pytest.raises(AccessError):
+            message_react_v1(token_0, dm_message_0_message_id, 1)
+        message_unreact_v1(token_0, dm_message_0_message_id, 1)
+
+    # AccessError: The authorised user is not a member of the channel or DM
+    def test_user_isnot_member_of_channel():
+        with pytest.raises(AccessError):
+            message_react_v1(token_2, channel_message_0_message_id, 1)
+        with pytest.raises(AccessError):
+            message_react_v1(token_2, channel_message_1_message_id, 1)
+
+    def test_user_isnot_member_of_dm():
+        with pytest.raises(AccessError):
+            message_react_v1(token_2, dm_message_0_message_id, 1)
+        with pytest.raises(AccessError):
+            message_react_v1(token_2, dm_message_1_message_id, 1)
+
+    # ----------------------------testing------------------------------------
+    # InputError Tests
+    test_invalid_message_id()
+    test_invalid_react_id()
+    test_react_id_already_in_message()
+
+    # AccessError Tests
+    test_invalid_token()
+
+    test_user_isnot_member_of_channel()
+    test_user_isnot_member_of_dm()
+
+    pass
+
+
+#############################################################################
+#                                                                           #
+#                       Test for message_unreact_v1                         #
+#                                                                           #
+#############################################################################
+"""
+Author: Shi Tong Yuan
+
+message/unreact/v1
+
+Background:
+Given a message within a channel or DM the authorised user is part of, remove a "react" to that particular message.
+
+Parameters: (token, message_id, react_id)
+Return Type: {}
+HTTP Method: POST
+
+InputError:
+    - message_id is not a valid message within a channel or DM that the authorised user has joined
+    - react_id is not a valid React ID
+    - Message with ID message_id does not contain an active React with ID react_id from the authorised user
+AccessError:
+    - The authorised user is not a member of the channel or DM that the message is within
+
+"""
+
+
+def test_message_unreact_v1():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")["token"]
+    token_2 = auth_register_v1("test_email2@gmail.com", "password", "First2", "Last2")["token"]
+
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")["auth_user_id"]
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")["auth_user_id"]
+
+    dm_0_id = dm_create_v1(token_0, [u_id_1])["dm_id"]
+    channel_0_id = channels_create_v1(token_0, "channel_0", True)["channel_id"]
+    channel_invite_v1(token_0, channel_0_id, u_id_1)
+
+    dm_message_0 = message_senddm_v1(token_0, dm_0_id, "I am message.")
+    dm_message_0_message_id = dm_message_0["message_id"]
+    dm_message_1 = message_senddm_v1(token_0, dm_0_id, "@first1last1 I am message.")
+    dm_message_1_message_id = dm_message_1["message_id"]
+
+    channel_message_0 = message_send_v2(token_0, channel_0_id, "I am message.")
+    channel_message_0_message_id = channel_message_0["message_id"]
+    channel_message_1 = message_send_v2(token_0, channel_0_id, "@first0last0 I am message.")
+    channel_message_1_message_id = channel_message_1["message_id"]
+
+    # test for the inputs checking
+    def test_invalid_token():
+        with pytest.raises(AccessError):
+            message_unreact_v1("string token", dm_message_0_message_id, 1)  # token's type is incorrect
+        with pytest.raises(AccessError):
+            message_unreact_v1(111000, dm_message_0_message_id, 1)  # token's range is incorrect
+        with pytest.raises(AccessError):
+            message_unreact_v1(None, dm_message_0_message_id, 1)  # token is None
+        pass
+
+    def test_invalid_message_id():
+        with pytest.raises(InputError):
+            message_unreact_v1(token_0, "string message_id", 1)  # message_id's type is incorrect
+        with pytest.raises(InputError):
+            message_unreact_v1(token_0, 99999999, 1)  # message_id's range is incorrect
+        with pytest.raises(InputError):
+            message_unreact_v1(token_0, None, 1)  # message_id is None
+        pass
+
+    def test_invalid_react_id():
+        with pytest.raises(InputError):
+            message_unreact_v1(token_0, dm_message_0_message_id, "string react_id")  # react_id type is incorrect
+        with pytest.raises(InputError):
+            message_unreact_v1(token_0, dm_message_0_message_id, 9999)  # react_id is int, but not 1
+        with pytest.raises(InputError):
+            message_unreact_v1(token_0, dm_message_0_message_id, None)  # react_id is None
+
+    # InputError : React_id is not contained in the message
+    def test_react_id_not_in_message():
+        message_react_v1(token_0, dm_message_0_message_id, 1)
+        message_unreact_v1(token_0, dm_message_0_message_id, 1)
+        with pytest.raises(AccessError):
+            message_unreact_v1(token_0, dm_message_0_message_id, 1)
+
+    # AccessError: The authorised user is not a member of the channel or DM
+    def test_user_isnot_member_of_channel():
+        message_react_v1(token_0, channel_message_0_message_id, 1)
+        message_react_v1(token_0, channel_message_1_message_id, 1)
+        with pytest.raises(AccessError):
+            message_unreact_v1(token_2, channel_message_0_message_id, 1)
+        with pytest.raises(AccessError):
+            message_unreact_v1(token_2, channel_message_1_message_id, 1)
+        message_unreact_v1(token_0, channel_message_0_message_id, 1)
+        message_unreact_v1(token_0, channel_message_1_message_id, 1)
+
+    def test_user_isnot_member_of_dm():
+        message_react_v1(token_0, dm_message_0_message_id, 1)
+        message_react_v1(token_0, dm_message_1_message_id, 1)
+        with pytest.raises(AccessError):
+            message_unreact_v1(token_2, dm_message_0_message_id, 1)
+        with pytest.raises(AccessError):
+            message_unreact_v1(token_2, dm_message_1_message_id, 1)
+        message_unreact_v1(token_0, dm_message_0_message_id, 1)
+        message_unreact_v1(token_0, dm_message_1_message_id, 1)
+
+    # ----------------------------testing------------------------------------
+    # InputError Tests
+    test_invalid_message_id()
+    test_invalid_react_id()
+    test_react_id_not_in_message()
+
+    # AccessError Tests
+    test_invalid_token()
+
+    test_user_isnot_member_of_channel()
+    test_user_isnot_member_of_dm()
+
+    pass
+
+
+#############################################################################
+#                                                                           #
+#                          Test for message_pin_v1                          #
+#                                                                           #
+#############################################################################
+"""
+Author: Shi Tong Yuan
+
+message/pin/v1
+
+Background:
+Given a message within a channel or DM, mark it as "pinned" to be given special display treatment by the frontend
+
+Parameters: (token, message_id)
+Return Type: {}
+HTTP Method: POST
+
+InputError:
+    - message_id is not a valid message
+    - Message with ID message_id is already pinned
+AccessError:
+    - The authorised user is not a member of the channel or DM that the message is within
+    - The authorised user is not an owner of the channel or DM
+
+"""
+
+
+def test_message_pin_v1():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")["token"]
+    token_2 = auth_register_v1("test_email2@gmail.com", "password", "First2", "Last2")["token"]
+
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")["auth_user_id"]
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")["auth_user_id"]
+    u_id_2 = auth_login_v1("test_email2@gmail.com", "password")["auth_user_id"]
+
+    dm_0_id = dm_create_v1(token_0, [u_id_1])["dm_id"]
+    channel_0_id = channels_create_v1(token_0, "channel_0", True)["channel_id"]
+    channel_invite_v1(token_0, channel_0_id, u_id_1)
+
+    dm_message_0 = message_senddm_v1(token_0, dm_0_id, "I am message.")
+    dm_message_0_message_id = dm_message_0["message_id"]
+    dm_message_1 = message_senddm_v1(token_0, dm_0_id, "@first1last1 I am message.")
+    dm_message_1_message_id = dm_message_1["message_id"]
+
+    channel_message_0 = message_send_v2(token_0, channel_0_id, "I am message.")
+    channel_message_0_message_id = channel_message_0["message_id"]
+    channel_message_1 = message_send_v2(token_0, channel_0_id, "@first0last0 I am message.")
+    channel_message_1_message_id = channel_message_1["message_id"]
+
+    # test for the inputs checking
+    def test_invalid_token():
+        with pytest.raises(AccessError):
+            message_pin_v1("string token", dm_message_0_message_id)  # token's type is incorrect
+        with pytest.raises(AccessError):
+            message_pin_v1(111000, dm_message_0_message_id)  # token's range is incorrect
+        with pytest.raises(AccessError):
+            message_pin_v1(None, dm_message_0_message_id)  # token is None
+
+    def test_invalid_message_id():
+        with pytest.raises(InputError):
+            message_pin_v1(token_0, "string message_id")  # message_id's type is incorrect
+        with pytest.raises(InputError):
+            message_pin_v1(token_0, 99999999)  # message_id's range is incorrect
+        with pytest.raises(InputError):
+            message_pin_v1(token_0, None)  # message_id is None
+
+    # InputError : Message with ID message_id is already pinned
+    def test_message_id_already_pinned():
+        message_pin_v1(token_0, dm_message_0_message_id)
+        with pytest.raises(InputError):
+            message_pin_v1(token_0, dm_message_0_message_id)
+        message_unpin_v1(token_0, dm_message_0_message_id)
+
+    # AccessError: The authorised user is not a member of the channel or DM
+    def test_user_isnot_member_of_channel():
+        with pytest.raises(AccessError):
+            message_pin_v1(token_2, channel_message_0_message_id)
+        with pytest.raises(AccessError):
+            message_pin_v1(token_2, channel_message_1_message_id)
+
+    def test_user_isnot_member_of_dm():
+        with pytest.raises(AccessError):
+            message_pin_v1(token_2, dm_message_0_message_id)
+        with pytest.raises(AccessError):
+            message_pin_v1(token_2, dm_message_1_message_id)
+
+    # AccessError: The authorised user is not an owner of the channel or DM
+
+    def test_user_isnot_owner_of_channel():
+        with pytest.raises(AccessError):
+            message_pin_v1(token_1, channel_message_0_message_id)
+
+    def test_user_isnot_owner_of_dm():
+        with pytest.raises(AccessError):
+            message_pin_v1(token_1, dm_message_1_message_id)
+
+    # ----------------------------testing------------------------------------
+    # InputError Tests
+    test_invalid_message_id()
+    test_message_id_already_pinned()
+
+    # AccessError Tests
+    test_invalid_token()
+
+    test_user_isnot_member_of_channel()
+    test_user_isnot_member_of_dm()
+
+    test_user_isnot_owner_of_channel()
+    test_user_isnot_owner_of_dm()
+    pass
+
+
+#############################################################################
+#                                                                           #
+#                        Test for message_unpin_v1                          #
+#                                                                           #
+#############################################################################
+"""
+Author: Shi Tong Yuan
+
+message/unpin/v1
+
+Background:
+Given a message within a channel or DM, remove it's mark as unpinned
+
+Parameters: (token, message_id)
+Return Type: {}
+HTTP Method: POST
+
+InputError:
+    - message_id is not a valid message
+    - Message with ID message_id is already unpinned
+AccessError:
+    - The authorised user is not a member of the channel or DM that the message is within
+    - The authorised user is not an owner of the channel or DM
+
+"""
+
+
+def test_message_unpin_v1():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")["token"]
+    token_2 = auth_register_v1("test_email2@gmail.com", "password", "First2", "Last2")["token"]
+
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")["auth_user_id"]
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")["auth_user_id"]
+    u_id_2 = auth_login_v1("test_email2@gmail.com", "password")["auth_user_id"]
+
+    dm_0_id = dm_create_v1(token_0, [u_id_1])["dm_id"]
+    channel_0_id = channels_create_v1(token_0, "channel_0", True)["channel_id"]
+    channel_invite_v1(token_0, channel_0_id, u_id_1)
+
+    dm_message_0 = message_senddm_v1(token_0, dm_0_id, "I am message.")
+    dm_message_0_message_id = dm_message_0["message_id"]
+    dm_message_1 = message_senddm_v1(token_0, dm_0_id, "@first1last1 I am message.")
+    dm_message_1_message_id = dm_message_1["message_id"]
+
+    channel_message_0 = message_send_v2(token_0, channel_0_id, "I am message.")
+    channel_message_0_message_id = channel_message_0["message_id"]
+    channel_message_1 = message_send_v2(token_0, channel_0_id, "@first0last0 I am message.")
+    channel_message_1_message_id = channel_message_1["message_id"]
+
+    # test for the inputs checking
+
+    def test_invalid_token():
+        with pytest.raises(AccessError):
+            message_unpin_v1("string token", dm_message_0_message_id)  # token's type is incorrect
+        with pytest.raises(AccessError):
+            message_unpin_v1(111000, dm_message_0_message_id)  # token's range is incorrect
+        with pytest.raises(AccessError):
+            message_unpin_v1(None, dm_message_0_message_id)  # token is None
+
+    def test_invalid_message_id():
+        with pytest.raises(InputError):
+            message_unpin_v1(token_0, "string message_id")  # message_id's type is incorrect
+        with pytest.raises(InputError):
+            message_unpin_v1(token_0, 99999999)  # message_id's range is incorrect
+        with pytest.raises(InputError):
+            message_unpin_v1(token_0, None)  # message_id is None
+
+    # InputError : Message with ID message_id is already unpinned
+    def test_message_id_already_unpinned():
+        message_pin_v1(token_0, dm_message_0_message_id)
+        message_unpin_v1(token_0, dm_message_0_message_id)
+        with pytest.raises(InputError):
+            message_unpin_v1(token_0, dm_message_0_message_id)
+
+    # AccessError: The authorised user is not a member of the channel or DM
+    def test_user_isnot_member_of_channel():
+        message_pin_v1(token_0, channel_message_0_message_id)
+        message_pin_v1(token_0, channel_message_1_message_id)
+        with pytest.raises(AccessError):
+            message_unpin_v1(token_2, channel_message_0_message_id)
+        with pytest.raises(AccessError):
+            message_unpin_v1(token_2, channel_message_1_message_id)
+
+    def test_user_isnot_member_of_dm():
+        message_pin_v1(token_0, dm_message_0_message_id)
+        message_pin_v1(token_0, dm_message_1_message_id)
+        with pytest.raises(AccessError):
+            message_unpin_v1(token_2, dm_message_0_message_id)
+        with pytest.raises(AccessError):
+            message_unpin_v1(token_2, dm_message_1_message_id)
+
+    # AccessError: The authorised user is not an owner of the channel or DM
+    def test_user_isnot_owner_of_channel():
+        with pytest.raises(AccessError):
+            message_unpin_v1(token_1, channel_message_0_message_id)
+
+    def test_user_isnot_owner_of_dm():
+        with pytest.raises(AccessError):
+            message_unpin_v1(token_1, dm_message_1_message_id)
+
+    # ----------------------------testing------------------------------------
+    # InputError Tests
+    test_invalid_message_id()
+    test_message_id_already_unpinned()
+
+    # AccessError Tests
+    test_invalid_token()
+
+    test_user_isnot_member_of_channel()
+    test_user_isnot_member_of_dm()
+
+    test_user_isnot_owner_of_channel()
+    test_user_isnot_owner_of_dm()
     pass
