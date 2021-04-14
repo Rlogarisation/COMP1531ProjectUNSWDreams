@@ -338,7 +338,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
 def message_sendlater_v1(token, channel_id, message, time_sent):
     # Type checking
-    if type(channel_id) != int or type(message) != str or type(time_sent) != float:
+    if type(channel_id) != int or type(message) != str or type(time_sent) != int:
         raise InputError(description="message_sendlater_v1 : incorrect type for your inputs.")
 
     auth_user = get_user_by_token(token)
@@ -367,7 +367,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
 
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     # Type checking
-    if type(dm_id) != int or type(message) != str or type(time_sent) != float:
+    if type(dm_id) != int or type(message) != str or type(time_sent) != int:
         raise InputError(description="message_sendlaterdm_v1 : incorrect type for your inputs.")
 
     # InputError 1: invalid token.
