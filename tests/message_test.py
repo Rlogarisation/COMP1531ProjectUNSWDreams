@@ -1401,7 +1401,10 @@ def test_message_pin_v1():
 
     # normal tests
     def test_normal_test01():
-        pass
+        message_pin_v1(token_0, channel_message_0_message_id)
+        message_pin_v1(token_0, channel_message_1_message_id)
+        message_pin_v1(token_0, dm_message_0_message_id)
+        message_pin_v1(token_0, dm_message_1_message_id)
     # ----------------------------testing------------------------------------
     # InputError Tests
     test_invalid_message_id()
@@ -1504,6 +1507,8 @@ def test_message_unpin_v1():
             message_unpin_v1(token_2, channel_message_0_message_id)
         with pytest.raises(AccessError):
             message_unpin_v1(token_2, channel_message_1_message_id)
+        message_unpin_v1(token_0, channel_message_0_message_id)
+        message_unpin_v1(token_0, channel_message_1_message_id)
 
     def test_user_isnot_member_of_dm():
         message_pin_v1(token_0, dm_message_0_message_id)
@@ -1512,19 +1517,41 @@ def test_message_unpin_v1():
             message_unpin_v1(token_2, dm_message_0_message_id)
         with pytest.raises(AccessError):
             message_unpin_v1(token_2, dm_message_1_message_id)
+        message_unpin_v1(token_0, dm_message_0_message_id)
+        message_unpin_v1(token_0, dm_message_1_message_id)
 
     # AccessError: The authorised user is not an owner of the channel or DM
     def test_user_isnot_owner_of_channel():
+        message_pin_v1(token_0, channel_message_0_message_id)
+        message_pin_v1(token_0, channel_message_1_message_id)
         with pytest.raises(AccessError):
             message_unpin_v1(token_1, channel_message_0_message_id)
+        with pytest.raises(AccessError):
+            message_unpin_v1(token_1, channel_message_1_message_id)
+        message_unpin_v1(token_0, channel_message_0_message_id)
+        message_unpin_v1(token_0, channel_message_1_message_id)
 
     def test_user_isnot_owner_of_dm():
+        message_pin_v1(token_0, dm_message_0_message_id)
+        message_pin_v1(token_0, dm_message_1_message_id)
+        with pytest.raises(AccessError):
+            message_unpin_v1(token_1, dm_message_0_message_id)
         with pytest.raises(AccessError):
             message_unpin_v1(token_1, dm_message_1_message_id)
+        message_unpin_v1(token_0, dm_message_0_message_id)
+        message_unpin_v1(token_0, dm_message_1_message_id)
 
     # normal tests
     def test_normal_test01():
-        pass
+        message_pin_v1(token_0, channel_message_0_message_id)
+        message_pin_v1(token_0, channel_message_1_message_id)
+        message_pin_v1(token_0, dm_message_0_message_id)
+        message_pin_v1(token_0, dm_message_1_message_id)
+
+        message_unpin_v1(token_0, channel_message_0_message_id)
+        message_unpin_v1(token_0, channel_message_1_message_id)
+        message_unpin_v1(token_0, dm_message_0_message_id)
+        message_unpin_v1(token_0, dm_message_1_message_id)
     # ----------------------------testing------------------------------------
     # InputError Tests
     test_invalid_message_id()
