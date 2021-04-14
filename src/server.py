@@ -101,13 +101,13 @@ def auth_logout_v1():
 @APP.route("/auth/passwordreset/request/v1", methods=['POST'])
 def auth_passwordreset_request_v1_http():
     info = request.get_json()
-    result = auth_passwordreset_request_v1(info['email'])
+    auth_passwordreset_request_v1(info['email'])
     # msg = Message('Reset Code', sender='yourID@gmail.com', recipients=[info['email']])
     # msg.body = f"The code to rest password is {result['reset_code']}"
     # mail.send(msg)
 
     dump_data(data)
-    return dumps(result)
+    return dumps({})
 
 
 @APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
