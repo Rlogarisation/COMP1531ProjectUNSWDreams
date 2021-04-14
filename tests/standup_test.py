@@ -71,7 +71,7 @@ def test_standup_start_unauthorised_user():
     auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
     token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
-    token2 = aauth_login_v1("test@testexample.com", "wp01^#$dp1o23")['token']
+    token2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")['token']
     channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
     with pytest.raises(AccessError):
         standup_start_v1(token2, channel_id1, 60)
@@ -198,11 +198,11 @@ def test_standup_send_unauthorised_user():
     auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
     token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
-    token2 = aauth_login_v1("test@testexample.com", "wp01^#$dp1o23")['token']
+    token2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")['token']
     channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
     standup_start_v1(token1, channel_id1, 60)
     with pytest.raises(AccessError):
-        standup_send_v1(token2, channel_id1, message)
+        standup_send_v1(token2, channel_id1, 'This is the first message')
 
 
 def test_standup_send_invalid_token():
