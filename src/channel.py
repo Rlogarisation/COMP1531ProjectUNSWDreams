@@ -101,24 +101,10 @@ def channel_details_v1(token, channel_id):
     owner_list = []
     member_list = []
     for owner in channel.owner_members:
-        dict_owner = {
-            "u_id": owner.u_id,
-            "email": owner.email,
-            "name_first": owner.name_first,
-            "name_last": owner.name_last,
-            "handle_str": owner.handle_str
-        }
-        owner_list.append(dict_owner)
+        owner_list.append(owner.return_type_user_v2())
 
     for member in channel.all_members:
-        dict_member = {
-            "u_id": member.u_id,
-            "email": member.email,
-            "name_first": member.name_first,
-            "name_last": member.name_last,
-            "handle_str": member.handle_str
-        }
-        member_list.append(dict_member)
+        member_list.append(member.return_type_user_v2())
 
     return {
         'name': channel.name,
@@ -172,7 +158,7 @@ def channel_messages_v1(token, channel_id, start):
         counter_end = 0
         end = -1
     while counter_start >= counter_end:
-        msg = channel.messages[counter_start].return_type_message()
+        msg = channel.messages[counter_start].return_type_message_v2()
         if user.u_id in msg['reacts']['u_ids']:
             msg['reacts']['is_this_user_reacted'] = True
         else:

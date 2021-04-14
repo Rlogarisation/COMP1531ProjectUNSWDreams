@@ -1,5 +1,6 @@
-from threading import Timer
+from threading import Thread, Timer
 import re
+from time import sleep, time
 from src.data_file import data, Message, Permission, current_time
 from src.error import InputError, AccessError
 from src.auth import get_user_by_token, get_user_by_handle, get_user_by_uid
@@ -35,8 +36,13 @@ AccessError:
 
 
 def message_send_v2(token, channel_id, message):
+    # error check
+    auth_user, message, channel = helper_message_send_v2(token, channel_id, message)
+
+    # if error check passed, create a new message id
     new_message_id = create_message_id()
-    helper_message_send_v2(token, channel_id, message, new_message_id)
+    # sned message to the channel
+    helper2_message_send_v2(new_message_id, auth_user, message, channel)
 
     return {
         'message_id': new_message_id,
@@ -67,8 +73,13 @@ AccessError:
 
 
 def message_senddm_v1(token, dm_id, message):
+    # error check
+    auth_user, message, dm = helper_message_senddm_v1(token, dm_id, message)
+
+    # if error check passed, create a new message id
     new_message_id = create_message_id()
-    helper_message_senddm_v1(token, dm_id, message, new_message_id)
+    # sned message to the dm
+    helper2_message_senddm_v1(new_message_id, auth_user, message, dm)
 
     return {
         'message_id': new_message_id,
@@ -175,6 +186,7 @@ def message_remove_v1(token, message_id):
 
     # if cannot find the channel or dm
     channel_dm = get_channel_dm_by_message_id(message_id)
+    print("channel_dm == ", channel_dm)
     check_owner = None
     if channel_dm is None:
         raise InputError(description="The message is not in any channel or dm")
@@ -275,33 +287,23 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
 
 def message_sendlater_v1(token, channel_id, message, time_sent):
-    # Type checking
-    if type(channel_id) != int or type(message) != str or type(time_sent) != float:
-        raise InputError(description="message_sendlater_v1 : incorrect type for your inputs.")
+    # Type checking for time_sent
+    if type(time_sent) != int:
+        raise InputError(description="message_sendlater_v1 : incorrect type for time_sent.")
 
-    auth_user = get_user_by_token(token)
-    if auth_user is None:
-        raise AccessError(description='Invalid token.')
-    # InputError 1: Message is more than 1000 characters
-    if len(message) > 1000:
-        raise InputError(description='message_send_v2 : Message is more than 1000 characters.')
-
-    # AccessError 1: invalid channel_id
-    channel = get_channel_by_channel_id(channel_id)
-    if type(channel_id) != int or channel is None:
-        raise InputError(description='message_send_v2 : Invalid channel_id.')
-
-    # AccessError 2: the authorised user has not joined the channel they are trying to post to
-    if auth_user not in channel.all_members:
-        raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
-
+    # error check
+    auth_user, message, channel = helper_message_send_v2(token, channel_id, message)
+    # check if time_sent is after current time
     cur_time = current_time()
     if time_sent < cur_time:
         raise InputError(description="Time sent is a time in the past")
 
+    # if all inputs are valid, create a new message id
     new_message_id = create_message_id()
-    timer = Timer((time_sent - cur_time), helper_message_send_v2, [token, channel_id, message, new_message_id])
+
+    timer = Timer((time_sent - cur_time), helper2_message_send_v2, [new_message_id, auth_user, message, channel])
     timer.start()
+    data['threads'].append(timer)
 
     return {
         'message_id': new_message_id
@@ -309,35 +311,23 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
 
 
 def message_sendlaterdm_v1(token, dm_id, message, time_sent):
-    # Type checking
-    if type(dm_id) != int or type(message) != str or type(time_sent) != float:
-        raise InputError(description="message_sendlaterdm_v1 : incorrect type for your inputs.")
+    # Type checking for time_sent
+    if type(time_sent) != int:
+        raise InputError(description="message_sendlaterdm_v1 : incorrect type for time_sent.")
 
-    # InputError 1: invalid token.
-    auth_user = get_user_by_token(token)
-    if auth_user is None:
-        raise AccessError(description='message_send_v2 : Invalid token.')
-
-    # InputError 1: Message is more than 1000 characters
-    if len(message) > 1000:
-        raise InputError(description='message_send_v2 : Message is more than 1000 characters.')
-
-    # AccessError 1: invalid dm_id
-    dm = get_dm_by_dm_id(dm_id)
-    if type(dm_id) != int or dm is None:
-        raise InputError(description='message_send_v2 : Invalid dm_id.')
-
-    # AccessError 2: the authorised user has not joined the channel they are trying to post to
-    if auth_user not in dm.dm_members:
-        raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
-
+    # error check
+    auth_user, message, dm = helper_message_senddm_v1(token, dm_id, message)
+    # check if time_sent is after current time
     cur_time = current_time()
     if time_sent < cur_time:
         raise InputError(description="Time sent is a time in the past")
 
+    # if all inputs are valid, create a new message id
     new_message_id = create_message_id()
-    timer = Timer((time_sent - cur_time), helper_message_senddm_v1, [token, dm_id, message, new_message_id])
+
+    timer = Timer((time_sent - cur_time), helper2_message_senddm_v1, [new_message_id, auth_user, message, dm])
     timer.start()
+    data['threads'].append(timer)
 
     return {
         'message_id': new_message_id
@@ -397,7 +387,7 @@ def message_unpin_v1(token, message_id):
 # generate a new session id
 def create_message_id():
     new_id = data['message_num']
-
+    data['message_num'] = data['message_num'] + 1
     return new_id
 
 
@@ -477,6 +467,7 @@ def tagging_user(message, channel_id, dm_id, sender):
     for word in split_msg:
         if re.search('@', word) is not None:
             handle = word[1:]
+            # print("handle == ", handle)
             invitee = get_user_by_handle(handle)
             if invitee is None:
                 continue
@@ -593,7 +584,10 @@ def update_message_dreams_stat():
     data['messages_exist'].append(stat_message)
 
 
-def helper_message_send_v2(token, channel_id, message, message_id):
+def helper_message_send_v2(token, channel_id, message):
+    if type(channel_id) != int or type(message) != str:
+        raise InputError(description="incorrect type for your inputs.")
+
     # InputError 1: invalid token.
     auth_user = get_user_by_token(token)
     if auth_user is None:
@@ -612,9 +606,12 @@ def helper_message_send_v2(token, channel_id, message, message_id):
     if auth_user not in channel.all_members:
         raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
 
+    return [auth_user, message, channel]
+
+
+def helper2_message_send_v2(message_id, auth_user, message, channel):
     time_created = current_time()
     message_created = Message(message_id, auth_user.u_id, message, time_created, channel.channel_id, -1)
-    data['message_num'] = data['message_num'] + 1
     channel.messages.append(message_created)
     auth_user.messages.append(message_created)
     data['class_messages'].append(message_created)
@@ -625,10 +622,13 @@ def helper_message_send_v2(token, channel_id, message, message_id):
     update_message_user_stat(auth_user)
 
     # check and tag user
-    tagging_user(message, channel_id, -1, auth_user)
+    tagging_user(message, channel.channel_id, -1, auth_user)
 
 
-def helper_message_senddm_v1(token, dm_id, message, message_id):
+def helper_message_senddm_v1(token, dm_id, message):
+    if type(dm_id) != int or type(message) != str:
+        raise InputError(description="incorrect type for your inputs.")
+
     # InputError 1: invalid token.
     auth_user = get_user_by_token(token)
     if auth_user is None:
@@ -647,9 +647,12 @@ def helper_message_senddm_v1(token, dm_id, message, message_id):
     if auth_user not in dm.dm_members:
         raise AccessError(description='message_send_v2 : the authorised user has not joined the channel.')
 
+    return [auth_user, message, dm]
+
+
+def helper2_message_senddm_v1(message_id, auth_user, message, dm):
     created_time = current_time()
     message_created = Message(message_id, auth_user.u_id, message, created_time, -1, dm.dm_id)
-    data['message_num'] = data['message_num'] + 1
     dm.dm_messages.append(message_created)
     auth_user.messages.append(message_created)
     data['class_messages'].append(message_created)
@@ -660,4 +663,4 @@ def helper_message_senddm_v1(token, dm_id, message, message_id):
     update_message_user_stat(auth_user)
 
     # check and tag user
-    tagging_user(message, -1, dm_id, auth_user)
+    tagging_user(message, -1, dm.dm_id, auth_user)

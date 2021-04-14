@@ -23,7 +23,7 @@ def user_profile_v1(token, u_id):
     if user_ is None:
         raise InputError(description="User with u_id is not a valid user")
 
-    result = user.return_type_user()
+    result = user.return_type_user_v2()
     return {
         'user': result
     }
@@ -95,7 +95,7 @@ def users_all(token):
 
     list_return = []
     for i in data['class_users']:
-        list_return.append(i.return_type_user())
+        list_return.append(i.return_type_user_v1())
     return {
         'users': list_return
     }
