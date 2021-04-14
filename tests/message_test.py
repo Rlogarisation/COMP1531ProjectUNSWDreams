@@ -735,6 +735,8 @@ def test_message_senddm_v1():
     test_failed_case2_with_at()
     test_failed_case3_with_at()
     pass
+
+
 #############################################################################
 #                                                                           #
 #                      Test for message_sendlater_v1                        #
@@ -829,15 +831,16 @@ def test_message_sendlater_v1():
         message_id_0 = message_sendlater_v1(token_0, channel_0_id, "Here is message 01.", time_sent_1 + 2)['message_id']
         message_id_1 = message_sendlater_v1(token_0, channel_0_id, "Here is message 02.", time_sent_1 + 3)['message_id']
 
+        channel_msgs = channel_messages_v1(token_0, channel_0_id, 0)
         assert len(channel_msgs['messages']) == 0
 
         for i in data['threads']:
             i.join()
 
-        channel_msgs_2 = channel_messages_v1(token_0, channel_0_id, 0)
-        assert len(channel_msgs_2['messages']) == 2
-        assert channel_msgs_2['messages'][0]['message'] == "Here is message 02."
-        assert channel_msgs_2['messages'][1]['message'] == "Here is message 01."
+        channel_msgs = channel_messages_v1(token_0, channel_0_id, 0)
+        assert len(channel_msgs['messages']) == 2
+        assert channel_msgs['messages'][0]['message'] == "Here is message 02."
+        assert channel_msgs['messages'][1]['message'] == "Here is message 01."
 
         assert message_id_0 == 0
         assert message_id_1 == 1

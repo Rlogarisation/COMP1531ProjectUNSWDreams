@@ -328,6 +328,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
     new_message_id = create_message_id()
     timer = Timer((time_sent - cur_time), helper_message_send_v2, [token, channel_id, message, new_message_id])
     timer.start()
+    data['threads'].append(timer)
 
     return {
         'message_id': new_message_id
@@ -364,6 +365,7 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
     new_message_id = create_message_id()
     timer = Timer((time_sent - cur_time), helper_message_senddm_v1, [token, dm_id, message, new_message_id])
     timer.start()
+    data['threads'].append(timer)
 
     return {
         'message_id': new_message_id
