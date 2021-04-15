@@ -47,7 +47,7 @@ def test_message_send_invalid_length_http(parameters):
     json_input2 = {"token": token, "channel_id": channel_id, "message": msg}
     status = requests.post(config.url + "message/send/v2", json=json_input2).status_code
     assert status == 400
-
+    requests.delete(config.url + "clear/v1")
 
 def test_message_send_not_join_http(parameters, parameters1):
     requests.delete(config.url + "clear/v1")
@@ -63,7 +63,7 @@ def test_message_send_not_join_http(parameters, parameters1):
     json_input2 = {"token": token1, "channel_id": channel_id, "message": "haha"}
     status = requests.post(config.url + "message/send/v2", json=json_input2).status_code
     assert status == 403
-
+    requests.delete(config.url + "clear/v1")
 #############################################################################
 #                                                                           #
 #                       http test for message_edit Error                    #
@@ -87,7 +87,7 @@ def test_message_edit_deleted_msg_http(parameters):
     json_input3 = {"token": token, "message_id": message_id, "message": "second"}
     status = requests.put(config.url + "message/edit/v2", json=json_input3).status_code
     assert status == 400
-
+    requests.delete(config.url + "clear/v1")
 
 def test_message_edit_accessError(parameters, parameters1):
     requests.delete(config.url + "clear/v1")
@@ -109,7 +109,7 @@ def test_message_edit_accessError(parameters, parameters1):
     json_input3 = {"token": token1, "message_id": message_id, "message": "heihei"}
     status = requests.put(config.url + "message/edit/v2", json=json_input3).status_code
     assert status == 403
-
+    requests.delete(config.url + "clear/v1")
 #############################################################################
 #                                                                           #
 #                     http test for message_remove Error                    #
@@ -127,7 +127,7 @@ def test_message_remove_invalid_msg_id(parameters):
     json_input2 = {"token": token, "message_id": "haha"}
     status = requests.delete(config.url + "message/remove/v1", json=json_input2).status_code
     assert status == 400
-
+    requests.delete(config.url + "clear/v1")
 
 def test_message_remove_accessError(parameters, parameters1):
     requests.delete(config.url + "clear/v1")
@@ -149,7 +149,7 @@ def test_message_remove_accessError(parameters, parameters1):
     json_input3 = {"token": token1, "message_id": message_id}
     status = requests.delete(config.url + "message/remove/v1", json=json_input3).status_code
     assert status == 403
-
+    requests.delete(config.url + "clear/v1")
 #############################################################################
 #                                                                           #
 #                      http test for message_share Error                    #
@@ -175,7 +175,7 @@ def test_message_share_not_join_http(parameters, parameters1):
     json_input3 = {"token": token1, "og_message_id": og_message_id, "message": "good", "channel_id": channel_id, "dm_id": -1}
     status = requests.post(config.url + "message/share/v1", json=json_input3).status_code
     assert status == 403
-
+    requests.delete(config.url + "clear/v1")
 #############################################################################
 #                                                                           #
 #                       http test for message_senddm Error                  #
@@ -197,7 +197,7 @@ def test_message_senddm_invalid_length_http(parameters):
     json_input2 = {"token": token0, "dm_id": dm_id, "message": msg}
     status = requests.post(config.url + "message/senddm/v1", json=json_input2).status_code
     assert status == 400
-
+    requests.delete(config.url + "clear/v1")
 
 def test_message_senddm_not_join_http(parameters, parameters1, parameters2):
     requests.delete(config.url + "clear/v1")
@@ -215,7 +215,7 @@ def test_message_senddm_not_join_http(parameters, parameters1, parameters2):
     json_input2 = {"token": token2, "dm_id": dm_id, "message": "haha"}
     status = requests.post(config.url + "message/senddm/v1", json=json_input2).status_code
     assert status == 403
-
+    requests.delete(config.url + "clear/v1")
 
 #############################################################################
 #                                                                           #
@@ -297,7 +297,7 @@ def test_message_valid_http(parameters, parameters1, parameters2):
     dm_msg = json.loads(dm_msg.text).get("messages")[0]["message"]
     correct = "this is comment" '"""' "good0" '"""'
     assert dm_msg == correct
-
+    requests.delete(config.url + "clear/v1")
 
 #############################################################################
 #                                                                           #
@@ -399,7 +399,7 @@ def test_message_sendlater(parameters, parameters1, parameters2):
     test_invalid_token()
 
     test_user_isnot_member_of_channel()
-
+    requests.delete(config.url + "clear/v1")
 
 #############################################################################
 #                                                                           #
@@ -498,7 +498,7 @@ def test_message_sendlaterdm(parameters, parameters1, parameters2):
     test_invalid_token()
 
     test_user_isnot_member_of_dm()
-
+    requests.delete(config.url + "clear/v1")
 
 #############################################################################
 #                                                                           #
@@ -625,7 +625,7 @@ def test_message_react(parameters, parameters1, parameters2):
 
     test_user_isnot_member_of_channel()
     test_user_isnot_member_of_dm()
-
+    requests.delete(config.url + "clear/v1")
 
 #############################################################################
 #                                                                           #
@@ -772,7 +772,7 @@ def test_message_unreact(parameters, parameters1, parameters2):
 
     test_user_isnot_member_of_channel()
     test_user_isnot_member_of_dm()
-
+    requests.delete(config.url + "clear/v1")
 
 #############################################################################
 #                                                                           #
@@ -902,7 +902,7 @@ def test_message_pin(parameters, parameters1, parameters2):
 
     test_user_isnot_owner_of_channel()
     test_user_isnot_owner_of_dm()
-
+    requests.delete(config.url + "clear/v1")
 
 #############################################################################
 #                                                                           #
@@ -1044,3 +1044,4 @@ def test_message_unpin(parameters, parameters1, parameters2):
 
     test_user_isnot_owner_of_channel()
     test_user_isnot_owner_of_dm()
+    requests.delete(config.url + "clear/v1")

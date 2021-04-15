@@ -145,7 +145,7 @@ def test_standup_start(parameters, parameters1, parameters2):
 
     # normal tests
     test_normal_test01()
-
+    requests.delete(config.url + "clear/v1")
     pass
 #############################################################################
 #                                                                           #
@@ -244,6 +244,7 @@ def test_standup_active(parameters, parameters1, parameters2):
     test_invalid_channel_id()
 
     test_normal_test01()
+    requests.delete(config.url + "clear/v1")
     pass
 #############################################################################
 #                                                                           #
@@ -354,4 +355,5 @@ def test_standup_send(parameters, parameters1, parameters2):
     test_standup_not_started()
     test_user_isnot_member_of_channel()
     test_normal_test01()
+    requests.delete(config.url + "clear/v1")
     pass

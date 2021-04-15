@@ -34,6 +34,7 @@ def test_auth_register_invalid_email_http():
     }
     status = requests.post(config.url + 'auth/register/v2', json=parameters).status_code
     assert status == 400
+    requests.delete(config.url + "clear/v1")
 
 
 def test_auth_register_duplicate_email_http():
@@ -47,6 +48,7 @@ def test_auth_register_duplicate_email_http():
     requests.post(config.url + 'auth/register/v2', json=parameters)
     status = requests.post(config.url + 'auth/register/v2', json=parameters).status_code
     assert status == 400
+    requests.delete(config.url + "clear/v1")
 
 
 def test_auth_register_pwd_length_http():
@@ -59,6 +61,7 @@ def test_auth_register_pwd_length_http():
     }
     status = requests.post(config.url + 'auth/register/v2', json=parameters).status_code
     assert status == 400
+    requests.delete(config.url + "clear/v1")
 
 
 def test_auth_register_firstName_length_http():
@@ -71,6 +74,7 @@ def test_auth_register_firstName_length_http():
     }
     status = requests.post(config.url + 'auth/register/v2', json=parameters).status_code
     assert status == 400
+    requests.delete(config.url + "clear/v1")
 
 
 def test_auth_register_lastName_length_http():
@@ -83,6 +87,7 @@ def test_auth_register_lastName_length_http():
     }
     status = requests.post(config.url + 'auth/register/v2', json=parameters).status_code
     assert status == 400
+    requests.delete(config.url + "clear/v1")
 #############################################################################
 #                                                                           #
 #                       http test for auth_login Error                   #
@@ -100,6 +105,7 @@ def test_auth_login_invalid_email_http():
     }
     status = requests.post(config.url + 'auth/login/v2', json=parameters).status_code
     assert status == 400
+    requests.delete(config.url + "clear/v1")
 
 
 def test_auth_login_not_registered_email_http():
@@ -117,6 +123,7 @@ def test_auth_login_not_registered_email_http():
     }
     status = requests.post(config.url + 'auth/login/v2', json=parameters2).status_code
     assert status == 400
+    requests.delete(config.url + "clear/v1")
 
 
 def test_auth_login_wrong_password_http(parameters):
@@ -128,6 +135,7 @@ def test_auth_login_wrong_password_http(parameters):
     }
     status = requests.post(config.url + 'auth/login/v2', json=parameters2).status_code
     assert status == 400
+    requests.delete(config.url + "clear/v1")
 #############################################################################
 #                                                                           #
 #                       http test for auth_logout Error                   #
@@ -142,7 +150,7 @@ def test_auth_logout_invalid_token_http(parameters):
     invalid_token = f"{token}123"
     resp = requests.post(config.url + 'auth/logout/v1', json={"token": invalid_token})
     assert json.loads(resp.text).get('is_success') is False
-
+    requests.delete(config.url + "clear/v1")
 #############################################################################
 #                                                                           #
 #          http test for auth_register, auth_login, auth_logout             #
@@ -175,3 +183,4 @@ def test_auth_logout_successfully_http(parameters):
     resp_logout1 = requests.post(config.url + 'auth/logout/v1', json={"token": token1})
     assert json.loads(resp_logout0.text).get('is_success') is True
     assert json.loads(resp_logout1.text).get('is_success') is True
+    requests.delete(config.url + "clear/v1")

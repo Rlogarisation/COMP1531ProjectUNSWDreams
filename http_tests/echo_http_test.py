@@ -10,3 +10,4 @@ def test_echo():
     """
     resp = requests.get(config.url + 'echo', params={'data': 'hello'})
     assert json.loads(resp.text) == {'data': 'hello'}
+    requests.delete(config.url + "clear/v1")
