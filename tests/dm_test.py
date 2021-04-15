@@ -73,6 +73,8 @@ def test_dm_details_v1():
     test_Inaccessible_member()
     test_invalid_user()
     test_normal_case()
+
+    clear_v1()
     pass
 
 
@@ -115,6 +117,7 @@ def test_dm_list_v1():
             dm_list_v1("invalid token")
         with pytest.raises(AccessError):
             dm_list_v1(None)
+
     def test_normal_case():
         dm_create_v1(token0, [1])
         dm_create_v1(token0, [2])
@@ -132,6 +135,7 @@ def test_dm_list_v1():
     test_invalid_token()
     test_normal_case()
 
+    clear_v1()
     pass
 
 
@@ -192,12 +196,12 @@ def test_dm_create_v1():
         with pytest.raises(InputError):
             dm_create_v1(token1, "i am not a list.")
         with pytest.raises(InputError):
-            dm_create_v1(token1, [4,5,6])
+            dm_create_v1(token1, [4, 5, 6])
 
     def test_none_inviter():
         with pytest.raises(AccessError):
             dm_create_v1(None, [1])
-    
+
     def test_normal_case():
         dm1 = dm_create_v1(token0, [1])
         assert dm1['dm_id'] == 0
@@ -207,6 +211,8 @@ def test_dm_create_v1():
     test_normal_case()
     test_invalid_u_id_list()
     test_none_inviter()
+
+    clear_v1()
     pass
 
 
@@ -245,7 +251,7 @@ def test_dm_remove_v1():
     dm_create_v1(token0, [1])
     dm_create_v1(token0, [2])
     dm_create_v1(token1, [2])
-    
+
     def test_invalid_token():
         with pytest.raises(AccessError):
             dm_remove_v1("invalid token", 0)
@@ -266,6 +272,7 @@ def test_dm_remove_v1():
         # dm_id is out of range
         with pytest.raises(InputError):
             dm_remove_v1(token0, 999)
+
     def test_remove_dm_twice():
         dm_remove_v1(token0, 1)
         with pytest.raises(InputError):
@@ -276,6 +283,7 @@ def test_dm_remove_v1():
             dm_remove_v1("invalid token", 2)
         with pytest.raises(AccessError):
             dm_remove_v1(token0, 2)
+
     def test_normal_case():
         dm_remove_v1(token0, 0)
 
@@ -285,6 +293,8 @@ def test_dm_remove_v1():
     test_remove_dm_twice()
     test_not_creator()
     test_normal_case()
+
+    clear_v1()
     pass
 
 
@@ -369,6 +379,8 @@ def test_dm_invite_v1():
     test_already_user()
     test_inviter_not_authorised()
     test_normal_case()
+
+    clear_v1()
     pass
 
 
@@ -442,7 +454,7 @@ def test_dm_leave_v1():
     def test_invalid_leaver():
         with pytest.raises(AccessError):
             dm_leave_v1(None, 2)
-    
+
     def test_normal_case():
         dm_leave_v1(token0, 0)
     # --------------------------testing---------------------------
@@ -452,6 +464,8 @@ def test_dm_leave_v1():
     test_user_not_in()
     test_invalid_leaver()
     test_normal_case()
+
+    clear_v1()
     pass
 
 
@@ -491,7 +505,7 @@ def test_dm_messages_v1():
     dm_create_v1(token0, [1])
     dm_create_v1(token0, [2])
     dm_create_v1(token1, [2])
-    
+
     def test_invalid_token():
         with pytest.raises(AccessError):
             dm_messages_v1("invalid token", 1, 0)
@@ -532,4 +546,6 @@ def test_dm_messages_v1():
     test_user_not_in()
     test_normal_case_less_50_msg()
     test_normal_case_more_50_msg()
+
+    clear_v1()
     pass

@@ -42,6 +42,8 @@ def test_clear_v1():
 
     assert channels_listall_v1(register['token'])['channels'] == []
 
+    clear_v1()
+
 
 def test_search_v1():
     auth_register_v1('user0@gmail.com', 'qwe1212', 'shaozhen', 'yan')
@@ -83,4 +85,6 @@ def test_search_v1():
     test_oversize_string()
     test_search_in_channel()
     test_search_in_dm()
+
+    clear_v1()
     pass

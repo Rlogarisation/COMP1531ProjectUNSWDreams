@@ -278,7 +278,9 @@ def test_standup_start():
     test_user_isnot_member_of_channel()
 
     # normal tests
-    test_normal_test01
+    test_normal_test01()
+
+    clear_v1()
     pass
 #############################################################################
 #                                                                           #
@@ -345,6 +347,9 @@ def test_standup_active():
     test_invalid_channel_id()
 
     test_normal_test01()
+
+    clear_v1()
+
     pass
 #############################################################################
 #                                                                           #
@@ -423,4 +428,6 @@ def test_standup_send():
     test_standup_not_started()
     test_user_isnot_member_of_channel()
     test_normal_test01()
+
+    clear_v1()
     pass

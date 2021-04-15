@@ -36,16 +36,22 @@ def test_auth_register_invalid_email():
     # with pytest.raises(InputError):
     #     auth_register_v1(None, "password", 'Lan', 'Lin')
 
+    clear_v1()
 
 # test email address is already being used by another user
+
+
 def test_auth_register_duplicate_email():
     clear_v1()
     auth_register_v1('haha1@gmail.com', 'shkdlch', 'Peter', 'White')
     with pytest.raises(InputError):
         auth_register_v1('haha1@gmail.com', '0w9epodu', 'Tom', 'White')
 
+    clear_v1()
 
 # test for password entered is less than 6 characters long
+
+
 def test_auth_register_pwd_length():
     clear_v1()
     with pytest.raises(InputError):
@@ -53,8 +59,11 @@ def test_auth_register_pwd_length():
     with pytest.raises(InputError):
         auth_register_v1('haha2@gmail.com', 'ab#', 'Peter', 'White')
 
+    clear_v1()
 
 # name_first is not between 1 and 50 characters inclusively in length
+
+
 def test_auth_register_firstName_length():
     clear_v1()
     name = 'a' * 51
@@ -63,8 +72,11 @@ def test_auth_register_firstName_length():
     with pytest.raises(InputError):
         auth_register_v1('haha2@gmail.com', 'iwsdrjcio', name, 'White')
 
+    clear_v1()
 
 # name_last is not between 1 and 50 characters inclusively in length
+
+
 def test_auth_register_lastName_length():
     clear_v1()
     name = 'a' * 51
@@ -73,8 +85,11 @@ def test_auth_register_lastName_length():
     with pytest.raises(InputError):
         auth_register_v1('haha2@gmail.com', 'iwsdcio3', 'Tom', name)
 
+    clear_v1()
 
 # test several users can successfully register
+
+
 def test_auth_register_valid_small():
     clear_v1()
     # register two users with valid inputs
@@ -97,8 +112,11 @@ def test_auth_register_valid_small():
     assert auth_user_id1 != auth_user_id2
     assert token1 != token2
 
+    clear_v1()
 
 # test large number of users can register successfully
+
+
 def test_auth_register_valid_large():
     clear_v1()
     id_list = []
@@ -112,8 +130,11 @@ def test_auth_register_valid_large():
     # check the number of registered users are correct
     assert len(set(id_list)) == len(id_list) == 50
 
+    clear_v1()
 
 # test if a valid handle is generated
+
+
 def test_auth_register_handle_valid():
     clear_v1()
     register1 = auth_register_v1('haha@gmail.com', '123123123', 'zxcvbnmasdfg', 'hjklqwe')
@@ -148,6 +169,8 @@ def test_auth_register_handle_valid():
     assert member3['handle_str'] == 'zxcvbnmasdfghjklqwer0'
     assert member4['handle_str'] == 'zxcvbnmasdfghjklqwer1'
 
+    clear_v1()
+
 
 """
 Author : Lan Lin
@@ -177,8 +200,11 @@ def test_auth_login_invalid_email():
     with pytest.raises(InputError):
         auth_login_v1(None, 'password')
 
+    clear_v1()
 
 # test for email entered does not belong to a user
+
+
 def test_auth_login_not_registered_email():
     clear_v1()
     # register a user
@@ -188,16 +214,22 @@ def test_auth_login_not_registered_email():
     with pytest.raises(InputError):
         auth_login_v1('haha2@gmail.com', '123123123')
 
+    clear_v1()
 
 # test for password is not correct
+
+
 def test_auth_login_wrong_password():
     clear_v1()
     auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'Green')
     with pytest.raises(InputError):
         auth_login_v1('haha@gmail.com', 'jfqowei0-23opj')
 
+    clear_v1()
 
 # test for users can login successfully
+
+
 def test_auth_login_valid():
     clear_v1()
     # register two users with valid inputs
@@ -216,8 +248,11 @@ def test_auth_login_valid():
     assert login1['token'] != register1['token']
     assert login2['token'] != register2['token']
 
+    clear_v1()
 
 # test for the same user with different sessions
+
+
 def test_auth_login_different_sessions():
     clear_v1()
     auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
@@ -233,6 +268,8 @@ def test_auth_login_different_sessions():
     token3 = login3['token']
     assert auth_user_id1 == auth_user_id2 == auth_user_id3
     assert token1 != token2 != token3
+
+    clear_v1()
 #############################################################################
 #                                                                           #
 #                       Test for auth_logout                                #
@@ -248,6 +285,8 @@ def test_auth_logout_invalid_token():
     assert auth_logout(invalid_token) == {'is_success': False}
     assert auth_logout(None) == {'is_success': False}
 
+    clear_v1()
+
 
 def test_auth_logout_successfully_emall():
     clear_v1()
@@ -262,6 +301,8 @@ def test_auth_logout_successfully_emall():
     assert auth_logout(token2) == {'is_success': True}
     # assert len(user1.current_sessions) == 0
 
+    clear_v1()
+
 
 def test_auth_logout_successfully_large():
     clear_v1()
@@ -273,6 +314,8 @@ def test_auth_logout_successfully_large():
     for token in token_list:
         result = auth_logout(token)
         assert result == {'is_success': True}
+
+    clear_v1()
 #############################################################################
 #                                                                           #
 #   Test for auth_passwordreset_request_v1 and auth_passwordreset_reset_v1  #
@@ -287,12 +330,16 @@ def test_auth_passwordreset_successful():
     auth_passwordreset_reset_v1(reset_code, 'TheNewPassword')
     assert auth_login_v1('cblinker17@gmail.com', 'TheNewPassword')['auth_user_id'] == id_check
 
+    clear_v1()
+
 
 def test_auth_passwordrequest_invalid_email():
     clear_v1()
     auth_register_v1('cblinker17@gmail.com', '123123123', 'Peter', 'White')
     with pytest.raises(InputError):
         auth_passwordreset_request_v1('cblinker@gmail.com')
+
+    clear_v1()
 
 
 def test_auth_passwordreset_reset_invalid_password():
@@ -303,6 +350,8 @@ def test_auth_passwordreset_reset_invalid_password():
     with pytest.raises(InputError):
         auth_passwordreset_reset_v1(reset_code, invalid_password)
 
+    clear_v1()
+
 
 def test_auth_passwordreset_reset_invalid_reset_code():
     clear_v1()
@@ -312,6 +361,7 @@ def test_auth_passwordreset_reset_invalid_reset_code():
     with pytest.raises(InputError):
         auth_passwordreset_reset_v1(invalid_reset_code, 'TheNewPassword')
 
+    clear_v1()
 
 # """
 # Author : Emir Aditya Zen

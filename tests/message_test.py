@@ -60,6 +60,8 @@ def test_message_send_invalid_token_v1():
     with pytest.raises(AccessError):
         message_send_v2("invlaid_token", channel_0_id, "it works!")
 
+    clear_v1()
+
 
 def test_message_send_long_message_v1():
     clear_v1()
@@ -71,6 +73,8 @@ def test_message_send_long_message_v1():
     with pytest.raises(InputError):
         message_send_v2(token_0, channel_0_id, long_message)
 
+    clear_v1()
+
 
 def test_message_send_invalid_channel_id_v1():
     clear_v1()
@@ -80,6 +84,8 @@ def test_message_send_invalid_channel_id_v1():
 
     with pytest.raises(InputError):
         message_send_v2(token_0, "invalid channel_id", "it not works")
+
+    clear_v1()
 
 
 def test_message_send_not_join_v1():
@@ -93,6 +99,8 @@ def test_message_send_not_join_v1():
 
     with pytest.raises(AccessError):
         message_send_v2(token_1, channel_0_id, "You can't send msg")
+
+    clear_v1()
 
 
 def test_message_send_same_message_id():
@@ -108,6 +116,8 @@ def test_message_send_same_message_id():
     with pytest.raises(AccessError):
         message_send_v2(token_1, channel_0_id, "Hope it works")
 
+    clear_v1()
+
 
 def test_message_send_valid_case():
     clear_v1()
@@ -120,6 +130,8 @@ def test_message_send_valid_case():
     assert all_messages["messages"][0]["message"] == "Hope it works"
     assert all_messages["messages"][0]["message_id"] == message_0_id
     assert all_messages["messages"][0]["u_id"] == u_id
+
+    clear_v1()
 
 
 #############################################################################
@@ -157,6 +169,8 @@ def test_message_remove_invalid_token():
     with pytest.raises(AccessError):
         message_remove_v1("invlaid_token", message_0_id)
 
+    clear_v1()
+
 
 def test_message_remove_message_not_exist():
     clear_v1()
@@ -172,6 +186,8 @@ def test_message_remove_message_not_exist():
 
     with pytest.raises(InputError):
         message_remove_v1(token_0, message_id)
+
+    clear_v1()
 
 
 def test_message_remove_not_owner_or_authorised_user_channel():
@@ -189,6 +205,8 @@ def test_message_remove_not_owner_or_authorised_user_channel():
     with pytest.raises(AccessError):
         message_remove_v1(token_1, message_0_id)
 
+    clear_v1()
+
 
 def test_message_remove_not_owner_or_authorised_user_dm():
     clear_v1()
@@ -204,6 +222,8 @@ def test_message_remove_not_owner_or_authorised_user_dm():
 
     with pytest.raises(AccessError):
         message_remove_v1(token_2, message_1_id)
+
+    clear_v1()
 
 
 def test_message_remove_not_owner_or_authorised_user_dm():
@@ -221,6 +241,8 @@ def test_message_remove_not_owner_or_authorised_user_dm():
     with pytest.raises(AccessError):
         message_remove_v1(token_2, message_1_id)
 
+    clear_v1()
+
 
 def test_message_remove_channel_valid_case():
     clear_v1()
@@ -231,6 +253,8 @@ def test_message_remove_channel_valid_case():
     message_0_id = message_send_v2(token_0, channel_0_id, "Hope it works")["message_id"]
 
     assert message_remove_v1(token_0, message_0_id) == {}
+
+    clear_v1()
 
 
 def test_message_remove_dm_valid_case():
@@ -244,6 +268,8 @@ def test_message_remove_dm_valid_case():
     message_0_id = message_senddm_v1(token_0, dm_id, "Hope it works")["message_id"]
 
     assert message_remove_v1(token_0, message_0_id) == {}
+
+    clear_v1()
 
 
 def test_remove_channel_dm_after_message_send():
@@ -260,6 +286,8 @@ def test_remove_channel_dm_after_message_send():
 
     with pytest.raises(InputError):
         message_remove_v1(token_0, message_0_id)
+
+    clear_v1()
 
 
 #############################################################################
@@ -300,6 +328,8 @@ def test_invalid_token1():
     with pytest.raises(AccessError):
         message_edit_v2("invalid token", message_0_id, "Hope it works")
 
+    clear_v1()
+
 
 def test_invalid_token2():
     clear_v1()
@@ -312,6 +342,8 @@ def test_invalid_token2():
 
     with pytest.raises(AccessError):
         message_edit_v2("invalid token", message_0_id, "Hope it works")
+
+    clear_v1()
 
 
 def test_message_edit_long_message():
@@ -327,6 +359,8 @@ def test_message_edit_long_message():
     with pytest.raises(InputError):
         message_edit_v2(token_0, message_0_id, longer_message)
 
+    clear_v1()
+
 
 def test_message_edit_deleted_message():
     clear_v1()
@@ -339,6 +373,8 @@ def test_message_edit_deleted_message():
 
     with pytest.raises(InputError):
         message_edit_v2(token_0, "non_exist_message_id", "It works")
+
+    clear_v1()
 
 
 def test_message_edit_not_owner_or_authorised_user():
@@ -356,6 +392,8 @@ def test_message_edit_not_owner_or_authorised_user():
     with pytest.raises(AccessError):
         message_edit_v2(token_1, message_0_id, "It works")
 
+    clear_v1()
+
 
 def test_message_edit_empty_message():
     clear_v1()
@@ -368,6 +406,8 @@ def test_message_edit_empty_message():
     all_messages = channel_messages_v1(token_0, channel_0_id, 0)
 
     assert all_messages["messages"] == []
+
+    clear_v1()
 
 
 def test_message_edit_valid_case_channel_msg():
@@ -384,6 +424,8 @@ def test_message_edit_valid_case_channel_msg():
     assert all_messages["messages"][0]["message"] == "It really works"
     assert all_messages["messages"][0]["message_id"] == message_0_id
     assert all_messages["messages"][0]["u_id"] == u_id
+
+    clear_v1()
 
 
 def test_message_edit_valid_case_dm_msg():
@@ -403,6 +445,8 @@ def test_message_edit_valid_case_dm_msg():
     assert all_messages["messages"][0]["message_id"] == message_0_id
     assert all_messages["messages"][0]["u_id"] == u_id_0
 
+    clear_v1()
+
 
 def test_message_edit_valid_case_dm_msg():
     clear_v1()
@@ -420,6 +464,8 @@ def test_message_edit_valid_case_dm_msg():
     assert all_messages["messages"][0]["message"] == "It really works"
     assert all_messages["messages"][0]["message_id"] == message_0_id
     assert all_messages["messages"][0]["u_id"] == u_id_0
+
+    clear_v1()
 
 
 #############################################################################
@@ -466,6 +512,8 @@ def test_message_share_channel_normal_case1():
 
     assert shared_message["shared_message_id"] == 1
 
+    clear_v1()
+
 
 def test_message_share_channel_normal_case2():
     clear_v1()
@@ -484,6 +532,8 @@ def test_message_share_channel_normal_case2():
 
     assert shared_message["shared_message_id"] == 1
 
+    clear_v1()
+
 
 def test_message_share_dm_normal_case():
     clear_v1()
@@ -501,6 +551,8 @@ def test_message_share_dm_normal_case():
     shared_message = message_share_v1(token_0, og_message_0_id, message_0, -1, dm_0_id)
 
     assert shared_message["shared_message_id"] == 1
+
+    clear_v1()
 
 
 def test_message_share_user_invalid():
@@ -521,6 +573,8 @@ def test_message_share_user_invalid():
     with pytest.raises(AccessError):
         message_share_v1(None, og_message_0_id, message_0, channel_0_id, -1)
 
+    clear_v1()
+
 
 def test_message_share_dm_normal_case():
     clear_v1()
@@ -538,6 +592,8 @@ def test_message_share_dm_normal_case():
     shared_message = message_share_v1(token_0, og_message_0_id, message_0, -1, dm_0_id)
 
     assert shared_message["shared_message_id"] == 1
+
+    clear_v1()
 
 
 def test_message_share_user_invalid():
@@ -557,6 +613,8 @@ def test_message_share_user_invalid():
         message_share_v1("invalid token", og_message_0_id, message_0, channel_0_id, -1)
     with pytest.raises(AccessError):
         message_share_v1(None, og_message_0_id, message_0, channel_0_id, -1)
+
+    clear_v1()
 
 
 def test_message_share_not_joing_channel():
@@ -574,6 +632,8 @@ def test_message_share_not_joing_channel():
 
     with pytest.raises(AccessError):
         message_share_v1(token_1, og_message_0_id, message_0, channel_0_id, -1)
+
+    clear_v1()
 
 
 def test_message_share_not_joing_dm():
@@ -595,6 +655,8 @@ def test_message_share_not_joing_dm():
     with pytest.raises(AccessError):
         message_share_v1(token_2, og_message_0_id, message_0, -1, dm_0_id)
 
+    clear_v1()
+
 
 def test_message_share_channel_dm_id_neither():
     clear_v1()
@@ -612,6 +674,7 @@ def test_message_share_channel_dm_id_neither():
     with pytest.raises(InputError):
         message_share_v1(token_1, og_message_0_id, message_0, -1, -1)
 
+    clear_v1()
 # dm_id and channel_id are both -1
 
 
@@ -632,6 +695,8 @@ def test_message_share_channel_dm_id_both():
 
     with pytest.raises(InputError):
         message_share_v1(token_1, og_message_0_id, message_0, channel_0_id, dm_0_id)
+
+    clear_v1()
 
 
 #############################################################################
@@ -734,6 +799,8 @@ def test_message_senddm_v1():
     test_failed_case_with_at()
     test_failed_case2_with_at()
     test_failed_case3_with_at()
+
+    clear_v1()
 
 
 #############################################################################
@@ -887,6 +954,8 @@ def test_message_sendlater_v1():
     test_normal_case01()
     test_normal_case02()
 
+    clear_v1()
+
 
 #############################################################################
 #                                                                           #
@@ -1039,6 +1108,8 @@ def test_message_sendlaterdm_v1():
     test_normal_case01()
     test_normal_case02()
 
+    clear_v1()
+
 
 #############################################################################
 #                                                                           #
@@ -1156,6 +1227,8 @@ def test_message_react_v1():
 
     # normal tests
     test_normal_test01()
+
+    clear_v1()
 
 
 #############################################################################
@@ -1300,6 +1373,8 @@ def test_message_unreact_v1():
     test_normal_test01()
     test_normal_test02()
 
+    clear_v1()
+
 
 #############################################################################
 #                                                                           #
@@ -1421,6 +1496,8 @@ def test_message_pin_v1():
 
     # normal tests
     test_normal_test01()
+
+    clear_v1()
 
 
 #############################################################################
@@ -1569,7 +1646,7 @@ def test_message_unpin_v1():
     # normal tests
     test_normal_test01()
 
-
+    clear_v1()
 #############################################################################
 #                                                                           #
 #                              Helper functions                             #

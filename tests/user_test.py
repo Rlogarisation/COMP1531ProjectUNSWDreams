@@ -62,6 +62,8 @@ def test_iteration12():
         assert user1['name_last'] == "White"
         assert user1['handle_str'] == "peterwhite"
 
+        clear_v1()
+
     # Case 2 - tests for multiple valid function implementation (no errors expected)
     #          expected outcome is function returns multiple users details
     # Occurs when user and token is valid
@@ -96,6 +98,7 @@ def test_iteration12():
         assert user2['name_last'] == "Green"
         assert user2['handle_str'] == "tomgreen"
 
+        clear_v1()
     # Case 3 - tests for input error outcome
     #          expected outcome is input error
     # Occurs when user id is invalid
@@ -117,6 +120,8 @@ def test_iteration12():
         with pytest.raises(InputError):
             user_profile_v1(token1, invalid_id)
 
+        clear_v1()
+
     # Case 4 - tests for access error outcome
     #          expected outcome is access error
     # Occurs when token is invalid
@@ -137,6 +142,7 @@ def test_iteration12():
         # Test conditions leading to an access error outcome due to invalid token
         with pytest.raises(AccessError):
             user_profile_v1(invalid_token, u_id1)
+        clear_v1()
 
     def test_user_profile_v1_token_not_match_u_id():
         clear_v1()
@@ -147,6 +153,7 @@ def test_iteration12():
 
         with pytest.raises(InputError):
             user_profile_v1(token_0, u_id_1)
+        clear_v1()
 
     def test_user_profile_v1_token_not_match_u_id():
         clear_v1()
@@ -156,6 +163,7 @@ def test_iteration12():
         u_id_1 = auth_login_v1("990102@gmail.com", "123123123")['auth_user_id']
 
         user_profile_v1(token_0, u_id_1)
+        clear_v1()
 
     """
     Author: Emir Aditya Zen
@@ -208,6 +216,7 @@ def test_iteration12():
         assert user1['u_id'] == u_id1
         assert user1['name_first'] == "Mark"
         assert user1['name_last'] == "Johnson"
+        clear_v1()
 
     # Case 2 - tests for input error due to name_first
     #          expected outcome is input error
@@ -225,6 +234,7 @@ def test_iteration12():
         # Test conditions leading to an input error outcome due to invalid first name
         with pytest.raises(InputError):
             user_profile_setname_v1(token1, "", "Johnson")
+        clear_v1()
 
     # Case 3 - tests for input error due to name_first
     #          expected outcome is input error
@@ -245,6 +255,7 @@ def test_iteration12():
         # Test conditions leading to an input error outcome due to invalid first name
         with pytest.raises(InputError):
             user_profile_setname_v1(token1, invalid_first_name, "Johnson")
+        clear_v1()
 
     # Case 4 - tests for input error due to name_last
     #          expected outcome is input error
@@ -262,6 +273,7 @@ def test_iteration12():
         # Test conditions leading to an input error outcome due to invalid last name
         with pytest.raises(InputError):
             user_profile_setname_v1(token1, "Mark", "")
+        clear_v1()
 
     # Case 5 - tests for input error due to name_last
     #          expected outcome is input error
@@ -282,6 +294,7 @@ def test_iteration12():
         # Test conditions leading to an input error outcome due to invalid last name
         with pytest.raises(InputError):
             user_profile_setname_v1(token1, "Mark", invalid_last_name)
+        clear_v1()
 
     # Case 6 - tests for access error outcome
     #          expected outcome is access error
@@ -302,7 +315,7 @@ def test_iteration12():
         # Test conditions leading to an access error outcome due to invalid token
         with pytest.raises(AccessError):
             user_profile_setname_v1(invalid_token, "Mark", "Johnson")
-
+        clear_v1()
     """
     Author: Emir Aditya Zen
 
@@ -355,6 +368,7 @@ def test_iteration12():
         assert user1['name_first'] == "Peter"
         assert user1['name_last'] == "White"
         assert user1['handle_str'] == "peterwhite"
+        clear_v1()
 
     # Case 2 - tests for input error due to email
     #          expected outcome is input error
@@ -372,6 +386,7 @@ def test_iteration12():
         # Test conditions leading to an input error outcome due to invalid email
         with pytest.raises(InputError):
             user_profile_setemail_v1(token1, "")
+        clear_v1()
 
     # Case 3 - tests for input error due to email
     #          expected outcome is input error
@@ -389,6 +404,7 @@ def test_iteration12():
         # Test conditions leading to an input error outcome due to invalid email
         with pytest.raises(InputError):
             user_profile_setemail_v1(token1, "blablaadgmaildotcom")
+        clear_v1()
 
     # Case 4 - tests for input error due to repeated email
     #          expected outcome is input error
@@ -407,6 +423,7 @@ def test_iteration12():
         # Test conditions leading to an input error outcome due to repeated email
         with pytest.raises(InputError):
             user_profile_setemail_v1(token1, "test@testexample.com")
+        clear_v1()
 
     # Case 5 - tests for access error outcome
     #          expected outcome is access error
@@ -427,6 +444,7 @@ def test_iteration12():
         # Test conditions leading to an access error outcome due to invalid token
         with pytest.raises(AccessError):
             user_profile_setemail_v1(invalid_token, "newhaha@gmail.com")
+        clear_v1()
 
     """
     Author: Emir Aditya Zen
@@ -480,6 +498,7 @@ def test_iteration12():
         assert user1['name_first'] == "Peter"
         assert user1['name_last'] == "White"
         assert user1['handle_str'] == "markjohnson"
+        clear_v1()
 
     # Case 2 - tests for input error due to handle
     #          expected outcome is input error
@@ -497,6 +516,7 @@ def test_iteration12():
         # Test conditions leading to an input error outcome due to invalid handle
         with pytest.raises(InputError):
             user_profile_sethandle_v1(token1, "")
+        clear_v1()
 
     # Case 3 - tests for input error due to handle
     #          expected outcome is input error
@@ -517,6 +537,7 @@ def test_iteration12():
         # Test conditions leading to an input error outcome due to invalid handle
         with pytest.raises(InputError):
             user_profile_sethandle_v1(token1, invalid_handle)
+        clear_v1()
 
     # Case 4 - tests for input error due to repeated handle
     #          expected outcome is input error
@@ -536,6 +557,7 @@ def test_iteration12():
         # Test conditions leading to an input error outcome due to repeated handle
         with pytest.raises(InputError):
             user_profile_sethandle_v1(token1, "tomgreen")
+        clear_v1()
 
     # Case 5 - tests for access error outcome
     #          expected outcome is access error
@@ -556,6 +578,7 @@ def test_iteration12():
         # Test conditions leading to an access error outcome due to invalid token
         with pytest.raises(AccessError):
             user_profile_sethandle_v1(invalid_token, "markjohnson")
+        clear_v1()
 
     """
     Author: Emir Aditya Zen
@@ -602,6 +625,7 @@ def test_iteration12():
         assert output[0]['name_first'] == "Peter"
         assert output[0]['name_last'] == "White"
         assert output[0]['handle_str'] == "peterwhite"
+        clear_v1()
 
     # Case 2 - tests for valid function implementation (no errors expected) multiple user case
     #          expected outcome is function outputs users as a list of dictionaries
@@ -634,6 +658,7 @@ def test_iteration12():
         assert output[1]['name_first'] == "Tom"
         assert output[1]['name_last'] == "Green"
         assert output[1]['handle_str'] == "tomgreen"
+        clear_v1()
 
     # Case 5 - tests for access error outcome
     #          expected outcome is access error
@@ -654,7 +679,7 @@ def test_iteration12():
         # Test conditions leading to an access error outcome due to invalid token
         with pytest.raises(AccessError):
             users_all(invalid_token)
-
+        clear_v1()
     #############################################################################
     #                                                                           #
     #                       Test for admin_user_permission_change               #
@@ -681,6 +706,7 @@ def test_iteration12():
         new_permission_id = Permission.global_owner
         with pytest.raises(AccessError):
             admin_userpermission_change(invalid_token, u_id2, new_permission_id)
+        clear_v1()
 
     def test_admin_change_permission_invalid_owner():
         clear_v1()
@@ -691,6 +717,7 @@ def test_iteration12():
         uid3 = register3['auth_user_id']
         with pytest.raises(AccessError):
             admin_userpermission_change(token2, uid3, Permission.global_owner)
+        clear_v1()
 
     def test_admin_change_permission_invalid_user():
         clear_v1()
@@ -701,6 +728,7 @@ def test_iteration12():
         invalid_uid = uid2 + 100
         with pytest.raises(InputError):
             admin_userpermission_change(token1, invalid_uid, Permission.global_owner)
+        clear_v1()
 
     def test_admin_change_permission_invalid_permission():
         clear_v1()
@@ -711,6 +739,7 @@ def test_iteration12():
         invalid_permission = 3
         with pytest.raises(InputError):
             admin_userpermission_change(token1, uid2, invalid_permission)
+        clear_v1()
 
     def test_admin_change_permission_owner():
         clear_v1()
@@ -722,6 +751,7 @@ def test_iteration12():
         admin_userpermission_change(token1, uid2, Permission.global_owner)
         channel_id = channels_create_v1(token1, "My Channel", False)['channel_id']
         channel_join_v1(token2, channel_id)
+        clear_v1()
 
     def test_admin_change_permission_member():
         clear_v1()
@@ -736,7 +766,7 @@ def test_iteration12():
         channel_id = channels_create_v1(token2, "My Channel", False)['channel_id']
         with pytest.raises(AccessError):
             channel_join_v1(token1, channel_id)
-
+        clear_v1()
     #############################################################################
     #                                                                           #
     #                       Test for admin_user_remove                          #
@@ -757,6 +787,7 @@ def test_iteration12():
             admin_user_remove("invalid token", u_id_0)
         with pytest.raises(AccessError):
             admin_user_remove(None, u_id_0)
+        clear_v1()
 
     def test_admin_user_remove_invalid_token():
         clear_v1()
@@ -765,6 +796,7 @@ def test_iteration12():
             admin_user_remove("invalid token", u_id_0)
         with pytest.raises(AccessError):
             admin_user_remove(None, u_id_0)
+        clear_v1()
 
     def test_admin_user_remove_invalid_uid():
         clear_v1()
@@ -774,6 +806,7 @@ def test_iteration12():
             admin_user_remove(token1, None)
         with pytest.raises(InputError):
             admin_user_remove(token1, 'hehe')
+        clear_v1()
 
     def test_admin_user_remove_only_owner():
         clear_v1()
@@ -782,6 +815,7 @@ def test_iteration12():
         uid1 = register1['auth_user_id']
         with pytest.raises(InputError):
             admin_user_remove(token1, uid1)
+        clear_v1()
 
     def test_admin_user_remove_invalid_owner():
         clear_v1()
@@ -791,6 +825,7 @@ def test_iteration12():
         uid2 = register2['auth_user_id']
         with pytest.raises(AccessError):
             admin_user_remove(token2, uid2)
+        clear_v1()
 
     def test_admin_user_remove_successfully():
         clear_v1()
@@ -806,6 +841,7 @@ def test_iteration12():
         name_first = user_profile2['user']['name_first']
         name_last = user_profile2['user']['name_last']
         assert f'{name_first} {name_last}' == 'Removed user'
+        clear_v1()
 
     def test_admin_user_remove_successfully2():
         clear_v1()
@@ -829,6 +865,7 @@ def test_iteration12():
         name_first = user_profile2['user']['name_first']
         name_last = user_profile2['user']['name_last']
         assert f'{name_first} {name_last}' == 'Removed user'
+        clear_v1()
 
 
 #############################################################################
