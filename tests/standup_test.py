@@ -1,9 +1,12 @@
 from tests.message_test import test_invalid_token1
 import pytest
+from datetime import datetime, timezone
+from time import sleep, time
 from src.other import clear_v1
 from src.auth import auth_login_v1, auth_register_v1, auth_logout
 from src.error import InputError, AccessError
 from src.channels import channels_create_v1, create_channel_id
+from src.channel import channel_invite_v1, channel_messages_v1
 from src.standup import standup_start_v1, standup_active_v1, standup_send_v1
 
 
@@ -220,6 +223,7 @@ def test_standup_start():
     u_id_2 = auth_login_v1("test_email2@gmail.com", "password")["auth_user_id"]
 
     channel_0_id = channels_create_v1(token_0, "channel_0", True)["channel_id"]
+    channel_1_id = channels_create_v1(token_0, "channel_1", True)["channel_id"]
 
     # test for the inputs checking
     def test_invalid_token():
@@ -259,7 +263,11 @@ def test_standup_start():
 
     # normal tests
     def test_normal_test01():
-        pass
+        time_sent = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
+        time_expected = standup_start_v1(token_0, channel_1_id, 2)
+        sleep(2)
+        time_finish = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
+        assert time_expected == time_finish == time_sent + 2
 
     # ----------------------------testing------------------------------------
     test_invalid_token()
@@ -290,6 +298,7 @@ def test_standup_active():
     u_id_2 = auth_login_v1("test_email2@gmail.com", "password")["auth_user_id"]
 
     channel_0_id = channels_create_v1(token_0, "channel_0", True)["channel_id"]
+    channel_1_id = channels_create_v1(token_0, "channel_1", True)["channel_id"]
 
     def test_invalid_token():
         with pytest.raises(AccessError):
@@ -309,7 +318,27 @@ def test_standup_active():
 
     # normal tests
     def test_normal_test01():
-        pass
+        time_sent = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
+        time_expected_1 = standup_start_v1(token_0, channel_0_id, 2)
+        time_expected_2 = standup_start_v1(token_0, channel_1_id, 3)
+
+        assert standup_active_v1(token_0, channel_0_id)['is_active'] == True
+        assert standup_active_v1(token_0, channel_0_id)['time_finish'] == time_sent + 2
+
+        assert standup_active_v1(token_0, channel_1_id)['is_active'] == True
+        assert standup_active_v1(token_0, channel_1_id)['time_finish'] == time_sent + 3
+
+        sleep(2)
+        assert standup_active_v1(token_0, channel_0_id)['is_active'] == False
+        assert standup_active_v1(token_0, channel_1_id)['is_active'] == True
+
+        sleep(1)
+        assert standup_active_v1(token_0, channel_0_id)['is_active'] == False
+        assert standup_active_v1(token_0, channel_1_id)['is_active'] == False
+
+        time_finish = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
+        print(type(time_finish), type(time_expected_1), type(time_expected_2), time_sent + 3)
+        assert time_finish == time_expected_1['time_finish'] + 1 == time_expected_2['time_finish'] == time_sent + 3
 
     # ----------------------------testing------------------------------------
     test_invalid_token()
@@ -335,6 +364,7 @@ def test_standup_send():
     u_id_2 = auth_login_v1("test_email2@gmail.com", "password")["auth_user_id"]
 
     channel_0_id = channels_create_v1(token_0, "channel_0", True)["channel_id"]
+    channel_invite_v1(token_0, channel_0_id, u_id_1)
 
     def test_invalid_token():
         with pytest.raises(AccessError):
@@ -372,7 +402,19 @@ def test_standup_send():
 
     # normal tests
     def test_normal_test01():
-        pass
+        time_sent = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
+        standup_start_v1(token_0, channel_0_id, 2)
+        assert standup_active_v1(token_0, channel_0_id)['is_active'] == True
+
+        standup_send_v1(token_0, channel_0_id, "message send by user_0.")
+        channel_0_msgs = channel_messages_v1(token_0, channel_0_id, 0)
+        assert len(channel_0_msgs['messages']) == 1
+
+        standup_send_v1(token_1, channel_0_id, "message send by user_1.")
+        assert len(channel_0_msgs['messages']) == 2
+
+        sleep(2)
+        assert standup_active_v1(token_0, channel_0_id)['is_active'] == False
     # ----------------------------testing------------------------------------
     test_invalid_token()
     test_invalid_channel_id()
