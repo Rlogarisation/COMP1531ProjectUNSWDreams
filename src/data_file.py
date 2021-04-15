@@ -183,7 +183,7 @@ DATA = {
     'channel_num': 0,
     'dm_num': 0,
     'secret': 'THIS_IS_SECRET',
-    'threads': []
+    # 'threads': []
 }
 
 

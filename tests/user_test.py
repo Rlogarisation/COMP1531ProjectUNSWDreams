@@ -840,3 +840,4 @@ def test_admin_user_remove_successfully2():
     name_first = user_profile2['user']['name_first']
     name_last = user_profile2['user']['name_last']
     assert f'{name_first} {name_last}' == 'Removed user'
+    clear_v1()
