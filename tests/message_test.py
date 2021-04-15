@@ -828,8 +828,8 @@ def test_message_sendlater_v1():
         channel_msgs = channel_messages_v1(token_0, channel_0_id, 0)
         assert len(channel_msgs['messages']) == 0
 
-        message_id_0 = message_sendlater_v1(token_0, channel_0_id, "Here is message 01.", time_sent_1 + 2)['message_id']
-        message_id_1 = message_sendlater_v1(token_0, channel_0_id, "Here is message 02.", time_sent_1 + 3)['message_id']
+        message_id_0 = message_sendlater_v1(token_0, channel_0_id, "Here is message 01.", time_sent_1 + 1)['message_id']
+        message_id_1 = message_sendlater_v1(token_0, channel_0_id, "Here is message 02.", time_sent_1 + 2)['message_id']
 
         channel_msgs = channel_messages_v1(token_0, channel_0_id, 0)
         assert len(channel_msgs['messages']) == 0
@@ -852,9 +852,9 @@ def test_message_sendlater_v1():
         channel_msgs = channel_messages_v1(token_0, channel_0_id, 0)
         assert len(channel_msgs['messages']) == 2
 
-        message_id_3 = message_sendlater_v1(token_0, channel_0_id, "Here is message 03.", time_sent_1 + 2)['message_id']
-        message_id_4 = message_sendlater_v1(token_0, channel_0_id, "Here is message 04.", time_sent_1 + 8)['message_id']
-        message_id_5 = message_sendlater_v1(token_0, channel_0_id, "Here is message 05.", time_sent_1 + 5)['message_id']
+        message_id_3 = message_sendlater_v1(token_0, channel_0_id, "Here is message 03.", time_sent_1 + 1)['message_id']
+        message_id_4 = message_sendlater_v1(token_0, channel_0_id, "Here is message 04.", time_sent_1 + 4)['message_id']
+        message_id_5 = message_sendlater_v1(token_0, channel_0_id, "Here is message 05.", time_sent_1 + 2)['message_id']
 
         channel_msgs = channel_messages_v1(token_0, channel_0_id, 0)
         assert len(channel_msgs['messages']) == 2
