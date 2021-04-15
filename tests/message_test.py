@@ -776,7 +776,7 @@ def test_message_sendlater_v1():
     channel_0_id = channels_create_v1(token_0, "channel_0", True)["channel_id"]
     channel_invite_v1(token_0, channel_0_id, u_id_1)
 
-    time_sent = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
+    time_sent = int(datetime(2020, 5, 9).replace(tzinfo=timezone.utc).timestamp())
 
     # test for the inputs checking
     def test_invalid_token():

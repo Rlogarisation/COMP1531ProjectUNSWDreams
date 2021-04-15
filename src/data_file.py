@@ -39,11 +39,16 @@ class User:
         self.image_path = ''
         self.reset_code = ''
 
-    def return_type_user(self):
-        """in 6.1.1 Data Types
-            (outputs only) named exactly user
-            Dictionary containing u_id, email, name_first, name_last, handle_str
-        """
+    def return_type_user_v1(self):
+        return {
+            'u_id': self.u_id,
+            'email': self.email,
+            'name_first': self.name_first,
+            'name_last': self.name_last,
+            'handle_str': self.handle_str,
+        }
+
+    def return_type_user_v2(self):
         return {
             'u_id': self.u_id,
             'email': self.email,
@@ -109,11 +114,15 @@ class Message:
         self.is_pinned = False
         self.reacted_users = []
 
-    def return_type_message(self):
-        """
-        dictionary contains types
-        { message_id, u_id, message, time_created }
-        """
+    def return_type_message_v1(self):
+        return {
+            'message_id': self.message_id,
+            'u_id': self.u_id,
+            'message': self.message,
+            'time_created': self.time_created,
+        }
+
+    def return_type_message_v2(self):
         return {
             'message_id': self.message_id,
             'u_id': self.u_id,
@@ -175,7 +184,8 @@ DATA = {
     'threads':[],
     'channel_num': 0,
     'dm_num': 0,
-    'secret': 'THIS_IS_SECRET'
+    'secret': 'THIS_IS_SECRET',
+    'threads': []
 }
 
 

@@ -287,7 +287,7 @@ def dm_details_v1(token, dm_id):
 
     member_list = []
     for member in dm.dm_members:
-        member_list.append(member.return_type_user())
+        member_list.append(member.return_type_user_v1())
     return {
         'name': dm.dm_name,
         'members': member_list,
@@ -371,11 +371,11 @@ def dm_messages_v1(token, dm_id, start):
         counter_end = 0
         end = -1
     while counter_start >= counter_end:
-        msg = dm.dm_messages[counter_start].return_type_message()
-        if user.u_id in msg['reacts']['u_ids']:
-            msg['reacts']['is_this_user_reacted'] = True
-        else:
-            msg['reacts']['is_this_user_reacted'] = False
+        msg = dm.dm_messages[counter_start].return_type_message_v1()
+        # if user.u_id in msg['reacts']['u_ids']:
+        #     msg['reacts']['is_this_user_reacted'] = True
+        # else:
+        #     msg['reacts']['is_this_user_reacted'] = False
         return_message.append(msg)
         counter_start -= 1
 
