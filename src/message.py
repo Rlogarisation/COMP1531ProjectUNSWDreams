@@ -319,7 +319,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
 
     timer = Timer((time_sent - cur_time), helper2_message_send_v2, [new_message_id, auth_user, message, channel])
     timer.start()
-    data['threads'].append(timer)
+    # data['threads'].append(timer)
 
     return {
         'message_id': new_message_id
@@ -361,7 +361,7 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
 
     timer = Timer((time_sent - cur_time), helper2_message_senddm_v1, [new_message_id, auth_user, message, dm])
     timer.start()
-    data['threads'].append(timer)
+    # data['threads'].append(timer)
 
     return {
         'message_id': new_message_id
@@ -603,7 +603,7 @@ def return_message_to_pin(token, message_id, flag):
 # update user's stats about channel joined
 def update_message_user_stat(user):
     stat_message_user = {
-        'num_messages_sent': len(user.part_of_channel),
+        'num_messages_sent': len(user.messages),
         'time_stamp': current_time()
     }
     user.messages_sent.append(stat_message_user)

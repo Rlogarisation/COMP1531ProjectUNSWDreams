@@ -12,6 +12,9 @@ from src.message import message_send_v2
 
 
 def standup_start_v1(token, channel_id, length):
+    if isinstance(length, int) is False or length < 0 or length is None:
+        raise InputError(description='length is invalid')
+
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description='Invalid token.')
@@ -44,14 +47,19 @@ def standup_active_v1(token, channel_id):
     if user is None:
         raise AccessError(description='Invalid token.')
 
+    if type(channel_id) != int:
+        raise InputError(description='Invalid channel_id.')
     channel = get_channel_by_channel_id(channel_id)
-    if type(channel_id) != int or channel is None:
+    if channel is None:
         raise InputError(description='Invalid channel_id.')
 
     return channel.standup
 
 
 def standup_send_v1(token, channel_id, message):
+    if type(channel_id) != int or type(message) != str:
+        raise InputError(description="incorrect type for your inputs.")
+
     if len(message) > 1000:
         raise InputError(description='Message is more than 1000 characters.')
 
@@ -60,7 +68,7 @@ def standup_send_v1(token, channel_id, message):
         raise AccessError(description='Invalid token.')
 
     channel = get_channel_by_channel_id(channel_id)
-    if type(channel_id) != int or channel is None:
+    if channel is None:
         raise InputError(description='Invalid channel_id.')
 
     if user not in channel.all_members:
@@ -81,8 +89,10 @@ def standup_send_v1(token, channel_id, message):
 
 
 def standup_send_packaged_message(token, channel):
-    packaged_message = "\n".join(channel.packaged_messages)
-    message_send_v2(token, channel.channel_id, packaged_message)
+    if len(channel.packaged_messages) > 0:
+        packaged_message = "\n".join(channel.packaged_messages)
+        message_send_v2(token, channel.channel_id, packaged_message)
+
     channel.deactivate_standup()
     channel.clear_packaged_messages()
     channel.clear_time_finish()

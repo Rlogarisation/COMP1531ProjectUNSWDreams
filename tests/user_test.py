@@ -873,3 +873,90 @@ def test_iteration12():
 #                  Test for user_profile_uploadphoto_v1                     #
 #                                                                           #
 #############################################################################
+"""
+Author: Lan Lin
+Background: Given a User by their user ID, remove the user from the Dreams.
+Input Error: 
+1. u_id does not refer to a valid user
+2. The user is currently the only owner
+Access Error: The authorised user is not an owner
+"""
+
+
+def test_admin_user_remove_invalid_token():
+    clear_v1()
+    u_id_0 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')['auth_user_id']
+    with pytest.raises(AccessError):
+        admin_user_remove("invalid token", u_id_0)
+    with pytest.raises(AccessError):
+        admin_user_remove(None, u_id_0)
+
+
+def test_admin_user_remove_invalid_uid():
+    clear_v1()
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    token1 = register1['token']
+    with pytest.raises(InputError):
+        admin_user_remove(token1, None)
+    with pytest.raises(InputError):
+        admin_user_remove(token1, 'hehe')
+
+
+def test_admin_user_remove_only_owner():
+    clear_v1()
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    token1 = register1['token']
+    uid1 = register1['auth_user_id']
+    with pytest.raises(InputError):
+        admin_user_remove(token1, uid1)
+
+
+def test_admin_user_remove_invalid_owner():
+    clear_v1()
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    token2 = register2['token']
+    uid2 = register2['auth_user_id']
+    with pytest.raises(AccessError):
+        admin_user_remove(token2, uid2)
+
+
+def test_admin_user_remove_successfully():
+    clear_v1()
+    regiester1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    token1 = regiester1['token']
+    token2 = register2['token']
+    uid2 = register2['auth_user_id']
+    user_profile2 = user_profile_v1(token2, uid2)
+    assert user_profile2['user']['email'] == 'test@testexample.com'
+    admin_user_remove(token1, uid2)
+    user_profile2 = user_profile_v1(token2, uid2)
+    name_first = user_profile2['user']['name_first']
+    name_last = user_profile2['user']['name_last']
+    assert f'{name_first} {name_last}' == 'Removed user'
+
+
+def test_admin_user_remove_successfully2():
+    clear_v1()
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    token1 = register1['token']
+    token2 = register2['token']
+    uid2 = register2['auth_user_id']
+
+    channel_id_0 = channels_create_v1(token2, "channel1", True)['channel_id']
+    dm_id_0 = dm_create_v1(token2, [uid2])['dm_id']
+
+    message_send_v2(token2, channel_id_0, "channel_msg")
+    message_senddm_v1(token2, dm_id_0, "dm_msg")
+
+    user_profile2 = user_profile_v1(token2, uid2)
+    assert user_profile2['user']['email'] == 'test@testexample.com'
+
+    admin_user_remove(token1, uid2)
+    user_profile2 = user_profile_v1(token2, uid2)
+    name_first = user_profile2['user']['name_first']
+    name_last = user_profile2['user']['name_last']
+    assert f'{name_first} {name_last}' == 'Removed user'
+    clear_v1()

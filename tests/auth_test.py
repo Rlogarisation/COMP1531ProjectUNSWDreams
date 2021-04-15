@@ -360,7 +360,6 @@ def test_auth_passwordreset_reset_invalid_reset_code():
     invalid_reset_code = reset_code + '123'
     with pytest.raises(InputError):
         auth_passwordreset_reset_v1(invalid_reset_code, 'TheNewPassword')
-
     clear_v1()
 
 # """

@@ -379,5 +379,4 @@ def test_channels_create_invalid_token():
     # Test conditions leading to an access error outcome
     with pytest.raises(AccessError):
         channels_create_v1(invalid_token, "public_channel", True)
-
     clear_v1()

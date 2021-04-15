@@ -1652,5 +1652,4 @@ def test_channel_leave_v1_accessErrorToken():
     invalid_token = token2 + "rkbgesorgbv#$%"
     with pytest.raises(AccessError):
         channel_leave_v1(invalid_token, channel_1_id)
-
     clear_v1()

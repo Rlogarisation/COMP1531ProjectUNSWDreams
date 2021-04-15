@@ -324,7 +324,7 @@ def test_message_sendlater(parameters, parameters1, parameters2):
     channel_0_id = json.loads(channel.text).get("channel_id")
     requests.post(config.url + "channel/invite/v2", json={"token": token_0, "channel_id": channel_0_id, "u_id": u_id_1})
 
-    time_sent = datetime(2021, 4, 9).replace(tzinfo=timezone.utc).timestamp()
+    time_sent = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()) + 1
 
     def test_invalid_token():
         input1 = {"token": "string token", "channel_id": channel_0_id, "message": "I am message.", "time_sent": time_sent}
@@ -423,7 +423,7 @@ def test_message_sendlaterdm(parameters, parameters1, parameters2):
     dm = requests.post(config.url + "dm/create/v1", json={"token": token_0, "u_ids": [u_id_1]})
     dm_0_id = json.loads(dm.text).get("dm_id")
 
-    time_sent = datetime(2021, 4, 9).replace(tzinfo=timezone.utc).timestamp()
+    time_sent = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()) + 5
 
     def test_invalid_token():
         input1 = {"token": "string token", "dm_id": dm_0_id, "message": "I am message.", "time_sent": time_sent}
@@ -439,9 +439,9 @@ def test_message_sendlaterdm(parameters, parameters1, parameters2):
         assert status3 == 403
 
     def test_invalid_dm_id():
-        input1 = {"token": token_0, "channel_id": "invalid channel_id", "message": "I am message.", "time_sent": time_sent}
-        input2 = {"token": token_0, "channel_id": 99999, "message": "I am message.", "time_sent": time_sent}
-        input3 = {"token": token_0, "channel_id": None, "message": "I am message.", "time_sent": time_sent}
+        input1 = {"token": token_0, "dm_id": "invalid channel_id", "message": "I am message.", "time_sent": time_sent}
+        input2 = {"token": token_0, "dm_id": 99999, "message": "I am message.", "time_sent": time_sent}
+        input3 = {"token": token_0, "dm_id": None, "message": "I am message.", "time_sent": time_sent}
 
         status1 = requests.post(config.url + "message/sendlaterdm/v1", json=input1).status_code
         status2 = requests.post(config.url + "message/sendlaterdm/v1", json=input2).status_code
@@ -452,9 +452,9 @@ def test_message_sendlaterdm(parameters, parameters1, parameters2):
         assert status3 == 400
 
     def test_invalid_message():
-        input1 = {"token": token_0, "channel_id": dm_0_id, "message": 123456, "time_sent": time_sent}
-        input2 = {"token": token_0, "channel_id": dm_0_id, "message": "a" * 2000, "time_sent": time_sent}
-        input3 = {"token": token_0, "channel_id": dm_0_id, "message": None, "time_sent": time_sent}
+        input1 = {"token": token_0, "dm_id": dm_0_id, "message": 123456, "time_sent": time_sent}
+        input2 = {"token": token_0, "dm_id": dm_0_id, "message": "a" * 2000, "time_sent": time_sent}
+        input3 = {"token": token_0, "dm_id": dm_0_id, "message": None, "time_sent": time_sent}
 
         status1 = requests.post(config.url + "message/sendlaterdm/v1", json=input1).status_code
         status2 = requests.post(config.url + "message/sendlaterdm/v1", json=input2).status_code
@@ -466,10 +466,10 @@ def test_message_sendlaterdm(parameters, parameters1, parameters2):
 
     def test_invalid_time_sent():
         past_time_sent = datetime(1999, 1, 2).replace(tzinfo=timezone.utc).timestamp()
-        input1 = {"token": token_0, "channel_id": dm_0_id, "message": "I am message.", "time_sent": "string time_sent"}
-        input2 = {"token": token_0, "channel_id": dm_0_id, "message": "I am message.", "time_sent": 123456}
-        input3 = {"token": token_0, "channel_id": dm_0_id, "message": "I am message.", "time_sent": None}
-        input4 = {"token": token_0, "channel_id": dm_0_id, "message": "I am message.", "time_sent": past_time_sent}
+        input1 = {"token": token_0, "dm_id": dm_0_id, "message": "I am message.", "time_sent": "string time_sent"}
+        input2 = {"token": token_0, "dm_id": dm_0_id, "message": "I am message.", "time_sent": 123456}
+        input3 = {"token": token_0, "dm_id": dm_0_id, "message": "I am message.", "time_sent": None}
+        input4 = {"token": token_0, "dm_id": dm_0_id, "message": "I am message.", "time_sent": past_time_sent}
 
         status1 = requests.post(config.url + "message/sendlaterdm/v1", json=input1).status_code
         status2 = requests.post(config.url + "message/sendlaterdm/v1", json=input2).status_code
@@ -482,7 +482,7 @@ def test_message_sendlaterdm(parameters, parameters1, parameters2):
         assert status4 == 400
 
     def test_user_isnot_member_of_dm():
-        input1 = {"token": token_2, "channel_id": dm_0_id, "message": "I am message.", "time_sent": time_sent}
+        input1 = {"token": token_2, "dm_id": dm_0_id, "message": "I am message.", "time_sent": time_sent}
 
         status1 = requests.post(config.url + "message/sendlaterdm/v1", json=input1).status_code
 
@@ -531,12 +531,12 @@ def test_message_react(parameters, parameters1, parameters2):
     dm_message_0 = requests.post(config.url + "message/senddm/v1", json={"token": token_0, "dm_id": dm_0_id, "message": "I am message."})
     dm_message_0_message_id = json.loads(dm_message_0.text).get("message_id")
     dm_message_1 = requests.post(config.url + "message/senddm/v1", json={"token": token_0, "dm_id": dm_0_id, "message": "@first1last1 I am message."})
-    dm_message_1_message_id = json.loads(dm_message_0.text).get("message_id")
+    dm_message_1_message_id = json.loads(dm_message_1.text).get("message_id")
 
     channel_message_0 = requests.post(config.url + "message/send/v2", json={"token": token_0, "channel_id": channel_0_id, "message": "I am message."})
-    channel_message_0_message_id = json.loads(dm_message_0.text).get("message_id")
+    channel_message_0_message_id = json.loads(channel_message_0.text).get("message_id")
     channel_message_1 = requests.post(config.url + "message/send/v2", json={"token": token_0, "channel_id": channel_0_id, "message": "@first0last0 I am messag."})
-    channel_message_1_message_id = json.loads(dm_message_0.text).get("message_id")
+    channel_message_1_message_id = json.loads(channel_message_1.text).get("message_id")
 
     def test_invalid_token():
         input1 = {"token": "string token", "message_id": dm_message_0_message_id, "react_id": 1}
@@ -658,12 +658,12 @@ def test_message_unreact(parameters, parameters1, parameters2):
     dm_message_0 = requests.post(config.url + "message/senddm/v1", json={"token": token_0, "dm_id": dm_0_id, "message": "I am message."})
     dm_message_0_message_id = json.loads(dm_message_0.text).get("message_id")
     dm_message_1 = requests.post(config.url + "message/senddm/v1", json={"token": token_0, "dm_id": dm_0_id, "message": "@first1last1 I am message."})
-    dm_message_1_message_id = json.loads(dm_message_0.text).get("message_id")
+    dm_message_1_message_id = json.loads(dm_message_1.text).get("message_id")
 
     channel_message_0 = requests.post(config.url + "message/send/v2", json={"token": token_0, "channel_id": channel_0_id, "message": "I am message."})
-    channel_message_0_message_id = json.loads(dm_message_0.text).get("message_id")
+    channel_message_0_message_id = json.loads(channel_message_0.text).get("message_id")
     channel_message_1 = requests.post(config.url + "message/send/v2", json={"token": token_0, "channel_id": channel_0_id, "message": "@first0last0 I am messag."})
-    channel_message_1_message_id = json.loads(dm_message_0.text).get("message_id")
+    channel_message_1_message_id = json.loads(channel_message_1.text).get("message_id")
 
     def test_invalid_token():
         input1 = {"token": "string token", "message_id": dm_message_0_message_id, "react_id": 1}
@@ -935,12 +935,12 @@ def test_message_unpin(parameters, parameters1, parameters2):
     dm_message_0 = requests.post(config.url + "message/senddm/v1", json={"token": token_0, "dm_id": dm_0_id, "message": "I am message."})
     dm_message_0_message_id = json.loads(dm_message_0.text).get("message_id")
     dm_message_1 = requests.post(config.url + "message/senddm/v1", json={"token": token_0, "dm_id": dm_0_id, "message": "@first1last1 I am message."})
-    dm_message_1_message_id = json.loads(dm_message_0.text).get("message_id")
+    dm_message_1_message_id = json.loads(dm_message_1.text).get("message_id")
 
     channel_message_0 = requests.post(config.url + "message/send/v2", json={"token": token_0, "channel_id": channel_0_id, "message": "I am message."})
-    channel_message_0_message_id = json.loads(dm_message_0.text).get("message_id")
+    channel_message_0_message_id = json.loads(channel_message_0.text).get("message_id")
     channel_message_1 = requests.post(config.url + "message/send/v2", json={"token": token_0, "channel_id": channel_0_id, "message": "@first0last0 I am messag."})
-    channel_message_1_message_id = json.loads(dm_message_0.text).get("message_id")
+    channel_message_1_message_id = json.loads(channel_message_1.text).get("message_id")
 
     def test_invalid_token():
         input1 = {"token": "string token", "message_id": dm_message_0_message_id}

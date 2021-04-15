@@ -183,7 +183,7 @@ def dm_remove_v1(token, dm_id):
     elif inviter not in dm.dm_owners:
         raise AccessError(description="The user is not the original DM creator")
 
-    # Remove the current dm for all users in User.part_of_channel and dm_owns
+    # Remove the current dm for all users in User.part_of_dm and dm_owns
     # Then remove dm in data class
     for member in dm.dm_members:
         member.part_of_dm.remove(dm)
@@ -329,7 +329,7 @@ dm/messages/v1
 
 Background:
 Given a DM with ID dm_id that the authorised user is part of,
-return up to 50 messages between index "start" and "start + 50". Message with index 0 is the most recent message in the channel. This function returns a new index "end" which is the value of "start + 50", or, if this function has returned the least recent messages in the channel, returns -1 in "end" to indicate there are no more messages to load after this return.
+return up to 50 messages between index "start" and "start + 50". Message with index 0 is the most recent message in the dm. This function returns a new index "end" which is the value of "start + 50", or, if this function has returned the least recent messages in the dm, returns -1 in "end" to indicate there are no more messages to load after this return.
 
 Parameters: (token, dm_id, start)
 Return Type: { messages, start, end }
@@ -338,7 +338,7 @@ HTTP Method: GET
 InputError when any of:
     DM ID is not a valid DM
 
-    start is greater than the total number of messages in the channel
+    start is greater than the total number of messages in the dm
 
 AccessError when any of:
     Authorised user is not a member of DM with dm_id
@@ -351,9 +351,9 @@ def dm_messages_v1(token, dm_id, start):
     if dm is None:
         raise InputError(description="dm_id does not refer to a valid or exising dm")
 
-    # Input error when start is greater than the total number of messages in the channel
+    # Input error when start is greater than the total number of messages in the dm
     if start > len(dm.dm_messages):
-        raise InputError(description="start is greater than the total number of messages in the channel")
+        raise InputError(description="start is greater than the total number of messages in the dm")
 
     # Access error when Authorised user is not a member of DM with dm_id
     user = get_user_by_token(token)
@@ -371,11 +371,11 @@ def dm_messages_v1(token, dm_id, start):
         counter_end = 0
         end = -1
     while counter_start >= counter_end:
-        msg = dm.dm_messages[counter_start].return_type_message_v1()
-        # if user.u_id in msg['reacts']['u_ids']:
-        #     msg['reacts']['is_this_user_reacted'] = True
-        # else:
-        #     msg['reacts']['is_this_user_reacted'] = False
+        msg = dm.dm_messages[counter_start].return_type_message_v2()
+        if user.u_id in msg['reacts']['u_ids']:
+            msg['reacts']['is_this_user_reacted'] = True
+        else:
+            msg['reacts']['is_this_user_reacted'] = False
         return_message.append(msg)
         counter_start -= 1
 
@@ -402,7 +402,7 @@ def get_dm_by_dm_id(dm_id):
     return None
 
 
-# check if the user is an owner of channel
+# check if the user is an owner of dm
 def is_user_owner_dm(dm_id, u_id):
     dm = get_dm_by_dm_id(dm_id)
     for owner in dm.dm_owners:
@@ -417,7 +417,7 @@ def create_dm_id():
     return new_id
 
 
-# check if the user is a member of channel
+# check if the user is a member of dm
 def is_user_in_dm(dm_id, u_id):
     dm = get_dm_by_dm_id(dm_id)
     for user in dm.dm_members:
@@ -426,16 +426,16 @@ def is_user_in_dm(dm_id, u_id):
     return None
 
 
-# update user's stats about channel joined
+# update user's stats about dm joined
 def update_dm_user_stat(user, time):
     stat_dm_user = {
         'num_dms_joined': len(user.part_of_dm),
         'time_stamp': time
     }
-    user.channels_joined.append(stat_dm_user)
+    user.dms_joined.append(stat_dm_user)
 
 
-# update Dreams stats about channels
+# update Dreams stats about dms
 def update_dm_dreams_stat(time):
     stat_dm = {
         'num_dms_exist': len(data['class_dms']),

@@ -88,3 +88,4 @@ def test_search_v1():
 
     clear_v1()
     pass
+    clear_v1()

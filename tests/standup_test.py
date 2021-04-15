@@ -30,52 +30,56 @@ def test_zen_Lan_tests():
     #                                                                           #
     #############################################################################
 
-    def test_standup_start_successful():
-        clear_v1()
-        auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-        token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
-        channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
-        time_finish_check = standup_start_v1(token1, channel_id1, 0.5)['time_finish']
-        standup_info = standup_active_v1(token1, channel_id1)
-        assert standup_info['time_finish'] == time_finish_check
-        assert standup_info['is_active'] is True
 
-    def test_standup_start_invalid_channel():
-        clear_v1()
-        auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-        token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
-        channels_create_v1(token1, 'ChannelOne', True)
-        invalid_channelid = 100
-        with pytest.raises(InputError):
-            standup_start_v1(token1, invalid_channelid, 0.5)
+def test_standup_start_successful():
+    clear_v1()
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
+    channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
+    time_finish_check = standup_start_v1(token1, channel_id1, 1)['time_finish']
+    standup_info = standup_active_v1(token1, channel_id1)
+    assert standup_info['time_finish'] == time_finish_check
+    assert standup_info['is_active'] is True
 
-    def test_standup_start_currently_running_standup():
-        clear_v1()
-        auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-        token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
-        channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
-        standup_start_v1(token1, channel_id1, 0.5)
-        with pytest.raises(InputError):
-            standup_start_v1(token1, channel_id1, 0.5)
 
-    def test_standup_start_invalid_token():
-        clear_v1()
-        auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-        token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
-        channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
-        invalid_token = token1 + 'tsyerhdjycgj'
-        with pytest.raises(AccessError):
-            standup_start_v1(invalid_token, channel_id1, 0.5)
+def test_standup_start_invalid_channel():
+    clear_v1()
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
+    channels_create_v1(token1, 'ChannelOne', True)
+    invalid_channelid = 100
+    with pytest.raises(InputError):
+        standup_start_v1(token1, invalid_channelid, 1)
 
-    # def test_standup_start_unauthorised_user():
-    #     clear_v1()
-    #     auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-    #     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
-    #     token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
-    #     token2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")['token']
-    #     channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
-    #     with pytest.raises(AccessError):
-    #         standup_start_v1(token2, channel_id1, 0.5)
+
+    clear_v1()
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
+    channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
+    standup_start_v1(token1, channel_id1, 1)
+    with pytest.raises(InputError):
+        standup_start_v1(token1, channel_id1, 1)
+
+
+def test_standup_start_invalid_token():
+    clear_v1()
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
+    channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
+    invalid_token = token1 + 'tsyerhdjycgj'
+    with pytest.raises(AccessError):
+        standup_start_v1(invalid_token, channel_id1, 1)
+
+
+def test_standup_start_unauthorised_user():
+    clear_v1()
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
+    token2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")['token']
+    channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
+    with pytest.raises(AccessError):
+        standup_start_v1(token2, channel_id1, 1)
 
     """
     Author : Emir Aditya Zen
@@ -264,7 +268,7 @@ def test_standup_start():
     # normal tests
     def test_normal_test01():
         time_sent = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
-        time_expected = standup_start_v1(token_0, channel_1_id, 2)
+        time_expected = standup_start_v1(token_0, channel_1_id, 2)['time_finish']
         sleep(2)
         time_finish = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
         assert time_expected == time_finish == time_sent + 2
@@ -282,9 +286,12 @@ def test_standup_start():
 
     clear_v1()
     pass
+
+
+    pass
 #############################################################################
 #                                                                           #
-#                        Test for standup_active_v1                         #
+#                        Test for standup_send_v1                           #
 #                                                                           #
 #############################################################################
 
@@ -351,6 +358,8 @@ def test_standup_active():
     clear_v1()
 
     pass
+
+
 #############################################################################
 #                                                                           #
 #                        Test for standup_send_v1                           #
@@ -398,7 +407,7 @@ def test_standup_send():
     # InputError : An active standup is not currently running in this channel
     def test_standup_not_started():
         with pytest.raises(InputError):
-            standup_send_v1(token_0, channel_0_id)
+            standup_send_v1(token_0, channel_0_id, "haha")
 
     # AccessError : Authorised user is not in the channel
     def test_user_isnot_member_of_channel():
@@ -407,19 +416,22 @@ def test_standup_send():
 
     # normal tests
     def test_normal_test01():
-        time_sent = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
-        standup_start_v1(token_0, channel_0_id, 2)
-        assert standup_active_v1(token_0, channel_0_id)['is_active'] == True
+        standup_start_v1(token_0, channel_0_id, 1)
+        assert standup_active_v1(token_0, channel_0_id)['is_active'] is True
 
         standup_send_v1(token_0, channel_0_id, "message send by user_0.")
         channel_0_msgs = channel_messages_v1(token_0, channel_0_id, 0)
-        assert len(channel_0_msgs['messages']) == 1
+        assert len(channel_0_msgs['messages']) == 0
 
         standup_send_v1(token_1, channel_0_id, "message send by user_1.")
-        assert len(channel_0_msgs['messages']) == 2
+        channel_0_msgs = channel_messages_v1(token_0, channel_0_id, 0)
+        assert len(channel_0_msgs['messages']) == 0
 
         sleep(2)
-        assert standup_active_v1(token_0, channel_0_id)['is_active'] == False
+        assert standup_active_v1(token_0, channel_0_id)['is_active'] is False
+        channel_0_msgs = channel_messages_v1(token_0, channel_0_id, 0)
+        assert len(channel_0_msgs['messages']) == 1
+
     # ----------------------------testing------------------------------------
     test_invalid_token()
     test_invalid_channel_id()
