@@ -203,8 +203,8 @@ def test_standup_active(parameters, parameters1, parameters2):
     def test_normal_test01():
         time_sent = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
 
-        input1 = {"token": token_2, "channel_id": channel_0_id, "length": 2}
-        input2 = {"token": token_2, "channel_id": channel_1_id, "length": 3}
+        input1 = {"token": token_0, "channel_id": channel_0_id, "length": 2}
+        input2 = {"token": token_0, "channel_id": channel_1_id, "length": 3}
 
         expected_1 = requests.post(config.url + "standup/start/v1", json=input1)
         expected_2 = requests.post(config.url + "standup/start/v1", json=input2)
@@ -313,6 +313,9 @@ def test_standup_send(parameters, parameters1, parameters2):
 
     # InputError : An active standup is not currently running in this channel
     def test_standup_not_started():
+        active_1 = requests.get(config.url + "standup/active/v1", params={"token": token_0, "channel_id": channel_0_id})
+        assert json.loads(active_1.text).get("is_active") == False
+
         input1 = {"token": token_0, "channel_id": channel_0_id, "message": "I am message."}
 
         status1 = requests.post(config.url + "standup/start/v1", json=input1).status_code
@@ -330,21 +333,21 @@ def test_standup_send(parameters, parameters1, parameters2):
     # normal tests
     def test_normal_test01():
         requests.post(config.url + "standup/start/v1", json={"token": token_0, "channel_id": channel_0_id, "length": 1})
-        active_1 = requests.get(config.url + "standup/active/v1", json={"token": token_0, "channel_id": channel_0_id})
+        active_1 = requests.get(config.url + "standup/active/v1", params={"token": token_0, "channel_id": channel_0_id})
         assert json.loads(active_1.text).get("is_active") == True
 
         requests.post(config.url + "standup/start/v1", json={"token": token_0, "channel_id": channel_0_id, "message": "message send by user_0."})
-        channel_0_msgs = requests.get(config.url + "channel/messages/v2", json={"token": token_0, "channel_id": channel_0_id, "start": 0})
+        channel_0_msgs = requests.get(config.url + "channel/messages/v2", params={"token": token_0, "channel_id": channel_0_id, "start": 0})
         assert len(json.loads(channel_0_msgs.text).get("messages")) == 0
 
         requests.post(config.url + "standup/start/v1", json={"token": token_1, "channel_id": channel_0_id, "message": "message send by user_1."})
-        channel_0_msgs = requests.get(config.url + "channel/messages/v2", json={"token": token_0, "channel_id": channel_0_id, "start": 0})
+        channel_0_msgs = requests.get(config.url + "channel/messages/v2", params={"token": token_0, "channel_id": channel_0_id, "start": 0})
         assert len(json.loads(channel_0_msgs.text).get("messages")) == 0
 
         sleep(2)
-        active_1 = requests.get(config.url + "standup/active/v1", json={"token": token_0, "channel_id": channel_0_id})
+        active_1 = requests.get(config.url + "standup/active/v1", params={"token": token_0, "channel_id": channel_0_id})
         assert json.loads(active_1.text).get("is_active") == False
-        channel_0_msgs = requests.get(config.url + "channel/messages/v2", json={"token": token_0, "channel_id": channel_0_id, "start": 0})
+        channel_0_msgs = requests.get(config.url + "channel/messages/v2", params={"token": token_0, "channel_id": channel_0_id, "start": 0})
         assert len(json.loads(channel_0_msgs.text).get("messages")) == 1
 
     # ----------------------------testing------------------------------------

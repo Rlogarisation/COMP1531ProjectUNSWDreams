@@ -5,6 +5,32 @@ from email.header import decode_header
 from email.utils import parseaddr
 
 
+def parser_subject(msg):
+    subject = msg['Subject']
+    value, charset = decode_header(subject)[0]
+    if charset:
+        value = value.decode(charset)
+    print('邮件主题： {0}'.format(value))
+    return value
+
+
+def parser_address(msg):
+    hdr, addr = parseaddr(msg['From'])
+    # name 发送人邮箱名称， addr 发送人邮箱地址
+    name, charset = decode_header(hdr)[0]
+    if charset:
+        name = name.decode(charset)
+    print('发送人邮箱名称: {0}，发送人邮箱地址: {1}'.format(name, addr))
+
+
+def parser_content(msg):
+    content = msg.get_payload()
+
+    # 文本信息
+    print("内容 :", content)
+    print("获得的reset code :", list(content.split())[-1:][0])
+
+
 def get_email_content():
     useraccount = 'styuannj@163.com'
     password = 'UXRVCTIAEQZVVGAG'
@@ -45,9 +71,20 @@ def get_email_content():
     msg = Parser().parsestr(text=msg_content)
     print('解码后的邮件信息:\n{}'.format(msg))
 
+    print("发送时间 == ", msg["Date"])
+
     # 关闭与服务器的连接，释放资源
     server.close()
 
     return msg
-if __name__ == "__main__":
-    get_email_content()
+
+
+if __name__ == '__main__':
+    # 返回解码的邮件详情
+    msg = get_email_content()
+    # 解析邮件主题
+    parser_subject(msg)
+    # 解析发件人详情
+    parser_address(msg)
+    # 解析内容
+    parser_content(msg)
