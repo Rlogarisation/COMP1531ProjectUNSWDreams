@@ -388,48 +388,6 @@ def test_auth_passwordreset_reset_invalid_reset_code():
         auth_passwordreset_reset_v1(invalid_reset_code, 'TheNewPassword')
     clear_v1()
 
-# """
-# Author : Emir Aditya Zen
-
-# Test for auth_passwordreset_request_v1 and auth_passwordreset_reset_v1 function implementation
-
-# Tests content:
-# 1. Succesful implementation of both functions
-# 3. Invalid reset_code
-# 4. New password less than 6 characters
-# """
-# #############################################################################
-# #                                                                           #
-# #   Test for auth_passwordreset_request_v1 and auth_passwordreset_reset_v1  #
-# #                                                                           #
-# #############################################################################
-
-
-# def test_auth_passwordreset_successful():
-#     clear_v1()
-#     id_check = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')['auth_user_id']
-#     reset_code = auth_passwordreset_request_v1('haha@gmail.com')['reset_code']
-#     auth_passwordreset_reset_v1(reset_code, 'TheNewPassword')
-#     assert auth_login_v1('haha@gmail.com', 'TheNewPassword')['auth_user_id'] == id_check
-
-
-# def test_auth_passwordreset_reset_invalid_password():
-#     clear_v1()
-#     auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-#     reset_code = auth_passwordreset_request_v1('haha@gmail.com')['reset_code']
-#     invalid_password = '123'
-#     with pytest.raises(InputError):
-#         auth_passwordreset_reset_v1(reset_code, invalid_password)
-
-
-# def test_auth_passwordreset_reset_invalid_reset_code():
-#     clear_v1()
-#     auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-#     reset_code = auth_passwordreset_request_v1('haha@gmail.com')['reset_code']
-#     invalid_reset_code = reset_code + '123'
-#     with pytest.raises(InputError):
-#         auth_passwordreset_reset_v1(invalid_reset_code, 'TheNewPassword')
-
 
 #############################################################################
 #                                                                           #
