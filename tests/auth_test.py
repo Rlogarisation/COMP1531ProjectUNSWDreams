@@ -1,4 +1,10 @@
+from time import sleep
 import pytest
+import poplib
+import base64
+from email.parser import Parser
+from email.header import decode_header
+from email.utils import parseaddr
 from src.other import clear_v1
 from src.auth import auth_login_v1, auth_register_v1, auth_logout, auth_passwordreset_request_v1, auth_passwordreset_reset_v1
 from src.error import InputError, AccessError
@@ -158,8 +164,8 @@ def test_auth_register_handle_valid():
     member4 = channel_members[3]
 
     """
-    - test if the handle is already taken, append the concatenated names with 
-    the smallest number (starting at 0) that 
+    - test if the handle is already taken, append the concatenated names with
+    the smallest number (starting at 0) that
     forms a new handle that isn't already taken.
     - test if the concatenation is longer than 20 characters, it is cutoff at 20 characters.
     """
@@ -326,7 +332,12 @@ def test_auth_logout_successfully_large():
 def test_auth_passwordreset_successful():
     clear_v1()
     id_check = auth_register_v1('styuannj@163.com', '123123123', 'Peter', 'White')['auth_user_id']
-    reset_code = auth_passwordreset_request_v1('styuannj@163.com')['reset_code']
+    auth_passwordreset_request_v1('styuannj@163.com')['reset_code']
+
+    sleep(2)
+    msg = get_email_content("styuannj@163.com", "UXRVCTIAEQZVVGAG", "pop.163.com")
+    reset_code = parser_reset_code(msg)
+
     auth_passwordreset_reset_v1(reset_code, 'TheNewPassword')
     assert auth_login_v1('styuannj@163.com', 'TheNewPassword')['auth_user_id'] == id_check
 
@@ -403,3 +414,89 @@ def test_auth_passwordreset_reset_invalid_reset_code():
 #     invalid_reset_code = reset_code + '123'
 #     with pytest.raises(InputError):
 #         auth_passwordreset_reset_v1(invalid_reset_code, 'TheNewPassword')
+
+
+#############################################################################
+#                                                                           #
+#                              Helper function                              #
+#                                                                           #
+#############################################################################
+
+def parser_subject(msg):
+    subject = msg['Subject']
+    value, charset = decode_header(subject)[0]
+    if charset:
+        value = value.decode(charset)
+    print('邮件主题： {0}'.format(value))
+    return value
+
+
+def parser_address(msg):
+    hdr, addr = parseaddr(msg['From'])
+    # name 发送人邮箱名称， addr 发送人邮箱地址
+    name, charset = decode_header(hdr)[0]
+    if charset:
+        name = name.decode(charset)
+    print('发送人邮箱名称: {0}，发送人邮箱地址: {1}'.format(name, addr))
+
+
+def parser_content(msg):
+    content = msg.get_payload()
+
+    # 文本信息
+    content_charset = content[0].get_content_charset()  # 获取编码格式
+    text = content[0].as_string().split('base64')[-1]
+    text_content = base64.b64decode(text).decode(content_charset)  # base64解码
+
+    # 添加了HTML代码的信息
+    content_charset = content[1].get_content_charset()
+    text = content[1].as_string().split('base64')[-1]
+    html_content = base64.b64decode(text).decode(content_charset)
+    print(('文本信息: {0}\n添加了HTML代码的信息: {1}'.format(text_content, html_content)))
+
+
+def parser_reset_code(msg):
+    content = msg.get_payload()
+    reset_code = list(content.split())[-1:][0]
+    return reset_code
+
+
+def get_email_content(email_address, password, pop3_server):
+    # 开始连接到服务器
+    server = poplib.POP3(pop3_server)
+
+    # 打开或者关闭调试信息，为打开，会在控制台打印客户端与服务器的交互信息
+    server.set_debuglevel(1)
+
+    # 打印POP3服务器的欢迎文字，验证是否正确连接到了邮件服务器
+    # print(server.getwelcome().decode('utf8'))
+
+    # 开始进行身份验证
+    server.user(email_address)
+    server.pass_(password)
+
+    # 返回邮件总数目和占用服务器的空间大小（字节数）， 通过stat()方法即可
+    email_num, email_size = server.stat()
+    # print("消息的数量: {0}, 消息的总大小: {1}".format(email_num, email_size))
+
+    # 使用list()返回所有邮件的编号，默认为字节类型的串
+    rsp, msg_list, rsp_siz = server.list()
+    # print("服务器的响应: {0},\n消息列表： {1},\n返回消息的大小： {2}".format(rsp, msg_list, rsp_siz))
+
+    # print('邮件总数： {}'.format(len(msg_list)))
+
+    # 下面单纯获取最新的一封邮件
+    total_mail_numbers = len(msg_list)
+    rsp, msglines, msgsiz = server.retr(total_mail_numbers)
+    # print("服务器的响应: {0},\n原始邮件内容： {1},\n该封邮件所占字节大小： {2}".format(rsp, msglines, msgsiz))
+
+    msg_content = b'\r\n'.join(msglines).decode('gbk')
+
+    msg = Parser().parsestr(text=msg_content)
+    # print('解码后的邮件信息:\n{}'.format(msg))
+    # print("发送时间 == ", msg["Date"])
+
+    # 关闭与服务器的连接，释放资源
+    server.close()
+
+    return msg
