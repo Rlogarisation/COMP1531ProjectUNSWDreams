@@ -334,7 +334,7 @@ def test_auth_logout_successfully_large():
 def test_auth_passwordreset_successful():
     clear_v1()
     id_check = auth_register_v1('styuannj@163.com', '123123123', 'Peter', 'White')['auth_user_id']
-    auth_passwordreset_request_v1('styuannj@163.com')['reset_code']
+    reset_code_1 = auth_passwordreset_request_v1('styuannj@163.com')['reset_code']
 
     # # email sent timestamp
     # time_stamp_1 = mktime(localtime())
@@ -351,9 +351,11 @@ def test_auth_passwordreset_successful():
     # # timestamp checking
     # assert time_stamp_1 - 2 <= time_stamp_2 <= time_stamp_1 + 2
 
-    reset_code = parser_reset_code(msg)
+    reset_code_2 = parser_reset_code(msg)
 
-    auth_passwordreset_reset_v1(reset_code, 'TheNewPassword')
+    assert reset_code_1 == reset_code_2
+
+    auth_passwordreset_reset_v1(reset_code_2, 'TheNewPassword')
     assert auth_login_v1('styuannj@163.com', 'TheNewPassword')['auth_user_id'] == id_check
 
     clear_v1()
