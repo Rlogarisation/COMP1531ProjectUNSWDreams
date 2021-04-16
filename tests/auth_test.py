@@ -1,4 +1,6 @@
-from time import sleep
+from datetime import datetime
+from threading import local
+from time import sleep, localtime, mktime, strftime, strptime
 import pytest
 import poplib
 import base64
@@ -334,8 +336,18 @@ def test_auth_passwordreset_successful():
     id_check = auth_register_v1('styuannj@163.com', '123123123', 'Peter', 'White')['auth_user_id']
     auth_passwordreset_request_v1('styuannj@163.com')['reset_code']
 
+    time_stamp_1 = mktime(localtime())
+
     sleep(2)
     msg = get_email_content("styuannj@163.com", "UXRVCTIAEQZVVGAG", "pop.163.com")
+
+    email_sent_time = list(msg['Date'].split())
+    del email_sent_time[5]
+    string_time = strptime(' '.join(email_sent_time), "%a, %d %b %Y %H:%M:%S (%Z)")
+    time_stamp_2 = mktime(string_time)
+
+    assert time_stamp_2 <= time_stamp_1 + 2
+
     reset_code = parser_reset_code(msg)
 
     auth_passwordreset_reset_v1(reset_code, 'TheNewPassword')
