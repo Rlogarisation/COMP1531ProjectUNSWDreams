@@ -85,7 +85,7 @@ def test_auth_register_lastName_length_http():
     assert status == 400
 #############################################################################
 #                                                                           #
-#                       http test for auth_login Error                      #
+#                       http test for auth_login Error                   #
 #                                                                           #
 #############################################################################
 
@@ -142,7 +142,18 @@ def test_auth_logout_invalid_token_http(parameters):
     invalid_token = f"{token}123"
     resp = requests.post(config.url + 'auth/logout/v1', json={"token": invalid_token})
     assert json.loads(resp.text).get('is_success') is False
+#############################################################################
+#                                                                           #
+#                http test for auth_passwordreset_request success           #
+#                                                                           #
+#############################################################################
 
+
+def test_auth_passwordreset_request_successful_http(parameters):
+    requests.delete(config.url + 'clear/v1')
+    requests.post(config.url + 'auth/register/v2', json=parameters)
+    output = requests.post(config.url + 'auth/password/reset/request/v1', json={"email": parameters.get('email')})
+    assert output.status_code == 200
 #############################################################################
 #                                                                           #
 #          http test for auth_register, auth_login, auth_logout             #
