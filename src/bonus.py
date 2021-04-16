@@ -37,3 +37,28 @@ def asciimoji_export_package(token, package, pkg_type):
             FILE.write(asciimoji_saved)
 
     FILE.close()
+
+
+def txt_to_pak(file_name):
+
+    try:
+        with open(file_name + ".txt", "r") as FILE_1:
+            content = eval(FILE_1.read())
+    except FileNotFoundError:
+        raise InputError(description=f"txt_to_pak : {file_name}.txt not found.")
+    with open(file_name + ".pak", "wb") as FILE_2:
+        pickle.dump(content, FILE_2)
+    FILE_1.close()
+    FILE_2.close()
+
+
+def pak_to_txt(file_name):
+    try:
+        with open(file_name + ".pak", "rb") as FILE_1:
+            content = eval(pickle.load(FILE_1))
+    except FileNotFoundError:
+        raise InputError(description=f"pak_to_txt : {file_name}.txt not found.")
+    with open(file_name + ".txt", "w") as FILE_2:
+        FILE_2.write(content)
+    FILE_1.close()
+    FILE_2.close()
