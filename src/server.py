@@ -201,7 +201,7 @@ def user_profile_uploadphoto():
     return dumps(result)
 
 
-@APP.route("/static/<path:path>", methods=['GET'])
+@APP.route("/src/static/<path:path>", methods=['GET'])
 def send_photo(path):
     return send_file(f"src/static/{path}")
 

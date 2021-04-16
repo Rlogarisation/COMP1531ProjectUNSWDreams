@@ -908,8 +908,6 @@ def test_user_stats_v1():
         assert user_stats['involvement_rate'] == 5 / 8
     # ----------------------------testing------------------------------------
     test_valid2()
-
-
 #############################################################################
 #                                                                           #
 #                        Test for users_stats_v1                             #
@@ -933,7 +931,7 @@ def test_users_stats_v1():
 
     dm_0_id = dm_create_v1(token_0, [u_id_1])["dm_id"]
     channel_0_id = channels_create_v1(token_1, "channel_0", True)["channel_id"]
-    channel_1_id = channels_create_v1(token_1, "channel_1", True)["channel_id"]
+    channels_create_v1(token_1, "channel_1", True)
 
     message_senddm_v1(token_0, dm_0_id, "I am message.")
     message_id1 = message_send_v2(token_1, channel_0_id, "I am message.")['message_id']
