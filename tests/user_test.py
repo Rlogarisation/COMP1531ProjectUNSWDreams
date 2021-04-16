@@ -5,9 +5,9 @@ from src.error import InputError, AccessError
 from src.channel import channel_details_v1, channel_invite_v1, channel_join_v1
 from src.channels import channels_create_v1
 from src.dm import dm_create_v1
-from src.message import message_send_v2, message_senddm_v1
+from src.message import message_send_v2, message_senddm_v1, message_remove_v1
 from src.user import user_profile_v1, user_profile_setname_v1, user_profile_setemail_v1, user_profile_sethandle_v1, \
-    users_all, admin_user_remove, admin_userpermission_change
+    users_all, admin_user_remove, admin_userpermission_change, user_stats_v1, users_stats_v1, user_profile_uploadphoto_v1, admin_user_remove
 from src.data_file import Permission
 
 
@@ -960,3 +960,133 @@ def test_admin_user_remove_successfully2():
     name_last = user_profile2['user']['name_last']
     assert f'{name_first} {name_last}' == 'Removed user'
     clear_v1()
+#############################################################################
+#                                                                           #
+#                        Test for user_stats_v1                             #
+#                                                                           #
+#############################################################################
+
+
+"""
+Auther: Lan Lin
+"""
+
+
+def test_user_stats_v1():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")["token"]
+
+    auth_login_v1("test_email0@gmail.com", "password")
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")["auth_user_id"]
+
+    def test_zero_involvement_rate():
+        assert user_stats_v1(token_0)['user_stats']['involvement_rate'] == 0
+
+    # ----------------------------testing------------------------------------
+    test_zero_involvement_rate()
+    # ------------------------------------------------------------------------
+
+    dm_0_id = dm_create_v1(token_0, [u_id_1])["dm_id"]
+    channel_0_id = channels_create_v1(token_1, "channel_0", True)["channel_id"]
+
+    message_senddm_v1(token_0, dm_0_id, "I am message.")
+    message_send_v2(token_1, channel_0_id, "I am message.")
+    message_send_v2(token_1, channel_0_id, "I am message.")
+
+    def test_invalid_token_user_stats():
+        with pytest.raises(AccessError):
+            user_stats_v1("string token")  # token's type is incorrect
+        with pytest.raises(AccessError):
+            user_stats_v1(1111111111)  # token's range is incorrect
+        with pytest.raises(AccessError):
+            user_stats_v1(None)
+
+    def test_valid1():
+        user0_stats = user_stats_v1(token_0)['user_stats']
+        user1_stats = user_stats_v1(token_1)['user_stats']
+        assert len(user0_stats['channels_joined']) == 0
+        assert len(user0_stats['dms_joined']) == 1
+        assert len(user0_stats['messages_sent']) == 1
+        assert user0_stats['involvement_rate'] == 2/5
+        assert len(user1_stats['channels_joined']) == 1
+        assert len(user1_stats['dms_joined']) == 1
+        assert len(user1_stats['messages_sent']) == 2
+        assert user1_stats['involvement_rate'] == 4/5
+    # ----------------------------testing------------------------------------
+    test_invalid_token_user_stats()
+    test_valid1()
+    # -----------------------------------------------------------------------
+    message_senddm_v1(token_0, dm_0_id, "I am message.")
+    message_senddm_v1(token_0, dm_0_id, "I am message.")
+    message_senddm_v1(token_0, dm_0_id, "I am message.")
+
+    def test_valid2():
+        user_stats = user_stats_v1(token_0)['user_stats']
+        assert len(user_stats['messages_sent']) == 4
+        assert user_stats['involvement_rate'] == 5 / 8
+    # ----------------------------testing------------------------------------
+    test_valid2()
+
+
+#############################################################################
+#                                                                           #
+#                        Test for users_stats_v1                             #
+#                                                                           #
+#############################################################################
+
+
+"""
+Auther: Lan Lin
+"""
+
+
+def test_users_stats_v1():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
+    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")["token"]
+    uid2 = auth_register_v1("test_email2@gmail.com", "password", "First1", "Last1")['auth_user_id']
+
+    auth_login_v1("test_email0@gmail.com", "password")
+    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")["auth_user_id"]
+
+    dm_0_id = dm_create_v1(token_0, [u_id_1])["dm_id"]
+    channel_0_id = channels_create_v1(token_1, "channel_0", True)["channel_id"]
+    channel_1_id = channels_create_v1(token_1, "channel_1", True)["channel_id"]
+
+    message_senddm_v1(token_0, dm_0_id, "I am message.")
+    message_id1 = message_send_v2(token_1, channel_0_id, "I am message.")['message_id']
+    message_send_v2(token_1, channel_0_id, "I am message.")
+
+    def test_invalid_token_users_stats():
+        with pytest.raises(AccessError):
+            user_stats_v1("string token")  # token's type is incorrect
+        with pytest.raises(AccessError):
+            user_stats_v1(1111111111)  # token's range is incorrect
+        with pytest.raises(AccessError):
+            user_stats_v1(None)
+
+    def test_valid1():
+        dreams_stats = users_stats_v1(token_0)['dreams_stats']
+        assert len(dreams_stats['channels_exist']) == 2
+        assert len(dreams_stats['dms_exist']) == 1
+        assert len(dreams_stats['messages_exist']) == 3
+        assert dreams_stats['utilization_rate'] == 2 / 3
+    # ----------------------------testing------------------------------------
+    test_invalid_token_users_stats()
+    test_valid1()
+    # -----------------------------------------------------------------------
+    message_remove_v1(token_1, message_id1)
+    admin_user_remove(token_0, uid2)
+
+    def test_valid2():
+        dreams_stats = users_stats_v1(token_0)['dreams_stats']
+        assert len(dreams_stats['messages_exist']) == 4
+        assert dreams_stats['utilization_rate'] == 1
+    # ----------------------------testing------------------------------------
+    test_valid2()
+#############################################################################
+#                                                                           #
+#                        Test for user_profile_uploadphoto_v1               #
+#                                                                           #
+#############################################################################

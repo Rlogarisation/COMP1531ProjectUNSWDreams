@@ -32,10 +32,7 @@ class User:
         self.channels_joined = []
         self.dms_joined = []
         self.messages_sent = []
-        self.image_url = 'https://www.google.com/url?sa=i&url=https%3A%2F%2Fsto' \
-                         'ck.adobe.com%2Fsk%2Fsearch%2Fimages%3Fk%3Ddefault%2Bprofile' \
-                         '%2Bpicture&psig=AOvVaw1X4P-65HFIrQQZfID-BTG7&ust=1618305715359000&s' \
-                         'ource=images&cd=vfe&ved=0CAIQjRxqFwoTCMD3uNyw-O8CFQAAAAAdAAAAABAD'
+        self.image_url = 'https://static.boredpanda.com/blog/wp-content/uploads/2020/05/700-1.jpg'
         self.image_path = ''
         self.reset_code = ''
 
