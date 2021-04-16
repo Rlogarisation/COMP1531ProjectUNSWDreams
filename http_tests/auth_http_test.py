@@ -138,7 +138,7 @@ def test_auth_login_wrong_password_http(parameters):
     requests.delete(config.url + "clear/v1")
 #############################################################################
 #                                                                           #
-#                       http test for auth_logout Error                   #
+#                       http test for auth_logout Error                     #
 #                                                                           #
 #############################################################################
 

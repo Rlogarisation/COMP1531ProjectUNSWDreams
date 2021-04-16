@@ -3,6 +3,8 @@ import base64
 from email.parser import Parser
 from email.header import decode_header
 from email.utils import parseaddr
+import time
+from datetime import date, datetime, timezone, tzinfo, timedelta
 
 
 def parser_subject(msg):
@@ -71,7 +73,9 @@ def get_email_content():
     msg = Parser().parsestr(text=msg_content)
     print('解码后的邮件信息:\n{}'.format(msg))
 
-    print("发送时间 == ", msg["Date"])
+    date_time = msg["Date"].split()
+    print("发送时间 == ", msg['Date'])
+    print("发送时间 == ", date_time[3], datetime.strptime(date_time[2], '%b').tm_mon, date_time[1], date_time[4])
 
     # 关闭与服务器的连接，释放资源
     server.close()
@@ -80,11 +84,22 @@ def get_email_content():
 
 
 if __name__ == '__main__':
-    # 返回解码的邮件详情
-    msg = get_email_content()
-    # 解析邮件主题
-    parser_subject(msg)
-    # 解析发件人详情
-    parser_address(msg)
-    # 解析内容
-    parser_content(msg)
+    # # 返回解码的邮件详情
+    # msg = get_email_content()
+    # # 解析邮件主题
+    # parser_subject(msg)
+    # # 解析发件人详情
+    # parser_address(msg)
+    # # 解析内容
+    # parser_content(msg)
+    print(datetime.now())
+    print(datetime.utcnow())
+    print(datetime.utcnow().replace(tzinfo=timezone.utc))
+    print(datetime.now() + timedelta(seconds=time.timezone))
+
+    print(datetime.now().timestamp())
+    print(datetime.utcnow().timestamp())
+    print(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
+    print((datetime.now() + timedelta(seconds=time.timezone)).replace(tzinfo=timezone.utc).timestamp())
+
+    datetime.strptime(datetime.now(), '%a, %d %b %Y %H:%M:%S %Z')
