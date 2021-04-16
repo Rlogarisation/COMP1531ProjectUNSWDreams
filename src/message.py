@@ -41,6 +41,12 @@ def message_send_v2(token, channel_id, message):
 
     # if error check passed, create a new message id
     new_message_id = create_message_id()
+
+    # bonus : replace <..> with asciimoji
+    user = get_user_by_token(token)
+    for i in user.asciimoji.keys():
+        message = message.replace(i, user.asciimoji[i])
+
     # sned message to the channel
     helper2_message_send_v2(new_message_id, auth_user, message, channel)
 
@@ -78,6 +84,12 @@ def message_senddm_v1(token, dm_id, message):
 
     # if error check passed, create a new message id
     new_message_id = create_message_id()
+
+    # bonus : replace <..> with asciimoji
+    user = get_user_by_token(token)
+    for i in user.asciimoji.keys():
+        message = message.replace(i, user.asciimoji[i])
+
     # sned message to the dm
     helper2_message_senddm_v1(new_message_id, auth_user, message, dm)
 

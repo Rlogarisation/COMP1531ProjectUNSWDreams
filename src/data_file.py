@@ -35,6 +35,9 @@ class User:
         self.image_url = 'https://static.boredpanda.com/blog/wp-content/uploads/2020/05/700-1.jpg'
         self.image_path = ''
         self.reset_code = ''
+        # bonus points
+        self.asciimoji = {"<acid>": "⊂(◉‿◉)つ", "<afraid>": "(ㆆ _ ㆆ)", "<angry>": "•`_´•", "<catlenny>": "( ͡° ᴥ ͡°)"}
+        self.common_words = ["I will be back soon.", "On my way, baby.", "How is it recently?"]
 
     def return_type_user_v1(self):
         return {
