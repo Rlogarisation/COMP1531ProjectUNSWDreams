@@ -1,6 +1,6 @@
 from src.data_file import Permission, data
 from src.auth import get_user_by_uid, session_to_token, token_to_session, get_user_by_token, \
-    is_email_valid
+    is_email_valid, auth_register_v1
 from src.error import InputError, AccessError
 from PIL import Image
 import requests
@@ -8,6 +8,7 @@ import os
 from src import config
 import urllib.request
 import io
+
 """
 user.py
 Auther: Lan Lin
@@ -20,11 +21,11 @@ def user_profile_v1(token, u_id):
     if user is None:
         raise AccessError(description="Token passed in is invalid")
 
-    user_ = get_user_by_uid(u_id)
-    if user_ is None:
+    user2 = get_user_by_uid(u_id)
+    if user2 is None:
         raise InputError(description="User with u_id is not a valid user")
 
-    result = user.return_type_user_v2()
+    result = user2.return_type_user_v2()
     return {
         'user': result
     }
@@ -161,8 +162,11 @@ def user_stats_v1(token):
         raise AccessError(description="Token passed in is invalid")
 
     num1 = len(user.part_of_channel) + len(user.part_of_dm) + len(user.messages)
-    num2 = len(data['class_channels']) + len(data['class_dms']) +len(data['class_messages'])
-    involvement_rate = num1/num2
+    num2 = len(data['class_channels']) + len(data['class_dms']) + len(data['class_messages'])
+    if num2 == 0:
+        involvement_rate = 0
+    else:
+        involvement_rate = num1 / num2
 
     user_stats = {
         'channels_joined': user.channels_joined,
@@ -183,7 +187,10 @@ def users_stats_v1(token):
 
     num1 = num_user_in_channel_dm()
     num2 = count_active_users()
-    utilization_rate = num1/num2
+    if num2 == 0:
+        utilization_rate = 0
+    else:
+        utilization_rate = num1 / num2
 
     dreams_stats = {
         'channels_exist': data['channels_exist'],
@@ -222,7 +229,6 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     # save the original image locally
     path = 'src/static/'
-    # path = './src/static'
     if not os.path.exists(path):
         os.mkdir(path)
     path = path + str(user.u_id) + '.jpg'
@@ -232,12 +238,13 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     # crop the image
     image_cropped = image.crop((x_start, y_start, x_end, y_end))
     # overwrite the original image by the cropped image
-    image_cropped.save(path)
+    image_cropped.save(path, format='JPEG')
 
     # generate the image_url
     user.image_url = config.url + path
-
     return {}
+
+
 #############################################################################
 #                                                                           #
 #                              Helper function                              #
@@ -268,3 +275,7 @@ def num_user_in_channel_dm():
         if num_channel_dm > 0:
             count += 1
     return count
+
+# if __name__ == "__main__":
+#     token = auth_register_v1("haha@gmail.com", "123123123", "Lan", "Lin").get('token')
+#     user_profile_uploadphoto_v1(token, "https://static.boredpanda.com/blog/wp-content/uploads/2020/05/700-1.jpg", 0, 0, 50, 50)
