@@ -201,6 +201,11 @@ def user_profile_uploadphoto():
     return dumps(result)
 
 
+@APP.route("/<path>", methods=['GET'])
+def send_photo(path):
+    return send_file(path)
+
+
 @APP.route("/user/stats/v1", methods=['GET'])
 def user_stats():
     token = request.args.get('token')
