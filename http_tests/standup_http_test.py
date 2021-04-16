@@ -178,9 +178,9 @@ def test_standup_active(parameters, parameters1, parameters2):
         input2 = {"token": 111000, "channel_id": channel_0_id}
         input3 = {"token": None, "channel_id": channel_0_id}
 
-        status1 = requests.get(config.url + "standup/active/v1", json=input1).status_code
-        status2 = requests.get(config.url + "standup/active/v1", json=input2).status_code
-        status3 = requests.get(config.url + "standup/active/v1", json=input3).status_code
+        status1 = requests.get(config.url + "standup/active/v1", params=input1).status_code
+        status2 = requests.get(config.url + "standup/active/v1", params=input2).status_code
+        status3 = requests.get(config.url + "standup/active/v1", params=input3).status_code
 
         assert status1 == 403
         assert status2 == 403
@@ -191,9 +191,9 @@ def test_standup_active(parameters, parameters1, parameters2):
         input2 = {"token": token_0, "channel_id": 99999}
         input3 = {"token": token_0, "channel_id": None}
 
-        status1 = requests.get(config.url + "standup/active/v1", json=input1).status_code
-        status2 = requests.get(config.url + "standup/active/v1", json=input2).status_code
-        status3 = requests.get(config.url + "standup/active/v1", json=input3).status_code
+        status1 = requests.get(config.url + "standup/active/v1", params=input1).status_code
+        status2 = requests.get(config.url + "standup/active/v1", params=input2).status_code
+        status3 = requests.get(config.url + "standup/active/v1", params=input3).status_code
 
         assert status1 == 400
         assert status2 == 400
@@ -215,26 +215,26 @@ def test_standup_active(parameters, parameters1, parameters2):
         input3 = {"token": token_0, "channel_id": channel_0_id}
         input4 = {"token": token_0, "channel_id": channel_1_id}
 
-        active_1 = requests.get(config.url + "standup/active/v1", json=input3)
-        active_2 = requests.get(config.url + "standup/active/v1", json=input4)
+        active_1 = requests.get(config.url + "standup/active/v1", params=input3)
+        active_2 = requests.get(config.url + "standup/active/v1", params=input4)
 
-        assert json.loads(active_1.text).get("is_active") == True
+        assert json.loads(active_1.text).get("is_active") is True
         assert json.loads(active_1.text).get("time_finish") == time_sent + 2
 
-        assert json.loads(active_2.text).get("is_active") == True
+        assert json.loads(active_2.text).get("is_active") is True
         assert json.loads(active_2.text).get("time_finish") == time_sent + 3
 
         sleep(2)
-        active_1 = requests.get(config.url + "standup/active/v1", json=input3)
-        active_2 = requests.get(config.url + "standup/active/v1", json=input4)
-        assert json.loads(active_1.text).get("is_active") == False
-        assert json.loads(active_2.text).get("is_active") == True
+        active_1 = requests.get(config.url + "standup/active/v1", params=input3)
+        active_2 = requests.get(config.url + "standup/active/v1", params=input4)
+        assert json.loads(active_1.text).get("is_active") is False
+        assert json.loads(active_2.text).get("is_active") is True
 
         sleep(1)
-        active_1 = requests.get(config.url + "standup/active/v1", json=input3)
-        active_2 = requests.get(config.url + "standup/active/v1", json=input4)
-        assert json.loads(active_1.text).get("is_active") == False
-        assert json.loads(active_2.text).get("is_active") == False
+        active_1 = requests.get(config.url + "standup/active/v1", params=input3)
+        active_2 = requests.get(config.url + "standup/active/v1", params=input4)
+        assert json.loads(active_1.text).get("is_active") is False
+        assert json.loads(active_2.text).get("is_active") is False
 
         time_finish = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
 
