@@ -336,20 +336,20 @@ def test_auth_passwordreset_successful():
     id_check = auth_register_v1('styuannj@163.com', '123123123', 'Peter', 'White')['auth_user_id']
     auth_passwordreset_request_v1('styuannj@163.com')['reset_code']
 
-    # email sent timestamp
+    # # email sent timestamp
     # time_stamp_1 = mktime(localtime())
 
     sleep(2)
     msg = get_email_content("styuannj@163.com", "UXRVCTIAEQZVVGAG", "pop.163.com")
 
-    # email received timestamp
+    # # email received timestamp
     # email_sent_time = list(msg['Date'].split())
     # del email_sent_time[5]
     # string_time = strptime(' '.join(email_sent_time), "%a, %d %b %Y %H:%M:%S (%Z)")
     # time_stamp_2 = mktime(string_time)
 
-    # timestamp checking
-    # assert time_stamp_2 <= time_stamp_1 + 2
+    # # timestamp checking
+    # assert time_stamp_1 - 2 <= time_stamp_2 <= time_stamp_1 + 2
 
     reset_code = parser_reset_code(msg)
 
