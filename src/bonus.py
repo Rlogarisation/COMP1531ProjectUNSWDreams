@@ -1,5 +1,6 @@
 # Here is bonus functions
-from src.data_file import data
+from re import S
+from src.data_file import current_time, data, Status
 from src.other import InputError, AccessError
 from src.auth import get_user_by_token
 from src.message import get_message_by_message_id
@@ -99,3 +100,40 @@ def message_to_common_words(token, message_id):
         raise AccessError(description="message_to_common_words : target message not found.")
 
     user.common_words.append(message.message)
+
+
+def get_user_status_by_token(token):
+    user = get_user_by_token(token)
+    if user == None:
+        return None
+    else:
+        return user.status
+
+
+def user_status_switch_personlly(token, status):
+    if type(status) != Status:
+        return InputError(description="user_status_switch : invalid status.")
+
+    user = get_user_by_token(token)
+    user.status = status
+
+
+def status_auto_switch(token):
+    user = get_user_by_token(token)
+
+    login_time = user.login_time
+    time_now = current_time()
+
+    lastest_message = 0
+    lastest_message_time = 0
+    for message in user.messages:
+        if message.time_created > lastest_message_time:
+            lastest_message_time = message.time_created
+            lastest_message = message
+
+    if time_now - lastest_message_time >= 15 * 60 and get_user_status_by_token(token) == Status.online and user.online_time >= 15 * 60:
+        # 距离最近一次发消息已有15多分钟， 在线超过15分钟
+        user.status = Status.busy_working
+    elif time_now - lastest_message_time >= 45 * 60 and user.online_time >= 60 * 60:
+        # 距离最近一次发消息已有45多分钟, 在线超过60分钟
+        user.status = Status.leave_away

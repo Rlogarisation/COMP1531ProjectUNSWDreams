@@ -5,7 +5,7 @@ import random
 import smtplib
 
 from jwt import InvalidSignatureError, InvalidTokenError
-from src.data_file import User, Permission, data
+from src.data_file import User, Permission, current_time, data, Status
 from src.error import InputError
 
 #############################################################################
@@ -41,7 +41,7 @@ def auth_register_v1(email, password, name_first, name_last):
     permission_id = create_permission(u_id)
     hashed_password = hash_password(password)
 
-    user_ = User(u_id, email, hashed_password, name_first, name_last, handle, auth_user_id, permission_id)
+    user_ = User(u_id, email, hashed_password, name_first, name_last, handle, auth_user_id, permission_id, Status.offline)
     session_id = create_session_id()
     token = session_to_token(session_id)
     user_.current_sessions.append(session_id)
@@ -77,6 +77,11 @@ def auth_login_v1(email, password):
     session_id = create_session_id()
     user.current_sessions.append(session_id)
     token = session_to_token(session_id)
+
+    # bonus
+    user.status = Status.online
+    user.login_time = current_time()
+
     return {
         'token': token,
         'auth_user_id': user.auth_user_id
@@ -89,6 +94,10 @@ def auth_logout(token):
         user = user_session[0]
         session_id = user_session[1]
         user.current_sessions.remove(session_id)
+
+        # bonus
+        user.status = Status.online
+
         return {'is_success': True}
 
     return {'is_success': False}
