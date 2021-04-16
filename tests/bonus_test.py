@@ -1,5 +1,5 @@
 # Here is the tests for Bonus functions
-from src.bonus import asciimoji_import_package, asciimoji_export_package
+from src.bonus import asciimoji_import_package, asciimoji_export_package, message_to_common_words
 from src.message import message_send_v2, message_senddm_v1
 from src.other import clear_v1
 from src.auth import auth_register_v1, auth_login_v1, get_user_by_token
@@ -111,4 +111,23 @@ def test_asciimoji_export_pak():
     assert eval(asciimoji_load) == {"<acid>": "⊂(◉‿◉)つ", "<afraid>": "(ㆆ _ ㆆ)", "<angry>": "•`_´•", "<catlenny>": "( ͡° ᴥ ͡°)"}
 
     os.system(f"rm -rf {package}.pak")
+    clear_v1()
+
+
+def test_message_to_common_words():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
+    user_0 = get_user_by_token(token_0)
+
+    channel_0_id = channels_create_v1(token_0, "channel_0", True)['channel_id']
+    channel_msgs = channel_messages_v1(token_0, channel_0_id, 0)["messages"]
+    assert len(channel_msgs) == 0
+
+    message_id = message_send_v2(token_0, channel_0_id, "message to channel.")["message_id"]
+    channel_msgs = channel_messages_v1(token_0, channel_0_id, 0)["messages"]
+    assert len(channel_msgs) == 1
+
+    message_to_common_words(token_0, message_id)
+    assert user_0.common_words == ["I will be back soon.", "On my way, baby.", "How is it recently?", "message to channel."]
+
     clear_v1()
