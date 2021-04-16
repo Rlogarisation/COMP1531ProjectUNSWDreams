@@ -181,11 +181,11 @@ DATA = {
     # to record the number of messages
     'message_num': 0,
     # threads
-    'threads':[],
+    'threads': [],
+    # number of channel and dm
     'channel_num': 0,
     'dm_num': 0,
-    'secret': 'THIS_IS_SECRET',
-    # 'threads': []
+    'secret': 'THIS_IS_SECRET'
 }
 
 
