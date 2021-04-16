@@ -7,6 +7,7 @@ import requests
 import os
 from src import config
 import urllib.request
+import io
 """
 user.py
 Auther: Lan Lin
@@ -207,7 +208,8 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         raise InputError(description="img_url returns an HTTP status other than 200.")
 
     # check the format of the image
-    image = Image.open(response.raw)
+    # image = Image.open(response.raw)
+    image = Image.open(io.BytesIO(response.content))
     if image.format != 'JPEG':
         raise InputError(description="Image uploaded is not a JPG")
 
@@ -219,7 +221,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         raise InputError(description="y_start or y_end are not within the dimensions of the image")
 
     # save the original image locally
-    path = 'src/static'
+    path = 'src/static/'
     # path = './src/static'
     if not os.path.exists(path):
         os.mkdir(path)

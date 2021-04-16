@@ -551,7 +551,12 @@ def standup_start():
 @APP.route("/standup/active/v1", methods=['GET'])
 def standup_active():
     token = request.args.get('token')
-    channel_id = int(request.args.get('channel_id'))
+    if request.args.get('channel_id') is None:
+        raise InputError(description='channel_id is not int')
+    try:
+        channel_id = int(request.args.get('channel_id'))
+    except ValueError as error:
+        raise InputError(description='channel_id is not int') from error
     result = standup_active_v1(token, channel_id)
     dump_data(data)
     return dumps(result)

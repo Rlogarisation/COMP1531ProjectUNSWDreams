@@ -102,11 +102,13 @@ def auth_passwordreset_request_v1(email):
     # generate the reset code
     reset_code = create_reset_code()
     user.reset_code = reset_code
-    connection = smtplib.SMTP("smtp.gmail.com", 587)
+    connection = smtplib.SMTP("smtp.qq.com", 587)
     connection.starttls()
-    connection.login(user='cblinker17@gmail.com', password='cs1531f11cblinker')
+    # connection.login(user='cblinker17@gmail.com', password='cs1531f11cblinker')
+    connection.login(user='1479294474@qq.com', password='zuqnikgabuoojefb')
     connection.sendmail(
-        from_addr='cblinker17@gmail.com',
+        # from_addr='cblinker17@gmail.com',
+        from_addr='1479294474@qq.com',
         to_addrs=email,
         msg=f"Subject:Password Reset Code for Dreams\n\nThe password rest code is {reset_code}"
     )
