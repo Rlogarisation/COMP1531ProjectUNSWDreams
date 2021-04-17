@@ -17,7 +17,6 @@ class Status:
     online = 1
     busy_working = 2
     leave_away = 3
-    stealth = 4
 
 
 class User:
