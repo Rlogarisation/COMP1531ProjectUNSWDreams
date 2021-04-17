@@ -185,18 +185,11 @@ def admin_userpermission_change_v1():
     return dumps(result)
 
 
-# @app.route('/static/<path:path>')
-# def send_js(path):
-#     return send_from_directory('', path)
-
-
 @APP.route("/user/profile/uploadphoto/v1", methods=['POST'])
 def user_profile_uploadphoto():
     info = request.get_json()
     result = user_profile_uploadphoto_v1(info['token'], info['img_url'], info['x_start'], info['y_start'],
                                          info['x_end'], info['y_end'])
-    # send_from_directory('', path)
-    # send_file(user.image_path)
     dump_data(data)
     return dumps(result)
 

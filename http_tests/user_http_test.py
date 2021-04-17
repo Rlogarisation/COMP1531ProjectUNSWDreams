@@ -44,7 +44,8 @@ def test_user_profile_v1_inputError_http(parameters):
     requests.delete(config.url + 'clear/v1')
     resp = requests.post(config.url + 'auth/register/v2', json=parameters)
     token = json.loads(resp.text).get('token')
-    status = requests.get(config.url + 'user/profile/v2?token=' + token + '&u_id=1').status_code
+    invalid_uid = -1
+    status = requests.get(config.url + 'user/profile/v2', params={'token': token, 'u_id': invalid_uid}).status_code
     assert status == 400
     requests.delete(config.url + "clear/v1")
 
@@ -350,7 +351,7 @@ def test_admin_user_permission_change_invalid_http(parameters):
 #############################################################################
 
 
-def test_user_stats(parameters, parameters1, parameters2):
+def test_user_stats(parameters, parameters1):
     requests.delete(config.url + 'clear/v1')
     user0 = requests.post(config.url + "auth/register/v2", json=parameters)
     user1 = requests.post(config.url + "auth/register/v2", json=parameters1)
@@ -380,9 +381,9 @@ def test_user_stats(parameters, parameters1, parameters2):
         input2 = {"token": 111000}
         input3 = {"token": None}
 
-        user_stat0 = requests.get(config.url + "user/stats/v1", params={'token': input1})
-        user_stat1 = requests.get(config.url + "user/stats/v1", params={'token': input2})
-        user_stat2 = requests.get(config.url + "user/stats/v1", params={'token': input3})
+        user_stat0 = requests.get(config.url + "user/stats/v1", params=input1)
+        user_stat1 = requests.get(config.url + "user/stats/v1", params=input2)
+        user_stat2 = requests.get(config.url + "user/stats/v1", params=input3)
 
         assert user_stat0.status_code == 403
         assert user_stat1.status_code == 403
@@ -454,9 +455,9 @@ def test_users_stats_v1(parameters, parameters1, parameters2):
         input2 = {"token": 111000}
         input3 = {"token": None}
 
-        user_stat0 = requests.get(config.url + "users/stats/v1", params={'token': input1})
-        user_stat1 = requests.get(config.url + "users/stats/v1", params={'token': input2})
-        user_stat2 = requests.get(config.url + "users/stats/v1", params={'token': input3})
+        user_stat0 = requests.get(config.url + "users/stats/v1", params=input1)
+        user_stat1 = requests.get(config.url + "users/stats/v1", params=input2)
+        user_stat2 = requests.get(config.url + "users/stats/v1", params=input3)
 
         assert user_stat0.status_code == 403
         assert user_stat1.status_code == 403
@@ -488,4 +489,71 @@ def test_users_stats_v1(parameters, parameters1, parameters2):
 #                        Test for user_profile_uploadphoto_v1               #
 #                                                                           #
 #############################################################################
+
+
+def user_profile_uploadphoto_v1_http(parameters):
+    requests.delete(config.url + 'clear/v1')
+    user0 = requests.post(config.url + "auth/register/v2", json=parameters)
+    token0 = json.loads(user0.text).get("token")
+    uid0 = json.loads(user0.text).get("auth_user_id")
+    url = 'https://static.boredpanda.com/blog/wp-content/uploads/2020/05/700-1.jpg'
+
+    def test_invalid_token1():
+        input1 = {"token": "string token", "img_url": url, "x_start": 0, "y_start": 0, "x_end": 50, "y_end": 50}
+        input2 = {"token": 1110000, "img_url": url, "x_start": 0, "y_start": 0, "x_end": 50, "y_end": 50}
+        input3 = {"token": None, "img_url": url, "x_start": 0, "y_start": 0, "x_end": 50, "y_end": 50}
+
+        respond1 = requests.post(config.url + "user/profile/uploadphoto/v1", json=input1)
+        respond2 = requests.get(config.url + "user/profile/uploadphoto/v1", json=input2)
+        respond3 = requests.get(config.url + "user/profile/uploadphoto/v1", json=input3)
+
+        assert respond1.status_code == 403
+        assert respond2.status_code == 403
+        assert respond3.status_code == 403
+
+    def test_invalid_url():
+        input1 = {"token": token0, "img_url": "http://haha", "x_start": 0, "y_start": 0, "x_end": 50, "y_end": 50}
+
+        respond = requests.post(config.url + "user/profile/uploadphoto/v1", json=input1)
+        assert respond.status_code == 400
+
+    def test_invalid_image_format():
+        input1 = {"token": token0, "img_url": 'https://pngimg.com/uploads/mario/mario_PNG53.png', "x_start": 0,
+                  "y_start": 0, "x_end": 50, "y_end": 50}
+
+        respond = requests.post(config.url + "user/profile/uploadphoto/v1", json=input1)
+        assert respond.status_code == 400
+
+    def test_invalid_x_bound():
+        input1 = {"token": token0, "img_url": url, "x_start": 50, "y_start": 0, "x_end": 0, "y_end": 50}
+
+        respond = requests.post(config.url + "user/profile/uploadphoto/v1", json=input1)
+        assert respond.status_code == 400
+
+    def test_invalid_y_bound():
+        input1 = {"token": token0, "img_url": url, "x_start": 0, "y_start": 50, "x_end": 50, "y_end": 0}
+
+        respond = requests.post(config.url + "user/profile/uploadphoto/v1", json=input1)
+        assert respond.status_code == 400
+
+    def test_valid():
+        user_profile_start = requests.get(config.url + 'user/profile/v2', params={'token': token0, 'u_id': uid0})
+        img_url1 = json.loads(user_profile_start.text)['profile_img_url']
+
+        input1 = {"token": token0, "img_url": url, "x_start": 0, "y_start": 0, "x_end": 50, "y_end": 50}
+        respond = requests.post(config.url + "user/profile/uploadphoto/v1", json=input1)
+
+        user_profile_end = requests.get(config.url + 'user/profile/v2', params={'token': token0, 'u_id': uid0})
+        img_url = json.loads(user_profile_start.text)['profile_img_url']
+
+        assert img_url1 != img_url
+        assert img_url == 'http://127.0.0.1:8080/static/' + str(uid0) + '.jpg'
+    # ----------------------------testing------------------------------------
+    test_invalid_token1()
+    test_invalid_url()
+    test_invalid_image_format()
+    test_invalid_x_bound()
+    test_invalid_y_bound()
+    test_valid()
+    requests.delete(config.url + 'clear/v1')
 
