@@ -81,7 +81,7 @@ def pak_to_txt(file_name):
     except FileNotFoundError:
         raise InputError(description=f"pak_to_txt : {file_name}.txt not found.")
     with open(file_name + ".txt", "w") as FILE_2:
-        FILE_2.write(content)
+        FILE_2.write(str(content))
     FILE_1.close()
     FILE_2.close()
 

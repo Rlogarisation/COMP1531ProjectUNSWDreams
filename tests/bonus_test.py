@@ -1,10 +1,10 @@
 # Here is the tests for Bonus functions
-from src.bonus import asciimoji_import_package, asciimoji_export_package, message_to_common_words
+from src.bonus import asciimoji_import_package, asciimoji_export_package, message_to_common_words, pak_to_txt, txt_to_pak
 from src.message import message_send_v2, message_senddm_v1
 from src.other import clear_v1
 from src.auth import auth_register_v1, auth_login_v1, get_user_by_token
 from src.channels import channels_create_v1
-from src.channel import channel_messages_v1
+from src.channel import channel_addowner_v1, channel_messages_v1
 from src.dm import dm_create_v1, dm_messages_v1
 import os
 import pickle
@@ -130,4 +130,35 @@ def test_message_to_common_words():
     message_to_common_words(token_0, message_id)
     assert user_0.common_words == ["I will be back soon.", "On my way, baby.", "How is it recently?", "message to channel."]
 
+    clear_v1()
+
+
+def test_txt_to_pak():
+    clear_v1()
+    with open("123.txt", 'w') as FILE:
+        FILE.write("123456")
+    FILE.close()
+
+    txt_to_pak("123")
+
+    with open("123.pak", 'rb') as FILE:
+        content2 = pickle.load(FILE)
+
+    assert str(content2) == "123456"
+    os.system("rm -rf 123.txt 123.pak")
+    clear_v1()
+
+
+def test_pak_to_txt():
+    clear_v1()
+    with open("123.pak", "wb") as FILE:
+        content = pickle.dump("123", FILE)
+    FILE.close()
+
+    pak_to_txt("123")
+    with open("123.txt", 'r') as FILE:
+        content1 = FILE.read()
+
+    assert content1 == "123"
+    os.system("rm -rf 123.txt 123.pak")
     clear_v1()
