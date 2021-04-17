@@ -1,4 +1,4 @@
-from src.data_file import Permission, data
+from src.data_file import Channel, DM, Message, Permission, data
 from src.auth import get_user_by_uid, session_to_token, token_to_session, get_user_by_token, \
     is_email_valid, auth_register_v1
 from src.error import InputError, AccessError
@@ -8,6 +8,7 @@ import os
 from src import config
 import urllib.request
 import io
+from typing import Any, List, Dict, Tuple
 
 """
 user.py
@@ -15,7 +16,7 @@ Auther: Lan Lin
 """
 
 
-def user_profile_v1(token, u_id):
+def user_profile_v1(token: str, u_id: int) -> Dict:
     # find the user to show the profile
     user = get_user_by_token(token)
     if user is None:
@@ -31,7 +32,7 @@ def user_profile_v1(token, u_id):
     }
 
 
-def user_profile_setname_v1(token, name_first, name_last):
+def user_profile_setname_v1(token: str, name_first: str, name_last: str) -> dict():
     # find the user to update the name
     user = get_user_by_token(token)
     if user is None:
@@ -50,7 +51,7 @@ def user_profile_setname_v1(token, name_first, name_last):
     return {}
 
 
-def user_profile_setemail_v1(token, email):
+def user_profile_setemail_v1(token: str, email: str) -> dict():
     # find the user to update the email
     user = get_user_by_token(token)
     if user is None:
@@ -70,7 +71,7 @@ def user_profile_setemail_v1(token, email):
     return {}
 
 
-def user_profile_sethandle_v1(token, handle_str):
+def user_profile_sethandle_v1(token: str, handle_str: str) -> dict():
     # find the user to update the handle
     user = get_user_by_token(token)
     if user is None:
@@ -89,7 +90,7 @@ def user_profile_sethandle_v1(token, handle_str):
     return {}
 
 
-def users_all(token):
+def users_all(token: str) -> Dict:
     # Pull the data of user from data_file
     user = get_user_by_token(token)
     if user is None:
@@ -103,7 +104,7 @@ def users_all(token):
     }
 
 
-def admin_user_remove(token, u_id):
+def admin_user_remove(token: str, u_id: int) -> dict():
     # find the owner to implement the remove
     owner = get_user_by_token(token)
     if owner is None:
@@ -140,7 +141,7 @@ def admin_user_remove(token, u_id):
     return {}
 
 
-def admin_userpermission_change(token, u_id, permission_id):
+def admin_userpermission_change(token: str, u_id: int, permission_id: int) -> dict():
     owner = get_user_by_token(token)
     if owner is None:
         raise AccessError(description="Token passed in is invalid")
@@ -156,7 +157,7 @@ def admin_userpermission_change(token, u_id, permission_id):
     return {}
 
 
-def user_stats_v1(token):
+def user_stats_v1(token: str) -> Dict:
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token passed in is invalid")
@@ -180,7 +181,7 @@ def user_stats_v1(token):
     }
 
 
-def users_stats_v1(token):
+def users_stats_v1(token: str) -> Dict:
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token passed in is invalid")
@@ -204,7 +205,7 @@ def users_stats_v1(token):
     }
 
 
-def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
+def user_profile_uploadphoto_v1(token: str, img_url: str, x_start: int, y_start: int, x_end: int, y_end: int) -> dict():
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token passed in is invalid")
@@ -253,7 +254,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 #############################################################################
 
 
-def count_active_users():
+def count_active_users() -> int:
     count = 0
     for user in data['class_users']:
         if f"{user.name_first} {user.name_last}" != "Removed user":
@@ -261,7 +262,7 @@ def count_active_users():
     return count
 
 
-def count_dream_owner():
+def count_dream_owner() -> int:
     count = 0
     for user in data['class_users']:
         if user.permission_id == Permission.global_owner:
@@ -269,7 +270,7 @@ def count_dream_owner():
     return count
 
 
-def num_user_in_channel_dm():
+def num_user_in_channel_dm() -> int:
     count = 0
     for user in data['class_users']:
         num_channel_dm = len(user.part_of_channel) + len(user.part_of_dm)

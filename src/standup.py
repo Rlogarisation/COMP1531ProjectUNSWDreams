@@ -1,9 +1,10 @@
 from threading import Timer
-from src.data_file import data, Message, Permission, current_time
+from src.data_file import Channel, data, Message, Permission, current_time
 from src.error import InputError, AccessError
 from src.auth import get_user_by_token, get_user_by_handle, get_user_by_uid
 from src.channel import get_channel_by_channel_id, is_user_owner_channel, is_user_in_channel
 from src.message import message_send_v2
+from typing import Any, List, Dict, Tuple
 #############################################################################
 #                                                                           #
 #                           Interface function                              #
@@ -11,7 +12,7 @@ from src.message import message_send_v2
 #############################################################################
 
 
-def standup_start_v1(token, channel_id, length):
+def standup_start_v1(token: str, channel_id: int, length: int) -> Dict:
     if isinstance(length, int) is False or length < 0 or length is None:
         raise InputError(description='length is invalid')
 
@@ -42,7 +43,7 @@ def standup_start_v1(token, channel_id, length):
     }
 
 
-def standup_active_v1(token, channel_id):
+def standup_active_v1(token: str, channel_id: int) -> Dict:
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description='Invalid token.')
@@ -56,7 +57,7 @@ def standup_active_v1(token, channel_id):
     return channel.standup
 
 
-def standup_send_v1(token, channel_id, message):
+def standup_send_v1(token: str, channel_id: int, message: str) -> Dict:
     if type(channel_id) != int or type(message) != str:
         raise InputError(description="incorrect type for your inputs.")
 
@@ -88,7 +89,7 @@ def standup_send_v1(token, channel_id, message):
 #############################################################################
 
 
-def standup_send_packaged_message(token, channel):
+def standup_send_packaged_message(token: str, channel: Channel) -> None:
     if len(channel.packaged_messages) > 0:
         packaged_message = "\n".join(channel.packaged_messages)
         message_send_v2(token, channel.channel_id, packaged_message)

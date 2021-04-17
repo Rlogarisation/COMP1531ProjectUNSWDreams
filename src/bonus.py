@@ -5,9 +5,10 @@ from src.other import InputError, AccessError
 from src.auth import get_user_by_token, get_user_by_uid
 from src.message import get_message_by_message_id
 import pickle
+from typing import Any, List, Dict, Tuple
 
 
-def asciimoji_import_package(token, package, pkg_type):
+def asciimoji_import_package(token: str, package: str, pkg_type: str) -> None:
     # input checking
     if type(token) != str or type(package) != str or type(pkg_type) != str:
         raise InputError(description="asciimoji_import_package : Parameters' type has error.")
@@ -33,7 +34,7 @@ def asciimoji_import_package(token, package, pkg_type):
     FILE.close()
 
 
-def asciimoji_export_package(token, package, pkg_type):
+def asciimoji_export_package(token: str, package: str, pkg_type: str) -> None:
     # input checking
     if type(token) != str or type(package) != str or type(pkg_type) != str:
         raise InputError(description="asciimoji_export_package : Parameters' type has error.")
@@ -54,7 +55,7 @@ def asciimoji_export_package(token, package, pkg_type):
     FILE.close()
 
 
-def txt_to_pak(file_name):
+def txt_to_pak(file_name: str) -> None:
     # input checking
     if type(file_name) != str:
         raise InputError(description=f"txt_to_pak : {file_name} need to be string.")
@@ -70,7 +71,7 @@ def txt_to_pak(file_name):
     FILE_2.close()
 
 
-def pak_to_txt(file_name):
+def pak_to_txt(file_name: str) -> None:
     # input checking
     if type(file_name) != str:
         raise InputError(description=f"pak_to_txt : {file_name} need to be string.")
@@ -86,7 +87,7 @@ def pak_to_txt(file_name):
     FILE_2.close()
 
 
-def message_to_common_words(token, message_id):
+def message_to_common_words(token: str, message_id: int) -> None:
     # input checking
     if type(token) != str or type(message_id) != int:
         raise InputError(description="message_to_common_words : Parameters' type has error.")
@@ -102,7 +103,7 @@ def message_to_common_words(token, message_id):
     user.common_words.append(message.message)
 
 
-def get_user_status_by_u_id(u_id):
+def get_user_status_by_u_id(u_id: int) -> int:
     user = get_user_by_uid(u_id)
     if user == None:
         raise InputError(description="get_user_status_by_u_id : u_id is invalid.")
@@ -110,7 +111,7 @@ def get_user_status_by_u_id(u_id):
         return user.status
 
 
-def user_status_switch_personlly(u_id, status):
+def user_status_switch_personlly(u_id: int, status: int) -> int:
     if type(status) != int:
         raise InputError(description="user_status_switch_personlly : invalid status.")
     user = get_user_by_uid(u_id)
@@ -119,7 +120,7 @@ def user_status_switch_personlly(u_id, status):
     user.status = status
 
 
-def status_auto_switch(u_id):
+def status_auto_switch(u_id: int) -> None:
     user = get_user_by_uid(u_id)
     if user == None:
         raise InputError(description="get_user_by_uid : u_id not found.")

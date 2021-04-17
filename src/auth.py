@@ -3,6 +3,7 @@ import jwt
 import hashlib
 import random
 import smtplib
+from typing import Any, List, Dict, Tuple, Union
 
 from jwt import InvalidSignatureError, InvalidTokenError
 from src.data_file import User, Permission, current_time, data, Status
@@ -32,7 +33,7 @@ InputError:
 """
 
 
-def auth_register_v1(email, password, name_first, name_last):
+def auth_register_v1(email: str, password: str, name_first: str, name_last: str):
     auth_register_check_error(email, password, name_first, name_last)
 
     u_id = create_uid()
@@ -70,7 +71,7 @@ InputError:
 """
 
 
-def auth_login_v1(email, password):
+def auth_login_v1(email: str, password: str):
     auth_login_error_check(email, password)
 
     user = get_user_by_email(email)
@@ -88,7 +89,7 @@ def auth_login_v1(email, password):
     }
 
 
-def auth_logout(token):
+def auth_logout(token: str):
     user_session = get_user_session_by_token(token)
     if user_session is not None:
         user = user_session[0]
@@ -104,7 +105,7 @@ def auth_logout(token):
     return {'is_success': False}
 
 
-def auth_passwordreset_request_v1(email):
+def auth_passwordreset_request_v1(email: str):
     user = get_user_by_email(email)
     if user is None:
         raise InputError(description="The email is invalid")
@@ -128,7 +129,7 @@ def auth_passwordreset_request_v1(email):
     }
 
 
-def auth_passwordreset_reset_v1(reset_code, new_password):
+def auth_passwordreset_reset_v1(reset_code: int, new_password: str):
     user = get_user_by_code(reset_code)
     if user is None:
         raise InputError(description="reset_code is not a valid reset code")
@@ -148,7 +149,7 @@ def auth_passwordreset_reset_v1(reset_code, new_password):
 
 
 # check if email entered is valid
-def is_email_valid(email):
+def is_email_valid(email: str) -> bool:
     if email is None:
         return False
     regex = '^[a-zA-Z0-9]+[\\._]?[a-zA-Z0-9]+[@]\\w+[.]\\w{2,3}$'
@@ -158,7 +159,7 @@ def is_email_valid(email):
         return False
 
 
-def get_user_by_code(reset_code):
+def get_user_by_code(reset_code: int) -> bool:
     if reset_code is None:
         return None
     for user in data['class_users']:
@@ -167,7 +168,7 @@ def get_user_by_code(reset_code):
     return None
 
 
-def get_user_by_token(token):
+def get_user_by_token(token: str) -> User:
     if token is None:
         return None
     session_dict = token_to_session(token)
@@ -182,7 +183,7 @@ def get_user_by_token(token):
     return None
 
 
-def get_user_session_by_token(token):
+def get_user_session_by_token(token: str) -> Union[List, None]:
     if token is None:
         return None
     session_dict = token_to_session(token)
@@ -201,7 +202,7 @@ def get_user_session_by_token(token):
 # the user is a class
 
 
-def get_user_by_uid(u_id):
+def get_user_by_uid(u_id: int) -> User:
     if u_id is None:
         return None
     for user in data['class_users']:
@@ -213,7 +214,7 @@ def get_user_by_uid(u_id):
 
 # return the specific user with email
 # the user is a class
-def get_user_by_email(email):
+def get_user_by_email(email: str) -> User:
     if email is None:
         return None
     for user in data['class_users']:
@@ -225,7 +226,7 @@ def get_user_by_email(email):
 
 # return the specific user with handle_str
 # the user is a class
-def get_user_by_handle(handle):
+def get_user_by_handle(handle: str) -> User:
     # handle will never be None
     for user in data['class_users']:
         if user.handle_str == handle:
@@ -235,7 +236,7 @@ def get_user_by_handle(handle):
 
 
 # check the InputError for auth_register
-def auth_register_check_error(email, password, name_first, name_last):
+def auth_register_check_error(email: str, password: str, name_first: str, name_last: str) -> None:
     # if the email address is invalid
     if not is_email_valid(email):
         raise InputError(description='Email address is not valid')
@@ -260,17 +261,17 @@ def auth_register_check_error(email, password, name_first, name_last):
 
 
 # create a new u_id
-def create_uid():
+def create_uid() -> int:
     u_id = len(data['class_users'])
     return u_id
 
 
 # create a new auth_user_id
-def create_auth_user_id(u_id):
+def create_auth_user_id(u_id: int) -> int:
     return u_id
 
 
-def create_reset_code():
+def create_reset_code() -> int:
     code = ''
     for _i in range(4):
         code += str(random.randint(0, 9))
@@ -278,17 +279,17 @@ def create_reset_code():
 
 
 # generate a new session id
-def create_session_id():
+def create_session_id() -> int:
     new_id = data['session_num']
     data['session_num'] = data['session_num'] + 1
     return new_id
 
 
-def session_to_token(session_id):
+def session_to_token(session_id: int) -> bytes:
     return jwt.encode({'sessionID': session_id}, data['secret'], algorithm='HS256')
 
 
-def token_to_session(token):
+def token_to_session(token: str) -> Union[Dict, None]:
     try:
         decode_session = jwt.decode(token, data['secret'], algorithms=['HS256'])
         return decode_session
@@ -296,14 +297,14 @@ def token_to_session(token):
         return None
 
 
-def hash_password(password):
+def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
 
 # return a concatenation of a lowercase - only
 # first name and last name. If the concatenation is
 # longer than 20 characters, it is cutoff at 20 characters
-def full_name_20(name_first, name_last):
+def full_name_20(name_first: str, name_last: str) -> str:
     full_name = name_first + name_last
     if len(full_name) > 20:
         full_name = list(full_name)[:20]
@@ -313,7 +314,7 @@ def full_name_20(name_first, name_last):
 
 
 # create a new handle
-def create_handle(name_first, name_last):
+def create_handle(name_first: str, name_last: str) -> str:
     name = full_name_20(name_first, name_last)
     count = 0
 
@@ -337,7 +338,7 @@ def create_handle(name_first, name_last):
         return handle
 
 
-def create_permission(u_id):
+def create_permission(u_id: int) -> int:
     if u_id == 0:
         return Permission.global_owner
     else:
@@ -348,7 +349,7 @@ def create_permission(u_id):
 # which include invalid email address,
 # the email entered does not belong to a user
 # and the password is incorrect
-def auth_login_error_check(email, password):
+def auth_login_error_check(email: str, password: str) -> None:
     user = get_user_by_email(email)
     if user is None:
         raise InputError(description='Email entered does not belong to a user')
@@ -358,8 +359,3 @@ def auth_login_error_check(email, password):
 
     if user.hashed_password != hash_password(password):
         raise InputError(description='Password is not correct')
-
-
-# if __name__ == "__main__":
-#     auth_register_v1("cblinker17@gmail.com", '497152365', 'Lan', 'Lin')
-#     auth_passwordreset_request_v1('cblinker17@gmail.com')
