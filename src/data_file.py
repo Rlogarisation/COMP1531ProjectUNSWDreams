@@ -128,7 +128,7 @@ class Message:
             'u_id': self.u_id,
             'message': self.message,
             'time_created': self.time_created,
-            'reacts': {'react_id': 1, 'u_ids': [u.u_id for u in self.reacted_users], 'is_this_user_reacted': False},
+            'reacts': [{'react_id': 1, 'u_ids': [u.u_id for u in self.reacted_users], 'is_this_user_reacted': False}],
             'is_pinned': self.is_pinned
         }
 

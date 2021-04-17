@@ -647,7 +647,6 @@ def helper2_message_send_v2(message_id, auth_user, message, channel):
     tagging_user(message, channel.channel_id, -1, auth_user)
 
 
-
 def helper_message_senddm_v1(token, dm_id, message):
     if type(dm_id) != int or type(message) != str:
         raise InputError(description="incorrect type for your inputs.")

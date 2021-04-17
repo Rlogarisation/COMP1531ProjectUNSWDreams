@@ -159,10 +159,10 @@ def channel_messages_v1(token, channel_id, start):
         end = -1
     while counter_start >= counter_end:
         msg = channel.messages[counter_start].return_type_message_v2()
-        if user.u_id in msg['reacts']['u_ids']:
-            msg['reacts']['is_this_user_reacted'] = True
+        if user.u_id in msg['reacts'][0]['u_ids']:
+            msg['reacts'][0]['is_this_user_reacted'] = True
         else:
-            msg['reacts']['is_this_user_reacted'] = False
+            msg['reacts'][0]['is_this_user_reacted'] = False
         return_message.append(msg)
         counter_start -= 1
 
