@@ -1,8 +1,9 @@
-from src.data_file import data, Permission, Notification, current_time
+from typing import Dict
+from src.data_file import Channel, User, data, Permission, Notification, current_time
 from src.error import InputError, AccessError
 from src.auth import session_to_token, token_to_session, get_user_by_token, auth_register_v1, \
     auth_login_v1
-
+from typing import Any, List, Dict, Tuple
 #############################################################################
 #                                                                           #
 #                           Interface function                              #
@@ -29,7 +30,7 @@ AccessError:
 """
 
 
-def channel_invite_v1(token, channel_id, u_id):
+def channel_invite_v1(token: str, channel_id: int, u_id: int) -> Dict:
     # Case 1 error checks
     # Checks for cases of InputError indicated by invalid channel_id or u_id
     # In addition, checks for cases of AccessError indicated by authorised user calling
@@ -75,7 +76,7 @@ AccessError:
 """
 
 
-def channel_details_v1(token, channel_id):
+def channel_details_v1(token: str, channel_id: int):
     # Case 1 InputError checks
     # Checks for cases of InputError indicated by invalid channel_id
     channel = get_channel_by_channel_id(channel_id)
@@ -338,10 +339,6 @@ def channel_removeowner_v1(token, channel_id, u_id):
     if channel is None:
         raise InputError(description="Channel_id does not refer to a valid channel")
 
-    # Checks for cases of InputError indicated by user with u_id is not an owner of channel
-    if is_user_owner_channel(channel_id, u_id) is None:
-        raise InputError(description="User is not an owner")
-
     # Checks if the user is currently the only owner
     if len(channel.owner_members) == 1:
         raise InputError(description="User is the only owner")
@@ -379,8 +376,6 @@ def get_channel_by_channel_id(channel_id):
     for channel in data['class_channels']:
         if channel.channel_id == channel_id:
             return channel
-
-    return None
 
 
 # Function checking if user exists in current data
@@ -461,14 +456,14 @@ def remove_user_from_owner_channel(channel, owner):
         next_owner.channel_owns.append(channel)
 
 
-def user_leaves_channel(channel, user, u_id, channel_id):
+def user_leaves_channel(channel: Channel, user: User, u_id: int, channel_id: int) -> None:
     user.part_of_channel.remove(channel)
     channel.all_members.remove(user)
     if is_user_owner_channel(channel_id, u_id) is not None:
         remove_user_from_owner_channel(channel, user)
 
 
-def token_into_u_id(token):
+def token_into_u_id(token: str) -> int:
     user = get_user_by_token(token)
     if user is None:
         return None
@@ -477,7 +472,7 @@ def token_into_u_id(token):
 
 
 # update user's stats about channel joined
-def update_channel_user_stat(user):
+def update_channel_user_stat(user: User) -> None:
     stat_channel_user = {
         'num_channels_joined': len(user.part_of_channel),
         'time_stamp': current_time()
@@ -486,7 +481,7 @@ def update_channel_user_stat(user):
 
 
 # update Dreams stats about channels
-def update_channel_dreams_stat():
+def update_channel_dreams_stat() -> None:
     stat_channel = {
         'num_channels_exist': len(data['class_channels']),
         'time_stamp': current_time()

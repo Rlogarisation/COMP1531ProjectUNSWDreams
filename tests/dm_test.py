@@ -4,7 +4,6 @@ from src.dm import dm_create_v1, dm_details_v1, dm_invite_v1, dm_leave_v1, dm_li
 from src.auth import auth_register_v1, auth_login_v1
 from src.other import clear_v1
 from src.message import message_senddm_v1
-
 #############################################################################
 #                                                                           #
 #                        Test for dm_details_v1                             #
@@ -74,6 +73,8 @@ def test_dm_details_v1():
     test_Inaccessible_member()
     test_invalid_user()
     test_normal_case()
+
+    clear_v1()
     pass
 
 
@@ -97,6 +98,7 @@ TEST CASES:
 
 
 def test_dm_list_v1():
+
     clear_v1()
     token0 = auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")['token']
     token1 = auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
@@ -133,6 +135,7 @@ def test_dm_list_v1():
     test_invalid_token()
     test_normal_case()
 
+    clear_v1()
     pass
 
 
@@ -157,6 +160,7 @@ TEST CASES:
 
 
 def test_dm_create_v1():
+
     clear_v1()
     token0 = auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")['token']
     token1 = auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")['token']
@@ -182,16 +186,33 @@ def test_dm_create_v1():
         with pytest.raises(AccessError):
             dm_create_v1(None, [1])
 
+    def test_invalid_token():
+        with pytest.raises(AccessError):
+            dm_create_v1("invalid token", [1])
+        with pytest.raises(AccessError):
+            dm_create_v1(None, [1])
+
+    def test_invalid_u_id_list():
+        with pytest.raises(InputError):
+            dm_create_v1(token1, "i am not a list.")
+        with pytest.raises(InputError):
+            dm_create_v1(token1, [4, 5, 6])
+
+    def test_none_inviter():
+        with pytest.raises(AccessError):
+            dm_create_v1(None, [1])
+
     def test_normal_case():
         dm1 = dm_create_v1(token0, [1])
         assert dm1['dm_id'] == 0
         assert dm1['dm_name'] == "peterwhite, tomgreen"
-
     # --------------------------testing---------------------------
     test_invalid_token()
     test_normal_case()
     test_invalid_u_id_list()
     test_none_inviter()
+
+    clear_v1()
     pass
 
 
@@ -237,6 +258,12 @@ def test_dm_remove_v1():
         with pytest.raises(AccessError):
             dm_remove_v1(None, 0)
 
+    def test_invalid_token():
+        with pytest.raises(AccessError):
+            dm_remove_v1("invalid token", 0)
+        with pytest.raises(AccessError):
+            dm_remove_v1(None, 0)
+
     def test_invalid_dm_id():
         # dm_id type invalid
         with pytest.raises(InputError):
@@ -266,6 +293,8 @@ def test_dm_remove_v1():
     test_remove_dm_twice()
     test_not_creator()
     test_normal_case()
+
+    clear_v1()
     pass
 
 
@@ -315,7 +344,6 @@ def test_dm_invite_v1():
         # dm_id type invalid
         with pytest.raises(InputError):
             dm_invite_v1(token0, "invalid_dm_id", 2)
-
         # dm_id is out of range
         with pytest.raises(InputError):
             dm_invite_v1(token0, 999, 2)
@@ -351,6 +379,8 @@ def test_dm_invite_v1():
     test_already_user()
     test_inviter_not_authorised()
     test_normal_case()
+
+    clear_v1()
     pass
 
 
@@ -421,6 +451,12 @@ def test_dm_leave_v1():
     def test_normal_case():
         dm_leave_v1(token0, 0)
 
+    def test_invalid_leaver():
+        with pytest.raises(AccessError):
+            dm_leave_v1(None, 2)
+
+    def test_normal_case():
+        dm_leave_v1(token0, 0)
     # --------------------------testing---------------------------
     test_invalid_token()
     test_invalid_dm_id()
@@ -428,6 +464,8 @@ def test_dm_leave_v1():
     test_user_not_in()
     test_invalid_leaver()
     test_normal_case()
+
+    clear_v1()
     pass
 
 
@@ -472,6 +510,10 @@ def test_dm_messages_v1():
         with pytest.raises(AccessError):
             dm_messages_v1("invalid token", 1, 0)
 
+    def test_invalid_token():
+        with pytest.raises(AccessError):
+            dm_messages_v1("invalid token", 1, 0)
+
     def test_invalid_dm_id():
         # dm_id type invalid
         with pytest.raises(InputError):
@@ -504,5 +546,7 @@ def test_dm_messages_v1():
     test_user_not_in()
     test_normal_case_less_50_msg()
     test_normal_case_more_50_msg()
+
+    clear_v1()
     pass
     clear_v1()

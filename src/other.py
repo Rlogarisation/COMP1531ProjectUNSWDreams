@@ -2,6 +2,7 @@ from src.data_file import data, DATA, dump_data, Notification
 from src.auth import get_user_by_uid, get_user_by_token
 from src.error import InputError, AccessError
 import re
+from typing import Any, List, Dict, Tuple
 """
 Author: Lan Lin
 
@@ -39,7 +40,7 @@ Access Error: Token is invalid
 """
 
 
-def search_v1(token, query_str):
+def search_v1(token: str, query_str: str):
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token is invalid")
@@ -80,7 +81,7 @@ Access Error: Token is invalid
 """
 
 
-def notification_get_v1(token):
+def notification_get_v1(token: str):
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token is invalid")
@@ -109,7 +110,7 @@ def notification_get_v1(token):
 
 # check if the query is contained in the message
 # it is case insensitive
-def check_contain_query(query, _message):
+def check_contain_query(query: str, _message: str) -> bool:
     if re.search(query, _message.message, re.IGNORECASE):
         return True
     else:

@@ -50,6 +50,8 @@ def test_channels_correct_channel():
     # Check the information of authorised user is correct
     assert (channel_list['channels'][0]['name'] == 'SheepChannel')
 
+    clear_v1()
+
 
 def test_channels_multiple_channels():
     clear_v1()
@@ -70,6 +72,8 @@ def test_channels_multiple_channels():
     assert (channel_list['channels'][0]['name'] == "EngineeringChannel")
     assert (channel_list['channels'][1]['name'] == "BussinessChannel")
     assert (channel_list['channels'][2]['name'] == "LawChannel")
+
+    clear_v1()
 
 
 def test_channels_multiple_users():
@@ -96,6 +100,8 @@ def test_channels_multiple_users():
     assert (channel_user1['channels'][0]['name'] == "mesterChannel")
     assert (channel_user2['channels'][0]['name'] == "mesterChannel")
 
+    clear_v1()
+
 
 def test_channels_oneUser_multiple_private_channels():
     clear_v1()
@@ -112,6 +118,8 @@ def test_channels_oneUser_multiple_private_channels():
     channel_user1 = channels_list_v1(token1)
     # Check the information of authorised user is correct
     assert len(channel_user1['channels']) == 4
+
+    clear_v1()
 
 
 def test_channels_invalidToken():
@@ -130,6 +138,8 @@ def test_channels_invalidToken():
     # Test conditions leading to an access error outcome
     with pytest.raises(AccessError):
         channels_list_v1(invalid_token)
+
+    clear_v1()
 
 
 #############################################################################
@@ -172,6 +182,8 @@ def test_allchannels_correct_channel():
     # List all the channels and check
     assert (len(channels_listall_v1(token1)) == 1)
 
+    clear_v1()
+
 
 def test_allchannels_multiple_channels():
     clear_v1()
@@ -192,10 +204,15 @@ def test_allchannels_multiple_channels():
     assert channel_user['channels'][2]['name'] == "LawChannel"
     assert len(channels_listall_v1(token1)['channels']) == 3
 
+    clear_v1()
+
+
 def test_invalid_token():
     clear_v1()
     with pytest.raises(AccessError):
         channels_listall_v1("invalid token")
+
+    clear_v1()
 
 
 def test_allchannels_multiple_users():
@@ -217,6 +234,8 @@ def test_allchannels_multiple_users():
     assert len(channels_listall_v1(token1)['channels']) == 2
     assert len(channels_listall_v1(token2)['channels']) == 2
 
+    clear_v1()
+
 
 def test_allchannels_private():
     clear_v1()
@@ -237,9 +256,12 @@ def test_allchannels_private():
     assert channel_user1['channels'][2]['name'] == "LawChannel"
     assert len(channels_listall_v1(token1)['channels']) == 3
 
+    clear_v1()
 
 # Test if the function will raise error
 # if the token input is invalid
+
+
 def test_listall_invalid_token():
     clear_v1()
     auth_register_v1("UNSWIsTheBest@gmail.com", "happyEveryday!", "Ian", "J")
@@ -257,6 +279,8 @@ def test_listall_invalid_token():
     # Test conditions leading to an access error outcome
     with pytest.raises(AccessError):
         channels_list_v1(invalid_token)
+
+    clear_v1()
 
 
 """
@@ -300,8 +324,11 @@ def test_channels_create_length_of_name():
     with pytest.raises(InputError):
         channels_create_v1(token1, 'A name clearly more than 20 characters', True)
 
+    clear_v1()
 
 # check the is_public is boolean or not
+
+
 def test_channels_create_is_public_bool():
     clear_v1()
     auth_register_v1('shaozhen@gmail.com', 'qwe1212', 'shaozhen', 'yan')
@@ -310,8 +337,11 @@ def test_channels_create_is_public_bool():
     with pytest.raises(InputError):
         channels_create_v1(token1, 'good_channel', 'not_a_bool')
 
+    clear_v1()
 
 # test if the channel has been created successfully
+
+
 def test_channels_create_valid():
     clear_v1()
     auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
@@ -332,8 +362,11 @@ def test_channels_create_valid():
     assert owner1['email'] == owner2['email'] == member1['email'] == member2['email'] == 'haha@gmail.com'
     assert len(channels_list_v1(token)['channels']) == 2
 
+    clear_v1()
 
 # test if the function is called by invalid token causing access error
+
+
 def test_channels_create_invalid_token():
     clear_v1()
     auth_register_v1('shaozhen@gmail.com', 'qwe1212', 'shaozhen', 'yan')

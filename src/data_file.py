@@ -12,8 +12,15 @@ class Permission:
     global_member = 2
 
 
+class Status:
+    offline = 0
+    online = 1
+    busy_working = 2
+    leave_away = 3
+
+
 class User:
-    def __init__(self, u_id, email, hashed_password, name_first, name_last, handle_str, auth_user_id, permission_id):
+    def __init__(self, u_id, email, hashed_password, name_first, name_last, handle_str, auth_user_id, permission_id, status):
         self.u_id = u_id
         self.email = email
         self.hashed_password = hashed_password
@@ -38,6 +45,10 @@ class User:
         # bonus points
         self.asciimoji = {"<acid>": "⊂(◉‿◉)つ", "<afraid>": "(ㆆ _ ㆆ)", "<angry>": "•`_´•", "<catlenny>": "( ͡° ᴥ ͡°)"}
         self.common_words = ["I will be back soon.", "On my way, baby.", "How is it recently?"]
+
+        self.status = status
+        self.login_time = -1
+        self.online_time = current_time() - self.login_time
 
     def return_type_user_v1(self):
         return {
@@ -180,6 +191,9 @@ DATA = {
     'session_num': 0,
     # to record the number of messages
     'message_num': 0,
+    # threads
+    'threads': [],
+    # number of channel and dm
     'channel_num': 0,
     'dm_num': 0,
     'secret': 'THIS_IS_SECRET',

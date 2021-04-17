@@ -10,6 +10,8 @@ from src.user import user_profile_v1, user_profile_setname_v1, user_profile_sete
     users_all, admin_user_remove, admin_userpermission_change, user_stats_v1, users_stats_v1, user_profile_uploadphoto_v1, admin_user_remove
 from src.data_file import Permission
 
+
+
 """
 Author: Emir Aditya Zen
 
@@ -31,13 +33,11 @@ AccessError:
 - The function is called with an invalid token
 """
 
-
 #############################################################################
 #                                                                           #
 #                        Test for user_profile_v1                           #
 #                                                                           #
 #############################################################################
-
 
 # Case 1 - tests for valid function implementation (no errors expected)
 #          expected outcome is function returns user details
@@ -62,10 +62,12 @@ def test_user_profile_v1_success():
     assert user1['name_last'] == "White"
     assert user1['handle_str'] == "peterwhite"
 
+    clear_v1()
 
 # Case 2 - tests for multiple valid function implementation (no errors expected)
 #          expected outcome is function returns multiple users details
 # Occurs when user and token is valid
+
 def test_user_profile_v1_successMultiple():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
@@ -96,10 +98,11 @@ def test_user_profile_v1_successMultiple():
     assert user2['name_last'] == "Green"
     assert user2['handle_str'] == "tomgreen"
 
-
+    clear_v1()
 # Case 3 - tests for input error outcome
 #          expected outcome is input error
 # Occurs when user id is invalid
+
 def test_user_profile_v1_inputError():
     # Clears data and registers and logins user_1
     clear_v1()
@@ -117,10 +120,12 @@ def test_user_profile_v1_inputError():
     with pytest.raises(InputError):
         user_profile_v1(token1, invalid_id)
 
+    clear_v1()
 
 # Case 4 - tests for access error outcome
 #          expected outcome is access error
 # Occurs when token is invalid
+
 def test_user_profile_v1_accessError():
     # Clears data and registers and logins user_1
     clear_v1()
@@ -137,7 +142,18 @@ def test_user_profile_v1_accessError():
     # Test conditions leading to an access error outcome due to invalid token
     with pytest.raises(AccessError):
         user_profile_v1(invalid_token, u_id1)
+    clear_v1()
 
+def test_user_profile_v1_token_not_match_u_id():
+    clear_v1()
+    token_0 = auth_register_v1("haha@gmail.com", "123123123", "Peter", "White")['token']
+    token_1 = auth_register_v1("990102@gmail.com", "123123123", "ShiTong", "Yuan")['token']
+    u_id_0 = auth_login_v1("haha@gmail.com", "123123123")['auth_user_id']
+    u_id_1 = auth_login_v1("990102@gmail.com", "123123123")['auth_user_id']
+
+    with pytest.raises(InputError):
+        user_profile_v1(token_0, u_id_1)
+    clear_v1()
 
 def test_user_profile_v1_token_not_match_u_id():
     clear_v1()
@@ -147,7 +163,7 @@ def test_user_profile_v1_token_not_match_u_id():
     u_id_1 = auth_login_v1("990102@gmail.com", "123123123")['auth_user_id']
 
     user_profile_v1(token_0, u_id_1)
-
+    clear_v1()
 
 """
 Author: Emir Aditya Zen
@@ -170,13 +186,11 @@ AccessError:
 - The function is called with an invalid token
 """
 
-
 #############################################################################
 #                                                                           #
 #                    Test for user_profile_setname_v1                       #
 #                                                                           #
 #############################################################################
-
 
 # Case 1 - tests for valid function implementation (no errors expected)
 #          expected outcome is function changes user name and outputs nothing
@@ -202,11 +216,12 @@ def test_user_profile_setname_v1_success():
     assert user1['u_id'] == u_id1
     assert user1['name_first'] == "Mark"
     assert user1['name_last'] == "Johnson"
-
+    clear_v1()
 
 # Case 2 - tests for input error due to name_first
 #          expected outcome is input error
 # Occurs when name_first is not between 1 and 50 characters inclusively in length
+
 def test_user_profile_setname_v1_inputError_nameFirst_caseOne():
     # Clears data and registers and logins user_1
     clear_v1()
@@ -219,11 +234,12 @@ def test_user_profile_setname_v1_inputError_nameFirst_caseOne():
     # Test conditions leading to an input error outcome due to invalid first name
     with pytest.raises(InputError):
         user_profile_setname_v1(token1, "", "Johnson")
-
+    clear_v1()
 
 # Case 3 - tests for input error due to name_first
 #          expected outcome is input error
 # Occurs when name_first is not between 1 and 50 characters inclusively in length
+
 def test_user_profile_setname_v1_inputError_nameFirst_caseTwo():
     # Clears data and registers and logins user_1
     clear_v1()
@@ -239,11 +255,12 @@ def test_user_profile_setname_v1_inputError_nameFirst_caseTwo():
     # Test conditions leading to an input error outcome due to invalid first name
     with pytest.raises(InputError):
         user_profile_setname_v1(token1, invalid_first_name, "Johnson")
-
+    clear_v1()
 
 # Case 4 - tests for input error due to name_last
 #          expected outcome is input error
 # Occurs when name_last is not between 1 and 50 characters inclusively in length
+
 def test_user_profile_setname_v1_inputError_nameLast_caseOne():
     # Clears data and registers and logins user_1
     clear_v1()
@@ -256,11 +273,12 @@ def test_user_profile_setname_v1_inputError_nameLast_caseOne():
     # Test conditions leading to an input error outcome due to invalid last name
     with pytest.raises(InputError):
         user_profile_setname_v1(token1, "Mark", "")
-
+    clear_v1()
 
 # Case 5 - tests for input error due to name_last
 #          expected outcome is input error
 # Occurs when name_last is not between 1 and 50 characters inclusively in length
+
 def test_user_profile_setname_v1_inputError_nameLast_caseTwo():
     # Clears data and registers and logins user_1
     clear_v1()
@@ -276,11 +294,12 @@ def test_user_profile_setname_v1_inputError_nameLast_caseTwo():
     # Test conditions leading to an input error outcome due to invalid last name
     with pytest.raises(InputError):
         user_profile_setname_v1(token1, "Mark", invalid_last_name)
-
+    clear_v1()
 
 # Case 6 - tests for access error outcome
 #          expected outcome is access error
 # Occurs when token is invalid
+
 def test_user_profile_setname_v1_accessError():
     # Clears data and registers and logins user_1
     clear_v1()
@@ -296,8 +315,7 @@ def test_user_profile_setname_v1_accessError():
     # Test conditions leading to an access error outcome due to invalid token
     with pytest.raises(AccessError):
         user_profile_setname_v1(invalid_token, "Mark", "Johnson")
-
-
+    clear_v1()
 """
 Author: Emir Aditya Zen
 
@@ -319,13 +337,11 @@ AccessError:
 - The function is called with an invalid token
 """
 
-
 #############################################################################
 #                                                                           #
 #                   Test for user_profile_setemail_v1                       #
 #                                                                           #
 #############################################################################
-
 
 # Case 1 - tests for valid function implementation (no errors expected)
 #          expected outcome is function changes user email and outputs nothing
@@ -352,11 +368,12 @@ def test_user_profile_setemail_v1_success():
     assert user1['name_first'] == "Peter"
     assert user1['name_last'] == "White"
     assert user1['handle_str'] == "peterwhite"
-
+    clear_v1()
 
 # Case 2 - tests for input error due to email
 #          expected outcome is input error
 # Occurs when email inputted has not been used but invalid
+
 def test_user_profile_setemail_v1_inputError_email_caseOne():
     # Clears data and registers and logins user_1
     clear_v1()
@@ -369,11 +386,12 @@ def test_user_profile_setemail_v1_inputError_email_caseOne():
     # Test conditions leading to an input error outcome due to invalid email
     with pytest.raises(InputError):
         user_profile_setemail_v1(token1, "")
-
+    clear_v1()
 
 # Case 3 - tests for input error due to email
 #          expected outcome is input error
 # Occurs when email inputted has not been used but invalid
+
 def test_user_profile_setemail_v1_inputError_email_caseTwo():
     # Clears data and registers and logins user_1
     clear_v1()
@@ -386,11 +404,12 @@ def test_user_profile_setemail_v1_inputError_email_caseTwo():
     # Test conditions leading to an input error outcome due to invalid email
     with pytest.raises(InputError):
         user_profile_setemail_v1(token1, "blablaadgmaildotcom")
-
+    clear_v1()
 
 # Case 4 - tests for input error due to repeated email
 #          expected outcome is input error
 # Occurs when email is valid but is used by another user
+
 def test_user_profile_setemail_v1_inputError_repeatedEmail():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
@@ -404,11 +423,12 @@ def test_user_profile_setemail_v1_inputError_repeatedEmail():
     # Test conditions leading to an input error outcome due to repeated email
     with pytest.raises(InputError):
         user_profile_setemail_v1(token1, "test@testexample.com")
-
+    clear_v1()
 
 # Case 5 - tests for access error outcome
 #          expected outcome is access error
 # Occurs when token is invalid
+
 def test_user_profile_setemail_v1_accessError():
     # Clears data and registers and logins user_1
     clear_v1()
@@ -424,7 +444,7 @@ def test_user_profile_setemail_v1_accessError():
     # Test conditions leading to an access error outcome due to invalid token
     with pytest.raises(AccessError):
         user_profile_setemail_v1(invalid_token, "newhaha@gmail.com")
-
+    clear_v1()
 
 """
 Author: Emir Aditya Zen
@@ -447,13 +467,11 @@ AccessError:
 - The function is called with an invalid token
 """
 
-
 #############################################################################
 #                                                                           #
 #                   Test for user_profile_sethandle_v1                      #
 #                                                                           #
 #############################################################################
-
 
 # Case 1 - tests for valid function implementation (no errors expected)
 #          expected outcome is function changes user handle and outputs nothing
@@ -480,11 +498,12 @@ def test_user_profile_sethandle_v1_success():
     assert user1['name_first'] == "Peter"
     assert user1['name_last'] == "White"
     assert user1['handle_str'] == "markjohnson"
-
+    clear_v1()
 
 # Case 2 - tests for input error due to handle
 #          expected outcome is input error
 # Occurs when handle_str is not between 3 and 20 characters inclusive
+
 def test_user_profile_sethandle_v1_inputError_handle_caseOne():
     # Clears data and registers and logins user_1
     clear_v1()
@@ -497,11 +516,12 @@ def test_user_profile_sethandle_v1_inputError_handle_caseOne():
     # Test conditions leading to an input error outcome due to invalid handle
     with pytest.raises(InputError):
         user_profile_sethandle_v1(token1, "")
-
+    clear_v1()
 
 # Case 3 - tests for input error due to handle
 #          expected outcome is input error
 # Occurs when handle_str is not between 3 and 20 characters inclusive
+
 def test_user_profile_sethandle_v1_inputError_handle_caseTwo():
     # Clears data and registers and logins user_1
     clear_v1()
@@ -517,11 +537,12 @@ def test_user_profile_sethandle_v1_inputError_handle_caseTwo():
     # Test conditions leading to an input error outcome due to invalid handle
     with pytest.raises(InputError):
         user_profile_sethandle_v1(token1, invalid_handle)
-
+    clear_v1()
 
 # Case 4 - tests for input error due to repeated handle
 #          expected outcome is input error
 # Occurs when handle_str is valid but is used by another user
+
 def test_user_profile_sethandle_v1_inputError_repeatedHandle():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
@@ -536,11 +557,12 @@ def test_user_profile_sethandle_v1_inputError_repeatedHandle():
     # Test conditions leading to an input error outcome due to repeated handle
     with pytest.raises(InputError):
         user_profile_sethandle_v1(token1, "tomgreen")
-
+    clear_v1()
 
 # Case 5 - tests for access error outcome
 #          expected outcome is access error
 # Occurs when token is invalid
+
 def test_user_profile_sethandle_v1_accessError():
     # Clears data and registers and logins user_1
     clear_v1()
@@ -556,7 +578,7 @@ def test_user_profile_sethandle_v1_accessError():
     # Test conditions leading to an access error outcome due to invalid token
     with pytest.raises(AccessError):
         user_profile_sethandle_v1(invalid_token, "markjohnson")
-
+    clear_v1()
 
 """
 Author: Emir Aditya Zen
@@ -575,13 +597,11 @@ AccessError:
 - The function is called with an invalid token
 """
 
-
 #############################################################################
 #                                                                           #
 #                          Test for users_all_v1                            #
 #                                                                           #
 #############################################################################
-
 
 # Case 1 - tests for valid function implementation (no errors expected) single user case
 #          expected outcome is function outputs users as a list of dictionaries
@@ -605,11 +625,12 @@ def test_users_all_v1_success():
     assert output[0]['name_first'] == "Peter"
     assert output[0]['name_last'] == "White"
     assert output[0]['handle_str'] == "peterwhite"
-
+    clear_v1()
 
 # Case 2 - tests for valid function implementation (no errors expected) multiple user case
 #          expected outcome is function outputs users as a list of dictionaries
 # Occurs when token is valid and multiple users is currently registered
+
 def test_users_all_v1_successMultiple():
     # Clears data and registers and logins user_1 and user_2
     clear_v1()
@@ -637,11 +658,12 @@ def test_users_all_v1_successMultiple():
     assert output[1]['name_first'] == "Tom"
     assert output[1]['name_last'] == "Green"
     assert output[1]['handle_str'] == "tomgreen"
-
+    clear_v1()
 
 # Case 5 - tests for access error outcome
 #          expected outcome is access error
 # Occurs when token is invalid
+
 def test_users_all_v1_accessError():
     # Clears data and registers and logins user_1
     clear_v1()
@@ -657,14 +679,12 @@ def test_users_all_v1_accessError():
     # Test conditions leading to an access error outcome due to invalid token
     with pytest.raises(AccessError):
         users_all(invalid_token)
-
-
+    clear_v1()
 #############################################################################
 #                                                                           #
 #                       Test for admin_user_permission_change               #
 #                                                                           #
 #############################################################################
-
 
 """
 Author: Lan Lin
@@ -676,7 +696,6 @@ Input Error:
 Access Error: The authorised user is not an owner
 """
 
-
 def test_invalid_token():
     clear_v1()
     register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
@@ -687,7 +706,7 @@ def test_invalid_token():
     new_permission_id = Permission.global_owner
     with pytest.raises(AccessError):
         admin_userpermission_change(invalid_token, u_id2, new_permission_id)
-
+    clear_v1()
 
 def test_admin_change_permission_invalid_owner():
     clear_v1()
@@ -698,7 +717,7 @@ def test_admin_change_permission_invalid_owner():
     uid3 = register3['auth_user_id']
     with pytest.raises(AccessError):
         admin_userpermission_change(token2, uid3, Permission.global_owner)
-
+    clear_v1()
 
 def test_admin_change_permission_invalid_user():
     clear_v1()
@@ -709,7 +728,7 @@ def test_admin_change_permission_invalid_user():
     invalid_uid = uid2 + 100
     with pytest.raises(InputError):
         admin_userpermission_change(token1, invalid_uid, Permission.global_owner)
-
+    clear_v1()
 
 def test_admin_change_permission_invalid_permission():
     clear_v1()
@@ -720,7 +739,7 @@ def test_admin_change_permission_invalid_permission():
     invalid_permission = 3
     with pytest.raises(InputError):
         admin_userpermission_change(token1, uid2, invalid_permission)
-
+    clear_v1()
 
 def test_admin_change_permission_owner():
     clear_v1()
@@ -732,7 +751,7 @@ def test_admin_change_permission_owner():
     admin_userpermission_change(token1, uid2, Permission.global_owner)
     channel_id = channels_create_v1(token1, "My Channel", False)['channel_id']
     channel_join_v1(token2, channel_id)
-
+    clear_v1()
 
 def test_admin_change_permission_member():
     clear_v1()
@@ -747,11 +766,111 @@ def test_admin_change_permission_member():
     channel_id = channels_create_v1(token2, "My Channel", False)['channel_id']
     with pytest.raises(AccessError):
         channel_join_v1(token1, channel_id)
+    clear_v1()
+#############################################################################
+#                                                                           #
+#                       Test for admin_user_remove                          #
+#                                                                           #
+#############################################################################
+"""
+Author: Lan Lin
+Background: Given a User by their user ID, remove the user from the Dreams.
+Input Error: 
+1. u_id does not refer to a valid user
+2. The user is currently the only owner
+Access Error: The authorised user is not an owner
+"""
+def test_admin_user_remove_invalid_token():
+    clear_v1()
+    u_id_0 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')['auth_user_id']
+    with pytest.raises(AccessError):
+        admin_user_remove("invalid token", u_id_0)
+    with pytest.raises(AccessError):
+        admin_user_remove(None, u_id_0)
+    clear_v1()
+
+def test_admin_user_remove_invalid_token():
+    clear_v1()
+    u_id_0 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')['auth_user_id']
+    with pytest.raises(AccessError):
+        admin_user_remove("invalid token", u_id_0)
+    with pytest.raises(AccessError):
+        admin_user_remove(None, u_id_0)
+    clear_v1()
+
+def test_admin_user_remove_invalid_uid():
+    clear_v1()
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    token1 = register1['token']
+    with pytest.raises(InputError):
+        admin_user_remove(token1, None)
+    with pytest.raises(InputError):
+        admin_user_remove(token1, 'hehe')
+    clear_v1()
+
+def test_admin_user_remove_only_owner():
+    clear_v1()
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    token1 = register1['token']
+    uid1 = register1['auth_user_id']
+    with pytest.raises(InputError):
+        admin_user_remove(token1, uid1)
+    clear_v1()
+
+def test_admin_user_remove_invalid_owner():
+    clear_v1()
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    token2 = register2['token']
+    uid2 = register2['auth_user_id']
+    with pytest.raises(AccessError):
+        admin_user_remove(token2, uid2)
+    clear_v1()
+
+def test_admin_user_remove_successfully():
+    clear_v1()
+    regiester1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    token1 = regiester1['token']
+    token2 = register2['token']
+    uid2 = register2['auth_user_id']
+    user_profile2 = user_profile_v1(token2, uid2)
+    assert user_profile2['user']['email'] == 'test@testexample.com'
+    admin_user_remove(token1, uid2)
+    user_profile2 = user_profile_v1(token2, uid2)
+    name_first = user_profile2['user']['name_first']
+    name_last = user_profile2['user']['name_last']
+    assert f'{name_first} {name_last}' == 'Removed user'
+    clear_v1()
+
+def test_admin_user_remove_successfully2():
+    clear_v1()
+    register1 = auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    register2 = auth_register_v1('test@testexample.com', 'wp01^#$dp1o23', 'Tom', 'Green')
+    token1 = register1['token']
+    token2 = register2['token']
+    uid2 = register2['auth_user_id']
+
+    channel_id_0 = channels_create_v1(token2, "channel1", True)['channel_id']
+    dm_id_0 = dm_create_v1(token2, [uid2])['dm_id']
+
+    message_send_v2(token2, channel_id_0, "channel_msg")
+    message_senddm_v1(token2, dm_id_0, "dm_msg")
+
+    user_profile2 = user_profile_v1(token2, uid2)
+    assert user_profile2['user']['email'] == 'test@testexample.com'
+
+    admin_user_remove(token1, uid2)
+    user_profile2 = user_profile_v1(token2, uid2)
+    name_first = user_profile2['user']['name_first']
+    name_last = user_profile2['user']['name_last']
+    assert f'{name_first} {name_last}' == 'Removed user'
+    clear_v1()
 
 
 #############################################################################
 #                                                                           #
-#                       Test for admin_user_remove                          #
+#                  Test for user_profile_uploadphoto_v1                     #
 #                                                                           #
 #############################################################################
 """
@@ -969,56 +1088,3 @@ def test_users_stats_v1():
 #                        Test for user_profile_uploadphoto_v1               #
 #                                                                           #
 #############################################################################
-
-
-def test_user_profile_uploadphoto_v1():
-    clear_v1()
-    url = 'https://static.boredpanda.com/blog/wp-content/uploads/2020/05/700-1.jpg'
-    register = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")
-    token_0 = register['token']
-    uid0 = register['auth_user_id']
-
-    def test_invalid_token1():
-        with pytest.raises(AccessError):
-            user_profile_uploadphoto_v1("string token", url, 0, 0, 50, 50)  # token's type is incorrect
-        with pytest.raises(AccessError):
-            user_profile_uploadphoto_v1(1111111111, url, 0, 0, 50, 50)  # token's range is incorrect
-        with pytest.raises(AccessError):
-            user_profile_uploadphoto_v1(None, url, 0, 0, 50, 50)
-
-    def test_invalid_url():
-        with pytest.raises(InputError):
-            user_profile_uploadphoto_v1(token_0, "http://haha", 0, 0, 50, 50)
-
-    def test_invalid_image_format():
-        invalid_format_url = 'https://pngimg.com/uploads/mario/mario_PNG53.png'
-        with pytest.raises(InputError):
-            user_profile_uploadphoto_v1(token_0, invalid_format_url, 0, 0, 50, 50)
-
-    def test_invalid_x_bound():
-        with pytest.raises(InputError):
-            user_profile_uploadphoto_v1(token_0, url, 50, 0, 0, 50)
-
-    def test_invalid_y_bound():
-        with pytest.raises(InputError):
-            user_profile_uploadphoto_v1(token_0, url, 0, 50, 50, 0)
-
-    def test_valid():
-        user_profile_start = user_profile_v1(token_0, uid0)['user']
-        img_url1 = user_profile_start['profile_img_url']
-
-        user_profile_uploadphoto_v1(token_0, url, 0, 0, 50, 50)
-
-        user_profile = user_profile_v1(token_0, uid0)['user']
-        img_url = user_profile['profile_img_url']
-
-        assert img_url1 != img_url
-        assert img_url == 'http://127.0.0.1:8080/static/' + str(uid0) + '.jpg'
-    # ----------------------------testing------------------------------------
-    test_invalid_token1()
-    test_invalid_url()
-    test_invalid_image_format()
-    test_invalid_x_bound()
-    test_invalid_y_bound()
-    test_valid()
-    clear_v1()

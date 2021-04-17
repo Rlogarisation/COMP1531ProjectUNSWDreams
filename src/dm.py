@@ -1,8 +1,8 @@
-from typing import Dict
-from src.data_file import data, Permission, DM, Notification, current_time
+from typing import Dict, Union
+from src.data_file import data, Permission, DM, User, Notification, current_time
 from src.error import InputError, AccessError
 from src.auth import get_user_by_uid, session_to_token, token_to_session, get_user_by_token
-
+from typing import Any, List, Dict, Tuple
 #############################################################################
 #                                                                           #
 #                           Interface function                              #
@@ -27,7 +27,7 @@ u_id does not refer to a valid user
 """
 
 
-def dm_create_v1(token, u_id_list):
+def dm_create_v1(token: str, u_id_list: List) -> Dict:
     list_dm_handles = []
     list_dm_invitee = []
 
@@ -37,9 +37,11 @@ def dm_create_v1(token, u_id_list):
         raise AccessError(description='The token is invalid, or the inviter has not registered')
     list_dm_handles.append(inviter.handle_str)
 
+    # input error if u_id_list is invalid
+    if (u_id_list is None) or (isinstance(u_id_list, list) == False):
+        raise InputError(description='The u_id is invalid, u_id does not refer to a vaild user')
+
     for uid in u_id_list:
-        if not isinstance(u_id_list, list):
-            raise InputError(description='The u_id is invalid, u_id does not refer to a vaild user')
         invitee = get_user_by_uid(uid)
         # input error if u_id does not refer to a valid user
         if invitee is None:
@@ -112,7 +114,7 @@ AccessError when:
 """
 
 
-def dm_invite_v1(token, dm_id, u_id):
+def dm_invite_v1(token: str, dm_id: int, u_id: int) -> Dict:
     # Input error when dm_id does not refer to an existing dm.
     dm = get_dm_by_dm_id(dm_id)
     if dm is None:
@@ -126,7 +128,9 @@ def dm_invite_v1(token, dm_id, u_id):
     # Access error when the authorised user is not already a member of the DM.
     inviter = get_user_by_token(token)
     if inviter is None:
-        raise AccessError(description="The authorised user is not already a member of the DM")
+        raise AccessError(description="The authorised user is invalid.")
+    elif inviter not in dm.dm_owners:
+        raise AccessError(description="The authorised user is not a onwer of the DM")
 
     # Expect invitee is not part of member yet
     if invitee in dm.dm_members:
@@ -166,7 +170,7 @@ AccessError when:
 """
 
 
-def dm_remove_v1(token, dm_id):
+def dm_remove_v1(token: str, dm_id: int) -> Dict:
     # Input error when dm_id does not refer to an existing dm.
     dm = get_dm_by_dm_id(dm_id)
     if dm is None:
@@ -215,7 +219,7 @@ AccessError when
 """
 
 
-def dm_leave_v1(token, dm_id):
+def dm_leave_v1(token: str, dm_id: int) -> Dict:
     # Input error when dm_id does not refer to an existing dm.
     dm = get_dm_by_dm_id(dm_id)
     if dm is None:
@@ -268,7 +272,7 @@ AccessError when
 """
 
 
-def dm_details_v1(token, dm_id):
+def dm_details_v1(token: str, dm_id: int) -> Dict:
     # Input error when dm_id does not refer to an existing dm.
     dm = get_dm_by_dm_id(dm_id)
     if dm is None:
@@ -306,7 +310,7 @@ N/A
 """
 
 
-def dm_list_v1(token):
+def dm_list_v1(token: str) -> Dict:
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token is invalid")
@@ -341,7 +345,7 @@ AccessError when any of:
 """
 
 
-def dm_messages_v1(token, dm_id, start):
+def dm_messages_v1(token: str, dm_id: int, start: int) -> Dict:
     # Input error when dm_id does not refer to an existing dm.
     dm = get_dm_by_dm_id(dm_id)
     if dm is None:
@@ -388,7 +392,7 @@ def dm_messages_v1(token, dm_id, start):
 #                                                                           #
 #############################################################################
 
-def get_dm_by_dm_id(dm_id):
+def get_dm_by_dm_id(dm_id: int) -> Union[DM, None]:
     if (not isinstance(dm_id, int)) or dm_id >= data['dm_num']:
         return None
     for dm in data['class_dms']:
@@ -399,7 +403,7 @@ def get_dm_by_dm_id(dm_id):
 
 
 # check if the user is an owner of dm
-def is_user_owner_dm(dm_id, u_id):
+def is_user_owner_dm(dm_id: int, u_id: int) -> Union[User, None]:
     dm = get_dm_by_dm_id(dm_id)
     for owner in dm.dm_owners:
         if owner.u_id == u_id:
@@ -407,14 +411,14 @@ def is_user_owner_dm(dm_id, u_id):
     return None
 
 
-def create_dm_id():
+def create_dm_id() -> int:
     new_id = data['dm_num']
     data['dm_num'] = data['dm_num'] + 1
     return new_id
 
 
 # check if the user is a member of dm
-def is_user_in_dm(dm_id, u_id):
+def is_user_in_dm(dm_id: int, u_id: int) -> Union[User, None]:
     dm = get_dm_by_dm_id(dm_id)
     for user in dm.dm_members:
         if u_id == user.u_id:
@@ -423,7 +427,7 @@ def is_user_in_dm(dm_id, u_id):
 
 
 # update user's stats about dm joined
-def update_dm_user_stat(user, time):
+def update_dm_user_stat(user: User, time: int) -> None:
     stat_dm_user = {
         'num_dms_joined': len(user.part_of_dm),
         'time_stamp': time
@@ -432,7 +436,7 @@ def update_dm_user_stat(user, time):
 
 
 # update Dreams stats about dms
-def update_dm_dreams_stat(time):
+def update_dm_dreams_stat(time: int) -> None:
     stat_dm = {
         'num_dms_exist': len(data['class_dms']),
         'time_stamp': time
