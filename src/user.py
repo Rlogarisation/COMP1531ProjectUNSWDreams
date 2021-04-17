@@ -241,7 +241,8 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     image_cropped.save(path, format='JPEG')
 
     # generate the image_url
-    user.image_url = config.url + path
+    # user.image_url = config.url + 'static/' + str(user.u_id) + '.jpg'
+    user.image_url = 'http://127.0.0.1:8080/static/0.jpg'
     return {}
 
 

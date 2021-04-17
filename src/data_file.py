@@ -140,7 +140,7 @@ class Message:
             'u_id': self.u_id,
             'message': self.message,
             'time_created': self.time_created,
-            'reacts': {'react_id': 1, 'u_ids': [u.u_id for u in self.reacted_users], 'is_this_user_reacted': False},
+            'reacts': [{'react_id': 1, 'u_ids': [u.u_id for u in self.reacted_users], 'is_this_user_reacted': False}],
             'is_pinned': self.is_pinned
         }
 
@@ -197,7 +197,7 @@ DATA = {
     # number of channel and dm
     'channel_num': 0,
     'dm_num': 0,
-    'secret': 'THIS_IS_SECRET'
+    'secret': 'THIS_IS_SECRET',
 }
 
 

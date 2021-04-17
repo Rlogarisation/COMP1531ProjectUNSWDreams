@@ -1,6 +1,5 @@
-from threading import Thread, Timer
+from threading import Timer
 import re
-from time import sleep, time
 from src.data_file import data, Message, Permission, current_time
 from src.error import InputError, AccessError
 from src.auth import get_user_by_token, get_user_by_handle, get_user_by_uid
@@ -43,11 +42,13 @@ def message_send_v2(token, channel_id, message):
     new_message_id = create_message_id()
 
     # bonus : replace <..> with asciimoji
-    user = get_user_by_token(token)
-    for i in user.asciimoji.keys():
-        message = message.replace(i, user.asciimoji[i])
+    for i in auth_user.asciimoji.keys():
+        message = message.replace(i, auth_user.asciimoji[i])
 
-    # sned message to the channel
+    # bonus: auth_user nudged a user in the channel by '#<user.handle_str>'
+    message = return_nudged_user_in_channel_message(message, channel_id, auth_user)
+
+    # send message to the channel
     helper2_message_send_v2(new_message_id, auth_user, message, channel)
 
     return {
@@ -86,11 +87,13 @@ def message_senddm_v1(token, dm_id, message):
     new_message_id = create_message_id()
 
     # bonus : replace <..> with asciimoji
-    user = get_user_by_token(token)
-    for i in user.asciimoji.keys():
-        message = message.replace(i, user.asciimoji[i])
+    for i in auth_user.asciimoji.keys():
+        message = message.replace(i, auth_user.asciimoji[i])
 
-    # sned message to the dm
+    # bonus: auth_user nudged a user in the channel by '#<user.handle_str>'
+    message = return_nudged_user_in_dm_message(message, dm_id, auth_user)
+
+    # send message to the dm
     helper2_message_senddm_v1(new_message_id, auth_user, message, dm)
 
     return {
@@ -153,12 +156,21 @@ def message_edit_v2(token, message_id, message):
         message_remove_v1(token, message_id)
     # Case 2: else edit message
     else:
-        get_message_by_message_id(message_id).message = message
-        # check and tag user
+        # bonus : replace <..> with asciimoji
+        message1 = message
+        for _i in auth_user.asciimoji.keys():
+            message1 = message.replace(_i, auth_user.asciimoji[_i])
+
+        # bonus: auth_user nudged a user in the channel by '#<user.handle_str>'
+        # tagging user
         if channel_dm[1] == 0:
+            message1 = return_nudged_user_in_channel_message(message1, channel_dm[0].channel_id, auth_user)
             tagging_user(message, channel_dm[0].channel_id, -1, auth_user)
         if channel_dm[1] == 1:
+            message1 = return_nudged_user_in_dm_message(message1, channel_dm[0].dm_id, auth_user)
             tagging_user(message, -1, channel_dm[0].dm_id, auth_user)
+
+        get_message_by_message_id(message_id).message = message1
 
     return {}
 
@@ -331,7 +343,6 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
 
     timer = Timer((time_sent - cur_time), helper2_message_send_v2, [new_message_id, auth_user, message, channel])
     timer.start()
-    # data['threads'].append(timer)
 
     return {
         'message_id': new_message_id
@@ -373,7 +384,6 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
 
     timer = Timer((time_sent - cur_time), helper2_message_senddm_v1, [new_message_id, auth_user, message, dm])
     timer.start()
-    # data['threads'].append(timer)
 
     return {
         'message_id': new_message_id
@@ -710,3 +720,51 @@ def helper2_message_senddm_v1(message_id, auth_user, message, dm):
 
     # check and tag user
     tagging_user(message, -1, dm.dm_id, auth_user)
+
+
+# bonus
+def return_nudged_user_in_channel_message(message, channel_id, sender):
+
+    split_msg = message.split()
+    nudged_message_list = [message]
+    for word in split_msg:
+        if re.search('#', word) is not None:
+            handle = word[1:]
+            receiver = get_user_by_handle(handle)
+            if receiver is None:
+                continue
+
+            if is_user_in_channel(channel_id, receiver.u_id) is None:
+                continue
+            nudged_message = f"{sender.name_first} {sender.name_last} nudged {receiver.name_first} {receiver.name_last}"
+            nudged_message_list.append(nudged_message)
+
+    if len(nudged_message_list) == 1:
+        return message
+    else:
+        return_message = '\n'.join(nudged_message_list)
+        return return_message
+
+
+# bonus
+def return_nudged_user_in_dm_message(message, dm_id, sender):
+
+    split_msg = message.split()
+    nudged_message_list = [message]
+    for word in split_msg:
+        if re.search('#', word) is not None:
+            handle = word[1:]
+            receiver = get_user_by_handle(handle)
+            if receiver is None:
+                continue
+
+            if is_user_in_dm(dm_id, receiver.u_id) is None:
+                continue
+            nudged_message = f"{sender.name_first} {sender.name_last} nudged {receiver.name_first} {receiver.name_last}"
+            nudged_message_list.append(nudged_message)
+
+    if len(nudged_message_list) == 1:
+        return message
+    else:
+        return_message = '\n'.join(nudged_message_list)
+        return return_message
