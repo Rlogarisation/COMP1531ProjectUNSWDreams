@@ -397,37 +397,37 @@ def test_auth_passwordreset_reset_invalid_reset_code():
 #                                                                           #
 #############################################################################
 
-def parser_subject(msg):
-    subject = msg['Subject']
-    value, charset = decode_header(subject)[0]
-    if charset:
-        value = value.decode(charset)
-    # print('邮件主题： {0}'.format(value))
-    return value
+# def parser_subject(msg):
+#     subject = msg['Subject']
+#     value, charset = decode_header(subject)[0]
+#     if charset:
+#         value = value.decode(charset)
+#     # print('邮件主题： {0}'.format(value))
+#     return value
 
 
-def parser_address(msg):
-    hdr, addr = parseaddr(msg['From'])
-    # name 发送人邮箱名称， addr 发送人邮箱地址
-    name, charset = decode_header(hdr)[0]
-    if charset:
-        name = name.decode(charset)
-    # print('发送人邮箱名称: {0}，发送人邮箱地址: {1}'.format(name, addr))
+# def parser_address(msg):
+#     hdr, addr = parseaddr(msg['From'])
+#     # name 发送人邮箱名称， addr 发送人邮箱地址
+#     name, charset = decode_header(hdr)[0]
+#     if charset:
+#         name = name.decode(charset)
+#     # print('发送人邮箱名称: {0}，发送人邮箱地址: {1}'.format(name, addr))
 
 
-def parser_content(msg):
-    content = msg.get_payload()
+# def parser_content(msg):
+#     content = msg.get_payload()
 
-    # 文本信息
-    content_charset = content[0].get_content_charset()  # 获取编码格式
-    text = content[0].as_string().split('base64')[-1]
-    text_content = base64.b64decode(text).decode(content_charset)  # base64解码
+#     # 文本信息
+#     content_charset = content[0].get_content_charset()  # 获取编码格式
+#     text = content[0].as_string().split('base64')[-1]
+#     text_content = base64.b64decode(text).decode(content_charset)  # base64解码
 
-    # 添加了HTML代码的信息
-    content_charset = content[1].get_content_charset()
-    text = content[1].as_string().split('base64')[-1]
-    html_content = base64.b64decode(text).decode(content_charset)
-    # print(('文本信息: {0}\n添加了HTML代码的信息: {1}'.format(text_content, html_content)))
+#     # 添加了HTML代码的信息
+#     content_charset = content[1].get_content_charset()
+#     text = content[1].as_string().split('base64')[-1]
+#     html_content = base64.b64decode(text).decode(content_charset)
+#     # print(('文本信息: {0}\n添加了HTML代码的信息: {1}'.format(text_content, html_content)))
 
 
 def parser_reset_code(msg):

@@ -96,8 +96,9 @@ def auth_logout(token):
         user.current_sessions.remove(session_id)
 
         # bonus
-        user.status = Status.online
-
+        user.status = Status.offline
+        user.login_time = -1
+        user.online_time = 0
         return {'is_success': True}
 
     return {'is_success': False}

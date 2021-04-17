@@ -2,7 +2,7 @@
 from re import S
 from src.data_file import current_time, data, Status
 from src.other import InputError, AccessError
-from src.auth import get_user_by_token
+from src.auth import get_user_by_token, get_user_by_uid
 from src.message import get_message_by_message_id
 import pickle
 
@@ -57,7 +57,7 @@ def asciimoji_export_package(token, package, pkg_type):
 def txt_to_pak(file_name):
     # input checking
     if type(file_name) != str:
-        raise InputError(description=f"txt_to_pak : {file_name}.txt not found.")
+        raise InputError(description=f"txt_to_pak : {file_name} need to be string.")
 
     try:
         with open(file_name + ".txt", "r") as FILE_1:
@@ -73,7 +73,7 @@ def txt_to_pak(file_name):
 def pak_to_txt(file_name):
     # input checking
     if type(file_name) != str:
-        raise InputError(description=f"pak_to_txt : {file_name}.pak not found.")
+        raise InputError(description=f"pak_to_txt : {file_name} need to be string.")
 
     try:
         with open(file_name + ".pak", "rb") as FILE_1:
@@ -102,24 +102,27 @@ def message_to_common_words(token, message_id):
     user.common_words.append(message.message)
 
 
-def get_user_status_by_token(token):
-    user = get_user_by_token(token)
+def get_user_status_by_u_id(u_id):
+    user = get_user_by_uid(u_id)
     if user == None:
-        return None
+        raise InputError(description="get_user_status_by_u_id : u_id is invalid.")
     else:
         return user.status
 
 
-def user_status_switch_personlly(token, status):
-    if type(status) != Status:
-        return InputError(description="user_status_switch : invalid status.")
-
-    user = get_user_by_token(token)
+def user_status_switch_personlly(u_id, status):
+    if type(status) != int:
+        raise InputError(description="user_status_switch_personlly : invalid status.")
+    user = get_user_by_uid(u_id)
+    if user == None:
+        raise InputError(description="user_status_switch_personlly : user not found.")
     user.status = status
 
 
-def status_auto_switch(token):
-    user = get_user_by_token(token)
+def status_auto_switch(u_id):
+    user = get_user_by_uid(u_id)
+    if user == None:
+        raise InputError(description="get_user_by_uid : u_id not found.")
 
     login_time = user.login_time
     time_now = current_time()
@@ -131,7 +134,7 @@ def status_auto_switch(token):
             lastest_message_time = message.time_created
             lastest_message = message
 
-    if time_now - lastest_message_time >= 15 * 60 and get_user_status_by_token(token) == Status.online and user.online_time >= 15 * 60:
+    if time_now - lastest_message_time >= 15 * 60 and get_user_status_by_u_id(u_id) == Status.online and user.online_time >= 15 * 60:
         # 距离最近一次发消息已有15多分钟， 在线超过15分钟
         user.status = Status.busy_working
     elif time_now - lastest_message_time >= 45 * 60 and user.online_time >= 60 * 60:

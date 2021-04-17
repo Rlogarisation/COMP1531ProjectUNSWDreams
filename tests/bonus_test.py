@@ -1,13 +1,16 @@
 # Here is the tests for Bonus functions
-from src.bonus import asciimoji_import_package, asciimoji_export_package, message_to_common_words, pak_to_txt, txt_to_pak
+from src.data_file import Status
+from src.error import InputError
+from src.bonus import asciimoji_import_package, asciimoji_export_package, get_user_status_by_u_id, message_to_common_words, pak_to_txt, txt_to_pak, user_status_switch_personlly
 from src.message import message_send_v2, message_senddm_v1
 from src.other import clear_v1
-from src.auth import auth_register_v1, auth_login_v1, get_user_by_token
+from src.auth import auth_logout, auth_register_v1, auth_login_v1, get_user_by_token
 from src.channels import channels_create_v1
 from src.channel import channel_addowner_v1, channel_messages_v1
 from src.dm import dm_create_v1, dm_messages_v1
 import os
 import pickle
+import pytest
 
 
 def test_send_asciimoji_to_channel():
@@ -135,30 +138,118 @@ def test_message_to_common_words():
 
 def test_txt_to_pak():
     clear_v1()
-    with open("123.txt", 'w') as FILE:
-        FILE.write("123456")
-    FILE.close()
 
-    txt_to_pak("123")
+    def normal_test():
+        with open("123.txt", 'w') as FILE:
+            FILE.write("123456")
+        FILE.close()
 
-    with open("123.pak", 'rb') as FILE:
-        content2 = pickle.load(FILE)
+        txt_to_pak("123")
 
-    assert str(content2) == "123456"
-    os.system("rm -rf 123.txt 123.pak")
+        with open("123.pak", 'rb') as FILE:
+            content2 = pickle.load(FILE)
+
+        assert str(content2) == "123456"
+        os.system("rm -rf 123.txt 123.pak")
+
+    def no_file_test():
+        with pytest.raises(InputError):
+            txt_to_pak("no_such_file")
+
+    def invalid_file_name():
+        with pytest.raises(InputError):
+            pak_to_txt(123)
+        with pytest.raises(InputError):
+            pak_to_txt(None)
+
+    # ------------------testing---------------------
+    normal_test()
+    no_file_test()
+    invalid_file_name()
     clear_v1()
 
 
 def test_pak_to_txt():
     clear_v1()
-    with open("123.pak", "wb") as FILE:
-        content = pickle.dump("123", FILE)
-    FILE.close()
 
-    pak_to_txt("123")
-    with open("123.txt", 'r') as FILE:
-        content1 = FILE.read()
+    def normal_test():
+        with open("123.pak", "wb") as FILE:
+            content = pickle.dump("123", FILE)
+        FILE.close()
 
-    assert content1 == "123"
-    os.system("rm -rf 123.txt 123.pak")
+        pak_to_txt("123")
+        with open("123.txt", 'r') as FILE:
+            content1 = FILE.read()
+
+        assert content1 == "123"
+        os.system("rm -rf 123.txt 123.pak")
+
+    def no_file_test():
+        with pytest.raises(InputError):
+            pak_to_txt("no_such_file")
+
+    def invalid_file_name():
+        with pytest.raises(InputError):
+            pak_to_txt(123)
+        with pytest.raises(InputError):
+            pak_to_txt(None)
+    # ------------------testing---------------------
+    normal_test()
+    no_file_test()
+    invalid_file_name()
+    clear_v1()
+
+
+def test_get_user_status_by_token():
+    clear_v1()
+
+    def test_normal_case():
+        token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
+        u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
+
+        user_status = get_user_status_by_u_id(u_id_0)
+        assert user_status == Status.online
+
+        auth_logout(token_0)
+        user_status = get_user_status_by_u_id(u_id_0)
+        assert user_status == Status.offline
+
+    def invalid_u_id():
+        with pytest.raises(InputError):
+            get_user_status_by_u_id("string token")
+        with pytest.raises(InputError):
+            get_user_status_by_u_id(123456)
+        with pytest.raises(InputError):
+            get_user_status_by_u_id(None)
+    # -------------------testing------------------------
+    test_normal_case()
+    invalid_u_id()
+    clear_v1()
+
+
+def test_user_status_switch_personlly():
+    clear_v1()
+    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
+    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
+
+    def test_normal_case():
+        user_status = get_user_status_by_u_id(u_id_0)
+        assert user_status == Status.online
+
+        user_status_switch_personlly(u_id_0, Status.leave_away)
+
+        user_status = get_user_status_by_u_id(u_id_0)
+        assert user_status == Status.leave_away
+
+    def invalid_u_id():
+        with pytest.raises(InputError):
+            user_status_switch_personlly("u_id_0", Status.leave_away)
+
+    def invalid_status():
+        with pytest.raises(InputError):
+            user_status_switch_personlly(u_id_0, None)
+    # -------------------testing------------------------
+    test_normal_case()
+    invalid_u_id()
+    invalid_status()
     clear_v1()
