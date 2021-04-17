@@ -969,3 +969,56 @@ def test_users_stats_v1():
 #                        Test for user_profile_uploadphoto_v1               #
 #                                                                           #
 #############################################################################
+
+
+def test_user_profile_uploadphoto_v1():
+    clear_v1()
+    url = 'https://static.boredpanda.com/blog/wp-content/uploads/2020/05/700-1.jpg'
+    register = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")
+    token_0 = register['token']
+    uid0 = register['auth_user_id']
+
+    def test_invalid_token1():
+        with pytest.raises(AccessError):
+            user_profile_uploadphoto_v1("string token", url, 0, 0, 50, 50)  # token's type is incorrect
+        with pytest.raises(AccessError):
+            user_profile_uploadphoto_v1(1111111111, url, 0, 0, 50, 50)  # token's range is incorrect
+        with pytest.raises(AccessError):
+            user_profile_uploadphoto_v1(None, url, 0, 0, 50, 50)
+
+    def test_invalid_url():
+        with pytest.raises(InputError):
+            user_profile_uploadphoto_v1(token_0, "http://haha", 0, 0, 50, 50)
+
+    def test_invalid_image_format():
+        invalid_format_url = 'https://pngimg.com/uploads/mario/mario_PNG53.png'
+        with pytest.raises(InputError):
+            user_profile_uploadphoto_v1(token_0, invalid_format_url, 0, 0, 50, 50)
+
+    def test_invalid_x_bound():
+        with pytest.raises(InputError):
+            user_profile_uploadphoto_v1(token_0, url, 50, 0, 0, 50)
+
+    def test_invalid_y_bound():
+        with pytest.raises(InputError):
+            user_profile_uploadphoto_v1(token_0, url, 0, 50, 50, 0)
+
+    def test_valid():
+        user_profile_start = user_profile_v1(token_0, uid0)['user']
+        img_url1 = user_profile_start['profile_img_url']
+
+        user_profile_uploadphoto_v1(token_0, url, 0, 0, 50, 50)
+
+        user_profile = user_profile_v1(token_0, uid0)['user']
+        img_url = user_profile['profile_img_url']
+
+        assert img_url1 != img_url
+        assert img_url == 'http://127.0.0.1:8080/static/' + str(uid0) + '.jpg'
+    # ----------------------------testing------------------------------------
+    test_invalid_token1()
+    test_invalid_url()
+    test_invalid_image_format()
+    test_invalid_x_bound()
+    test_invalid_y_bound()
+    test_valid()
+    clear_v1()

@@ -210,7 +210,10 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         raise AccessError(description="Token passed in is invalid")
 
     # get the image from url
-    response = requests.get(img_url, stream=True)
+    try:
+        response = requests.get(img_url, stream=True)
+    except requests.ConnectionError:
+        raise InputError(description="The input is not url")
     if response.status_code != 200:
         raise InputError(description="img_url returns an HTTP status other than 200.")
 
@@ -241,8 +244,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     image_cropped.save(path, format='JPEG')
 
     # generate the image_url
-    # user.image_url = config.url + 'static/' + str(user.u_id) + '.jpg'
-    user.image_url = 'http://127.0.0.1:8080/static/0.jpg'
+    user.image_url = 'http://127.0.0.1:8080/static/' + str(user.u_id) + '.jpg'
     return {}
 
 

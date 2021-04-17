@@ -52,20 +52,20 @@ def search_v1(token, query_str):
         for chaneel_message in channel.messages:
             if check_contain_query(query_str, chaneel_message) is True:
                 msg = chaneel_message.return_type_message_v2()
-                if user.u_id in msg['reacts']['u_ids']:
-                    msg['reacts']['is_this_user_reacted'] = True
+                if user.u_id in msg['reacts'][0]['u_ids']:
+                    msg['reacts'][0]['is_this_user_reacted'] = True
                 else:
-                    msg['reacts']['is_this_user_reacted'] = False
+                    msg['reacts'][0]['is_this_user_reacted'] = False
                 return_list.append(msg)
 
     for dm in user.part_of_dm:
         for dm_message in dm.dm_messages:
             if check_contain_query(query_str, dm_message) is True:
                 msg = dm_message.return_type_message_v2()
-                if user.u_id in msg['reacts']['u_ids']:
-                    msg['reacts']['is_this_user_reacted'] = True
+                if user.u_id in msg['reacts'][0]['u_ids']:
+                    msg['reacts'][0]['is_this_user_reacted'] = True
                 else:
-                    msg['reacts']['is_this_user_reacted'] = False
+                    msg['reacts'][0]['is_this_user_reacted'] = False
                 return_list.append(msg)
 
     return {
