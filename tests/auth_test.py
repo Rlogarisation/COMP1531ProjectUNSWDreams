@@ -290,10 +290,12 @@ def test_auth_passwordreset_successful1():
     sleep(2)
     msg = get_email_content("styuannj@163.com", "UXRVCTIAEQZVVGAG", "pop.163.com")
 
-    count = 0
+    error_wait = 0
     reset_code_2 = parser_reset_code(msg)
-    while reset_code_1 != reset_code_2 and count <= 5:
+    while reset_code_1 != reset_code_2 and error_wait <= 5:
+        sleep(1)
         reset_code_2 = parser_reset_code(msg)
+        error_wait += 1
     assert reset_code_1 == reset_code_2
 
     auth_passwordreset_reset_v1(reset_code_2, 'TheNewPassword')
