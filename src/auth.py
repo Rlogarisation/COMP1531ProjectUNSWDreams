@@ -3,7 +3,7 @@ import jwt
 import hashlib
 import random
 import smtplib
-from typing import Any, Union
+from typing import Any, Dict, Union
 from src.data_file import User, Permission, current_time, data, Status
 from src.error import InputError
 
@@ -31,7 +31,7 @@ InputError:
 """
 
 
-def auth_register_v1(email: str, password: str, name_first: str, name_last: str) -> dict:
+def auth_register_v1(email: str, password: str, name_first: str, name_last: str) -> Dict:
     auth_register_check_error(email, password, name_first, name_last)
 
     u_id = create_uid()
@@ -69,7 +69,7 @@ InputError:
 """
 
 
-def auth_login_v1(email: str, password: str) -> dict:
+def auth_login_v1(email: str, password: str) -> Dict:
     auth_login_error_check(email, password)
 
     user = get_user_by_email(email)
@@ -87,7 +87,7 @@ def auth_login_v1(email: str, password: str) -> dict:
     }
 
 
-def auth_logout(token: str) -> dict:
+def auth_logout(token: str) -> Dict:
     user_session = get_user_session_by_token(token)
     if user_session is not None:
         user = user_session[0]
@@ -103,7 +103,7 @@ def auth_logout(token: str) -> dict:
     return {'is_success': False}
 
 
-def auth_passwordreset_request_v1(email: str) -> dict:
+def auth_passwordreset_request_v1(email: str) -> Dict:
     user = get_user_by_email(email)
     if user is None:
         raise InputError(description="The email is invalid")
@@ -127,7 +127,7 @@ def auth_passwordreset_request_v1(email: str) -> dict:
     }
 
 
-def auth_passwordreset_reset_v1(reset_code: str, new_password: str) -> dict:
+def auth_passwordreset_reset_v1(reset_code: str, new_password: str) -> Dict:
     user = get_user_by_code(reset_code)
     if user is None:
         raise InputError(description="reset_code is not a valid reset code")
@@ -234,7 +234,7 @@ def get_user_by_handle(handle: str) -> Union[User, None]:
 
 
 # check the InputError for auth_register
-def auth_register_check_error(email: str, password: str, name_first: str, name_last: str) -> Any:
+def auth_register_check_error(email: str, password: str, name_first: str, name_last: str) -> None:
     # if the email address is invalid
     if not is_email_valid(email):
         raise InputError(description='Email address is not valid')
@@ -347,7 +347,7 @@ def create_permission(u_id: int) -> int:
 # which include invalid email address,
 # the email entered does not belong to a user
 # and the password is incorrect
-def auth_login_error_check(email: str, password: str) -> Any:
+def auth_login_error_check(email: str, password: str) -> None:
     user = get_user_by_email(email)
     if user is None:
         raise InputError(description='Email entered does not belong to a user')

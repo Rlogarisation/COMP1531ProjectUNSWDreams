@@ -2,7 +2,7 @@ from src.data_file import Channel, User, data, Permission, Notification, current
 from src.error import InputError, AccessError
 from src.auth import session_to_token, token_to_session, get_user_by_token, auth_register_v1, \
     auth_login_v1
-from typing import Any, List, Dict, Tuple, Union
+from typing import Dict, Union
 #############################################################################
 #                                                                           #
 #                           Interface function                              #
@@ -29,7 +29,7 @@ AccessError:
 """
 
 
-def channel_invite_v1(token: str, channel_id: int, u_id: int) -> dict:
+def channel_invite_v1(token: str, channel_id: int, u_id: int) -> Dict:
     # Case 1 error checks
     # Checks for cases of InputError indicated by invalid channel_id or u_id
     # In addition, checks for cases of AccessError indicated by authorised user calling
@@ -75,7 +75,7 @@ AccessError:
 """
 
 
-def channel_details_v1(token: str, channel_id: int) -> dict:
+def channel_details_v1(token: str, channel_id: int) -> Dict:
     # Case 1 InputError checks
     # Checks for cases of InputError indicated by invalid channel_id
     channel = get_channel_by_channel_id(channel_id)
@@ -133,7 +133,7 @@ AccessError:
 """
 
 
-def channel_messages_v1(token, channel_id, start) -> dict:
+def channel_messages_v1(token: str, channel_id: int, start: int) -> Dict:
     # Input error when channel_id does not refer to an existing channel.
     channel = get_channel_by_channel_id(channel_id)
     if channel is None:
@@ -191,7 +191,7 @@ AccessError:
 """
 
 
-def channel_join_v1(token, channel_id) -> dict:
+def channel_join_v1(token: str, channel_id: int) -> Dict:
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token passed in is invalid")
@@ -230,7 +230,7 @@ AccessError:
 """
 
 
-def channel_leave_v1(token, channel_id) -> dict:
+def channel_leave_v1(token: str, channel_id: int) -> Dict:
     # Get channel and user
     channel = get_channel_by_channel_id(channel_id)
     user = get_user_by_token(token)
@@ -277,7 +277,7 @@ AccessError:
 """
 
 
-def channel_addowner_v1(token, channel_id, u_id) -> dict:
+def channel_addowner_v1(token: str, channel_id: int, u_id: int) -> Dict:
     # Case 1 InputError checks
     # Checks for cases of InputError indicated by invalid channel_id
     channel = get_channel_by_channel_id(channel_id)
@@ -331,7 +331,7 @@ AccessError:
 """
 
 
-def channel_removeowner_v1(token, channel_id, u_id) -> dict:
+def channel_removeowner_v1(token: str, channel_id: int, u_id: int) -> Dict:
     # Case 1 InputError checks
     # Checks for cases of InputError indicated by invalid channel_id
     channel = get_channel_by_channel_id(channel_id)
@@ -372,7 +372,7 @@ def channel_removeowner_v1(token, channel_id, u_id) -> dict:
 #############################################################################
 
 
-def get_channel_by_channel_id(channel_id):
+def get_channel_by_channel_id(channel_id: int) -> Union[Channel, None]:
 
     if (not isinstance(channel_id, int)) or channel_id >= data['channel_num']:
         return None
@@ -385,7 +385,7 @@ def get_channel_by_channel_id(channel_id):
 
 # Function checking if user exists in current data
 # Return user dictionary if it exists and if not return None
-def get_user_by_u_id(u_id):
+def get_user_by_u_id(u_id: int) -> Union[User, None]:
     for user in data["class_users"]:
         if u_id == user.u_id:
             return user
@@ -394,7 +394,7 @@ def get_user_by_u_id(u_id):
 
 
 # check if the user is a member of channel
-def is_user_in_channel(channel_id, auth_user_id):
+def is_user_in_channel(channel_id: int, auth_user_id: int) -> Union[User, None]:
     channel = get_channel_by_channel_id(channel_id)
     for user in channel.all_members:
         if auth_user_id == user.auth_user_id:
@@ -403,7 +403,7 @@ def is_user_in_channel(channel_id, auth_user_id):
 
 
 # Checks if function channel_invite_v1 will generate an error
-def error_check(channel_id, u_id, token):
+def error_check(channel_id: int, u_id: int, token: str) -> None:
     # Checking for InputError
     # error_test1 and error_test2 checks if channel and user is valid or not
     # if user or channel is invalid throw inputError
@@ -429,13 +429,13 @@ def error_check(channel_id, u_id, token):
 
 
 # Function adding user into specified channel and adds that channel into user class
-def add_user_into_channel(channel, invitee):
+def add_user_into_channel(channel: Channel, invitee: User) -> None:
     invitee.part_of_channel.append(channel)
     channel.all_members.append(invitee)
 
 
 # check if the user is an owner of channel
-def is_user_owner_channel(channel_id, auth_user_id):
+def is_user_owner_channel(channel_id: int, auth_user_id: int) -> Union[User, None]:
     channel = get_channel_by_channel_id(channel_id)
     for owner in channel.owner_members:
         if auth_user_id == owner.auth_user_id:
@@ -444,13 +444,13 @@ def is_user_owner_channel(channel_id, auth_user_id):
 
 
 # Function making user into specified channel owner and adds that channel into user class
-def add_user_into_owner_channel(channel, owner):
+def add_user_into_owner_channel(channel: Channel, owner: User) -> None:
     owner.channel_owns.append(channel)
     channel.owner_members.append(owner)
 
 
 # Function making user into specified channel member from owner
-def remove_user_from_owner_channel(channel, owner):
+def remove_user_from_owner_channel(channel: Channel, owner: User) -> None:
     owner.channel_owns.remove(channel)
     channel.owner_members.remove(owner)
     # If the leaving owner is the only one owner and there is still member in the dm
@@ -461,7 +461,7 @@ def remove_user_from_owner_channel(channel, owner):
         next_owner.channel_owns.append(channel)
 
 
-def user_leaves_channel(channel: Channel, user: User, u_id: int, channel_id: int) -> Any:
+def user_leaves_channel(channel: Channel, user: User, u_id: int, channel_id: int) -> None:
     user.part_of_channel.remove(channel)
     channel.all_members.remove(user)
     if is_user_owner_channel(channel_id, u_id) is not None:
@@ -477,7 +477,7 @@ def token_into_u_id(token: str) -> Union[int, None]:
 
 
 # update user's stats about channel joined
-def update_channel_user_stat(user: User) -> Any:
+def update_channel_user_stat(user: User) -> None:
     stat_channel_user = {
         'num_channels_joined': len(user.part_of_channel),
         'time_stamp': current_time()
@@ -486,7 +486,7 @@ def update_channel_user_stat(user: User) -> Any:
 
 
 # update Dreams stats about channels
-def update_channel_dreams_stat() -> Any:
+def update_channel_dreams_stat() -> None:
     stat_channel = {
         'num_channels_exist': len(data['class_channels']),
         'time_stamp': current_time()

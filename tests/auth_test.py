@@ -1,9 +1,13 @@
+from time import sleep
 import pytest
+import poplib
+from email.parser import Parser
 from src.other import clear_v1
 from src.auth import auth_login_v1, auth_register_v1, auth_logout, auth_passwordreset_request_v1, auth_passwordreset_reset_v1
 from src.error import InputError, AccessError
 from src.channel import channel_details_v1, channel_invite_v1
 from src.channels import channels_create_v1
+
 """
 Author: Lan Lin
 
@@ -278,7 +282,24 @@ def test_auth_logout_successfully_large():
 #############################################################################
 
 
-def test_auth_passwordreset_successful():
+def test_auth_passwordreset_successful1():
+    clear_v1()
+    id_check = auth_register_v1('styuannj@163.com', '123123123', 'Peter', 'White')['auth_user_id']
+    reset_code_1 = auth_passwordreset_request_v1('styuannj@163.com')['reset_code']
+
+    sleep(2)
+    msg = get_email_content("styuannj@163.com", "UXRVCTIAEQZVVGAG", "pop.163.com")
+
+    reset_code_2 = parser_reset_code(msg)
+    assert reset_code_1 == reset_code_2
+
+    auth_passwordreset_reset_v1(reset_code_2, 'TheNewPassword')
+    assert auth_login_v1('styuannj@163.com', 'TheNewPassword')['auth_user_id'] == id_check
+
+    clear_v1()
+
+
+def test_auth_passwordreset_successful2():
     clear_v1()
     id_check = auth_register_v1('cblinker17@gmail.com', '123123123', 'Peter', 'White')['auth_user_id']
     reset_code = auth_passwordreset_request_v1('cblinker17@gmail.com')['reset_code']
@@ -292,6 +313,8 @@ def test_auth_passwordrequest_invalid_email():
     with pytest.raises(InputError):
         auth_passwordreset_request_v1('cblinker@gmail.com')
 
+    clear_v1()
+
 
 def test_auth_passwordreset_reset_invalid_password():
     clear_v1()
@@ -300,6 +323,8 @@ def test_auth_passwordreset_reset_invalid_password():
     invalid_password = '123'
     with pytest.raises(InputError):
         auth_passwordreset_reset_v1(reset_code, invalid_password)
+
+    clear_v1()
 
 
 def test_auth_passwordreset_reset_invalid_reset_code():
@@ -311,3 +336,38 @@ def test_auth_passwordreset_reset_invalid_reset_code():
         auth_passwordreset_reset_v1(invalid_reset_code, 'TheNewPassword')
     clear_v1()
 
+
+#############################################################################
+#                                                                           #
+#                              Helper function                              #
+#                                                                           #
+#############################################################################
+
+
+def parser_reset_code(msg):
+    content = msg.get_payload()
+    reset_code = list(content.split())[-1:][0]
+    return reset_code
+
+
+def get_email_content(email_address, password, pop3_server):
+    # start connecting to server
+    server = poplib.POP3(pop3_server)
+
+    server.set_debuglevel(1)
+
+    # identification
+    server.user(email_address)
+    server.pass_(password)
+    rsp, msg_list, rsp_siz = server.list()
+
+    # get the least recent email
+    total_mail_numbers = len(msg_list)
+    rsp, msglines, msgsiz = server.retr(total_mail_numbers)
+    msg_content = b'\r\n'.join(msglines).decode('gbk')
+
+    msg = Parser().parsestr(text=msg_content)
+    # close the server
+    server.close()
+
+    return msg
