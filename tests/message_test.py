@@ -899,6 +899,7 @@ def test_message_sendlater_v1():
         channel_msgs = channel_messages_v1(token_0, channel_0_id, 0)
         assert len(channel_msgs['messages']) == 0
 
+        # Note: 这边需要加了data[threads]之后，方可判断timers的运行情况，sleep不行会所有进程都sleep掉
         # for i in data['threads']:
         #     i.join()
         #
@@ -924,6 +925,7 @@ def test_message_sendlater_v1():
         channel_msgs = channel_messages_v1(token_0, channel_0_id, 0)
         assert len(channel_msgs['messages']) == 0
 
+        # Note: 这边需要加了data[threads]之后，方可判断timers的运行情况，sleep不行会所有进程都sleep掉
         # for i in data['threads']:
         #     i.join()
         #
