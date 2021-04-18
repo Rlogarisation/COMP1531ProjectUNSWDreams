@@ -364,12 +364,12 @@ def get_email_content(email_address, password, pop3_server):
     # identification
     server.user(email_address)
     server.pass_(password)
-    rsp, msg_list, rsp_siz = server.list()
+    _rsp, msg_list, _rsp_siz = server.list()
 
     # get the least recent email
     total_mail_numbers = len(msg_list)
-    rsp, msglines, msgsiz = server.retr(total_mail_numbers)
-    msg_content = b'\r\n'.join(msglines).decode('gbk')
+    _rsp, _msglines, _msgsiz = server.retr(total_mail_numbers)
+    msg_content = b'\r\n'.join(_msglines).decode('gbk')
 
     msg = Parser().parsestr(text=msg_content)
     # close the server
