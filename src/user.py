@@ -211,8 +211,8 @@ def user_profile_uploadphoto_v1(token: str, img_url: str, x_start: int, y_start:
     # get the image from url
     try:
         response = requests.get(img_url, stream=True)
-    except requests.ConnectionError:
-        raise InputError(description="The input is not url")
+    except requests.ConnectionError as e:
+        raise InputError(description="The input is not url") from e
     if response.status_code != 200:
         raise InputError(description="img_url returns an HTTP status other than 200.")
 

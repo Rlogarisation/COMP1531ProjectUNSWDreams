@@ -290,7 +290,12 @@ def test_auth_passwordreset_successful1():
     sleep(2)
     msg = get_email_content("styuannj@163.com", "UXRVCTIAEQZVVGAG", "pop.163.com")
 
+    error_wait = 0
     reset_code_2 = parser_reset_code(msg)
+    while reset_code_1 != reset_code_2 and error_wait <= 5:
+        sleep(1)
+        reset_code_2 = parser_reset_code(msg)
+        error_wait += 1
     assert reset_code_1 == reset_code_2
 
     auth_passwordreset_reset_v1(reset_code_2, 'TheNewPassword')
@@ -359,12 +364,12 @@ def get_email_content(email_address, password, pop3_server):
     # identification
     server.user(email_address)
     server.pass_(password)
-    rsp, msg_list, rsp_siz = server.list()
+    _rsp, msg_list, _rsp_siz = server.list()
 
     # get the least recent email
     total_mail_numbers = len(msg_list)
-    rsp, msglines, msgsiz = server.retr(total_mail_numbers)
-    msg_content = b'\r\n'.join(msglines).decode('gbk')
+    _rsp, _msglines, _msgsiz = server.retr(total_mail_numbers)
+    msg_content = b'\r\n'.join(_msglines).decode('gbk')
 
     msg = Parser().parsestr(text=msg_content)
     # close the server

@@ -539,9 +539,9 @@ def user_profile_uploadphoto_v1_http(parameters):
         img_url1 = json.loads(user_profile_start.text)['profile_img_url']
 
         input1 = {"token": token0, "img_url": url, "x_start": 0, "y_start": 0, "x_end": 50, "y_end": 50}
-        respond = requests.post(config.url + "user/profile/uploadphoto/v1", json=input1)
+        requests.post(config.url + "user/profile/uploadphoto/v1", json=input1)
 
-        user_profile_end = requests.get(config.url + 'user/profile/v2', params={'token': token0, 'u_id': uid0})
+        requests.get(config.url + 'user/profile/v2', params={'token': token0, 'u_id': uid0})
         img_url = json.loads(user_profile_start.text)['profile_img_url']
 
         assert img_url1 != img_url
@@ -554,4 +554,3 @@ def user_profile_uploadphoto_v1_http(parameters):
     test_invalid_y_bound()
     test_valid()
     requests.delete(config.url + 'clear/v1')
-

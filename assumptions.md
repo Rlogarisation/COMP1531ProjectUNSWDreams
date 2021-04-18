@@ -1,6 +1,6 @@
 # Assumption
 
-## Iteration 1
+## Iteration 3
 
 ## Assumptions for auth.py:
 * We assume that auth_user_id is the same with u_id,  
@@ -32,6 +32,7 @@ The user log out one session will not affect other sessions.
   """
 * If the original message is edited, the content of the shared message will not automatically be edited.  
 * If the message is edited, the time created will not change
+* If a channel or a dm is removed, the messages in the channel or dm are not removed
  
 ## Assumptions for dm.py:
 * If the only owner leaves the dm, and there is still member in the dm  
@@ -48,3 +49,26 @@ and his/hers name_last will be replaced by 'user'.
 * The order of the notifications is from the most to least recent.  
 * If more than one user are tagged in one message, all the tagged users will receive the notification.
 * Sending message, editinging message and sharing message can tag users.
+
+## Assumptions for standup.py:
+* After standup ended, the message sent by the user who started the standup was a packaged message  
+for each message sent by standup/send.  The message format is {user's handle_str}: {message}.  
+  
+## Assumption for bonus:
+* For bonus part we have 1.Object-Oriented Programming, 2.Type Checking, 3.New Features
+* Object-Oriented Programming:
+  We use class User, Channel, DM, Message, Notification, Permission, Status for the implement.  
+* Type Checking:  
+  We use typing module to check the input parameters of the functions and the output of the  
+  functions.
+* New Features:  
+  * asciimoji: When typing certain keywords, the message shows in channel/dm will replace  
+  the keywords with emoji.
+  * User's status: After registered, or the user has one or more active sessions the status  
+  of the user is online. When there is no active session for the user, the user's status  
+  is offline. When the user is online, the users can switch their status by themselves,  
+  which include "busy working" and "leave away"  
+  * nudged user: When user1 typing "#{user2's handle}", the message sent will automatically add  
+  "{user1.name_first} {user1.name_last} nudged {user2.name_first} {user2.name_last}", which is  
+  a way to increase fun interactions between users. The two users should be in the same channel or dm.  
+  * User can add their commonly used message to "common message"  

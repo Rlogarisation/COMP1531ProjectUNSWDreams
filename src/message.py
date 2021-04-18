@@ -410,7 +410,7 @@ def message_react_v1(token: str, message_id: int, react_id: int) -> Dict:
 
 
 def message_unreact_v1(token: str, message_id: int, react_id: int) -> Dict:
-    message, user, channel_dm = return_message_if_valid(token, message_id, react_id, 1)
+    message, user, _channel_dm = return_message_if_valid(token, message_id, react_id, 1)
     message.reacted_users.remove(user)
     return {}
 

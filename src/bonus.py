@@ -21,14 +21,14 @@ def asciimoji_import_package(token: str, package: str, pkg_type: str) -> Any:
         try:
             with open(package + ".pak", "rb") as FILE:
                 asciimoji_load = pickle.load(FILE)
-        except FileNotFoundError:
-            raise InputError(description=f"asciimoji_import_package : {package}.pak not found.")
+        except FileNotFoundError as error:
+            raise InputError(description=f"asciimoji_import_package : {package}.pak not found.") from error
     elif pkg_type == "txt":
         try:
             with open(package + ".txt", "r") as FILE:
                 asciimoji_load = FILE.read()
-        except FileNotFoundError:
-            raise InputError(description=f"asciimoji_import_package : {package}.txt not found.")
+        except FileNotFoundError as error:
+            raise InputError(description=f"asciimoji_import_package : {package}.txt not found.") from error
 
     user.asciimoji.update(eval(asciimoji_load))
     FILE.close()
@@ -63,8 +63,8 @@ def txt_to_pak(file_name: str) -> None:
     try:
         with open(file_name + ".txt", "r") as FILE_1:
             content = eval(FILE_1.read())
-    except FileNotFoundError:
-        raise InputError(description=f"txt_to_pak : {file_name}.txt not found.")
+    except FileNotFoundError as error:
+        raise InputError(description=f"txt_to_pak : {file_name}.txt not found.") from error
     with open(file_name + ".pak", "wb") as FILE_2:
         pickle.dump(content, FILE_2)
     FILE_1.close()
@@ -79,8 +79,8 @@ def pak_to_txt(file_name: str) -> None:
     try:
         with open(file_name + ".pak", "rb") as FILE_1:
             content = eval(pickle.load(FILE_1))
-    except FileNotFoundError:
-        raise InputError(description=f"pak_to_txt : {file_name}.txt not found.")
+    except FileNotFoundError as error:
+        raise InputError(description=f"pak_to_txt : {file_name}.txt not found.") from error
     with open(file_name + ".txt", "w") as FILE_2:
         FILE_2.write(str(content))
     FILE_1.close()
@@ -125,15 +125,15 @@ def status_auto_switch(u_id: int) -> Any:
     if user is None:
         raise InputError(description="get_user_by_uid : u_id not found.")
 
-    login_time = user.login_time
+    # login_time = user.login_time
     time_now = current_time()
 
-    lastest_message = 0
+    # lastest_message = 0
     lastest_message_time = 0
     for message in user.messages:
         if message.time_created > lastest_message_time:
             lastest_message_time = message.time_created
-            lastest_message = message
+            # lastest_message = message
 
     if time_now - lastest_message_time >= 15 * 60 and get_user_status_by_u_id(u_id) == Status.online and user.online_time >= 15 * 60:
         # 距离最近一次发消息已有15多分钟， 在线超过15分钟
