@@ -125,10 +125,10 @@ def status_auto_switch(u_id: int) -> Any:
     if user is None:
         raise InputError(description="get_user_by_uid : u_id not found.")
 
-    login_time = user.login_time
+    # login_time = user.login_time
     time_now = current_time()
 
-    lastest_message = 0
+    # lastest_message = 0
     lastest_message_time = 0
     for message in user.messages:
         if message.time_created > lastest_message_time:

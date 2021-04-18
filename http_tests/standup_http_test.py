@@ -51,12 +51,12 @@ def test_standup_start(parameters, parameters1, parameters2):
     user2 = requests.post(config.url + "auth/register/v2", json=parameters2)
 
     token_0 = json.loads(user0.text).get("token")
-    token_1 = json.loads(user1.text).get("token")
+    json.loads(user1.text).get("token")
     token_2 = json.loads(user2.text).get("token")
 
-    u_id_0 = json.loads(user0.text).get("auth_user_id")
-    u_id_1 = json.loads(user1.text).get("auth_user_id")
-    u_id_2 = json.loads(user2.text).get("auth_user_id")
+    json.loads(user0.text).get("auth_user_id")
+    json.loads(user1.text).get("auth_user_id")
+    json.loads(user2.text).get("auth_user_id")
 
     channel_0 = requests.post(config.url + "channels/create/v2", json={"token": token_0, "name": "channel_0", "is_public": True})
     channel_0_id = json.loads(channel_0.text).get("channel_id")
@@ -161,12 +161,12 @@ def test_standup_active(parameters, parameters1, parameters2):
     user2 = requests.post(config.url + "auth/register/v2", json=parameters2)
 
     token_0 = json.loads(user0.text).get("token")
-    token_1 = json.loads(user1.text).get("token")
-    token_2 = json.loads(user2.text).get("token")
+    json.loads(user1.text).get("token")
+    json.loads(user2.text).get("token")
 
-    u_id_0 = json.loads(user0.text).get("auth_user_id")
-    u_id_1 = json.loads(user1.text).get("auth_user_id")
-    u_id_2 = json.loads(user2.text).get("auth_user_id")
+    json.loads(user0.text).get("auth_user_id")
+    json.loads(user1.text).get("auth_user_id")
+    json.loads(user2.text).get("auth_user_id")
 
     channel_0 = requests.post(config.url + "channels/create/v2", json={"token": token_0, "name": "channel_0", "is_public": True})
     channel_0_id = json.loads(channel_0.text).get("channel_id")
@@ -265,9 +265,9 @@ def test_standup_send(parameters, parameters1, parameters2):
     token_1 = json.loads(user1.text).get("token")
     token_2 = json.loads(user2.text).get("token")
 
-    u_id_0 = json.loads(user0.text).get("auth_user_id")
+    json.loads(user0.text).get("auth_user_id")
     u_id_1 = json.loads(user1.text).get("auth_user_id")
-    u_id_2 = json.loads(user2.text).get("auth_user_id")
+    json.loads(user2.text).get("auth_user_id")
 
     channel_0 = requests.post(config.url + "channels/create/v2", json={"token": token_0, "name": "channel_0", "is_public": True})
     channel_0_id = json.loads(channel_0.text).get("channel_id")

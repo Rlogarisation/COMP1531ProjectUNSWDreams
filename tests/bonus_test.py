@@ -17,7 +17,7 @@ def test_send_asciimoji_to_channel():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
 
-    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")["auth_user_id"]
+    auth_login_v1("test_email0@gmail.com", "password")
 
     channel_0_id = channels_create_v1(token_0, "channel_0", True)["channel_id"]
 
@@ -32,9 +32,9 @@ def test_send_asciimoji_to_channel():
 def test_send_asciimoji_to_dm():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
-    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")["token"]
+    auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")
 
-    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")["auth_user_id"]
+    auth_login_v1("test_email0@gmail.com", "password")
     u_id_1 = auth_login_v1("test_email1@gmail.com", "password")["auth_user_id"]
 
     dm_0_id = dm_create_v1(token_0, [u_id_1])["dm_id"]
@@ -72,7 +72,7 @@ def test_asciimoji_export_txt():
     token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")["token"]
 
     user_1 = get_user_by_token(token_1)
-    user_name = package_name = user_1.name_first + user_1.name_last
+    package_name = user_1.name_first + user_1.name_last
 
     asciimoji_export_package(token_1, package_name, "txt")
 
@@ -104,7 +104,6 @@ def test_asciimoji_import_pak():
 def test_asciimoji_export_pak():
     clear_v1()
     token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")["token"]
-    user_1 = get_user_by_token(token_1)
 
     package = "asciimoji"
     asciimoji_export_package(token_1, package, "pak")
@@ -229,7 +228,7 @@ def test_get_user_status_by_token():
 
 def test_user_status_switch_personlly():
     clear_v1()
-    token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
+    auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")
     u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
 
     def test_normal_case():

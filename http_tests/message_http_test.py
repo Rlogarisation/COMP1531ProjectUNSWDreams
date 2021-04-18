@@ -313,12 +313,12 @@ def test_message_sendlater(parameters, parameters1, parameters2):
     user2 = requests.post(config.url + "auth/register/v2", json=parameters2)
 
     token_0 = json.loads(user0.text).get("token")
-    token_1 = json.loads(user1.text).get("token")
+    json.loads(user1.text).get("token")
     token_2 = json.loads(user2.text).get("token")
 
-    u_id_0 = json.loads(user0.text).get("auth_user_id")
+    json.loads(user0.text).get("auth_user_id")
     u_id_1 = json.loads(user1.text).get("auth_user_id")
-    u_id_2 = json.loads(user2.text).get("auth_user_id")
+    json.loads(user2.text).get("auth_user_id")
 
     channel = requests.post(config.url + "channels/create/v2", json={"token": token_0, "name": "channel_0", "is_public": True})
     channel_0_id = json.loads(channel.text).get("channel_id")
@@ -413,12 +413,12 @@ def test_message_sendlaterdm(parameters, parameters1, parameters2):
     user2 = requests.post(config.url + "auth/register/v2", json=parameters2)
 
     token_0 = json.loads(user0.text).get("token")
-    token_1 = json.loads(user1.text).get("token")
+    json.loads(user1.text).get("token")
     token_2 = json.loads(user2.text).get("token")
 
-    u_id_0 = json.loads(user0.text).get("auth_user_id")
+    json.loads(user0.text).get("auth_user_id")
     u_id_1 = json.loads(user1.text).get("auth_user_id")
-    u_id_2 = json.loads(user2.text).get("auth_user_id")
+    json.loads(user2.text).get("auth_user_id")
 
     dm = requests.post(config.url + "dm/create/v1", json={"token": token_0, "u_ids": [u_id_1]})
     dm_0_id = json.loads(dm.text).get("dm_id")
@@ -514,12 +514,12 @@ def test_message_react(parameters, parameters1, parameters2):
     user2 = requests.post(config.url + "auth/register/v2", json=parameters2)
 
     token_0 = json.loads(user0.text).get("token")
-    token_1 = json.loads(user1.text).get("token")
+    json.loads(user1.text).get("token")
     token_2 = json.loads(user2.text).get("token")
 
-    u_id_0 = json.loads(user0.text).get("auth_user_id")
+    json.loads(user0.text).get("auth_user_id")
     u_id_1 = json.loads(user1.text).get("auth_user_id")
-    u_id_2 = json.loads(user2.text).get("auth_user_id")
+    json.loads(user2.text).get("auth_user_id")
 
     dm = requests.post(config.url + "dm/create/v1", json={"token": token_0, "u_ids": [u_id_1]})
     dm_0_id = json.loads(dm.text).get("dm_id")
@@ -641,12 +641,12 @@ def test_message_unreact(parameters, parameters1, parameters2):
     user2 = requests.post(config.url + "auth/register/v2", json=parameters2)
 
     token_0 = json.loads(user0.text).get("token")
-    token_1 = json.loads(user1.text).get("token")
+    json.loads(user1.text).get("token")
     token_2 = json.loads(user2.text).get("token")
 
-    u_id_0 = json.loads(user0.text).get("auth_user_id")
+    json.loads(user0.text).get("auth_user_id")
     u_id_1 = json.loads(user1.text).get("auth_user_id")
-    u_id_2 = json.loads(user2.text).get("auth_user_id")
+    json.loads(user2.text).get("auth_user_id")
 
     dm = requests.post(config.url + "dm/create/v1", json={"token": token_0, "u_ids": [u_id_1]})
     dm_0_id = json.loads(dm.text).get("dm_id")
@@ -791,9 +791,9 @@ def test_message_pin(parameters, parameters1, parameters2):
     token_1 = json.loads(user1.text).get("token")
     token_2 = json.loads(user2.text).get("token")
 
-    u_id_0 = json.loads(user0.text).get("auth_user_id")
+    json.loads(user0.text).get("auth_user_id")
     u_id_1 = json.loads(user1.text).get("auth_user_id")
-    u_id_2 = json.loads(user2.text).get("auth_user_id")
+    json.loads(user2.text).get("auth_user_id")
 
     dm = requests.post(config.url + "dm/create/v1", json={"token": token_0, "u_ids": [u_id_1]})
     dm_0_id = json.loads(dm.text).get("dm_id")
@@ -804,12 +804,12 @@ def test_message_pin(parameters, parameters1, parameters2):
 
     dm_message_0 = requests.post(config.url + "message/senddm/v1", json={"token": token_0, "dm_id": dm_0_id, "message": "I am message."})
     dm_message_0_message_id = json.loads(dm_message_0.text).get("message_id")
-    dm_message_1 = requests.post(config.url + "message/senddm/v1", json={"token": token_0, "dm_id": dm_0_id, "message": "@first1last1 I am message."})
+    requests.post(config.url + "message/senddm/v1", json={"token": token_0, "dm_id": dm_0_id, "message": "@first1last1 I am message."})
     dm_message_1_message_id = json.loads(dm_message_0.text).get("message_id")
 
-    channel_message_0 = requests.post(config.url + "message/send/v2", json={"token": token_0, "channel_id": channel_0_id, "message": "I am message."})
+    requests.post(config.url + "message/send/v2", json={"token": token_0, "channel_id": channel_0_id, "message": "I am message."})
     channel_message_0_message_id = json.loads(dm_message_0.text).get("message_id")
-    channel_message_1 = requests.post(config.url + "message/send/v2", json={"token": token_0, "channel_id": channel_0_id, "message": "@first0last0 I am messag."})
+    requests.post(config.url + "message/send/v2", json={"token": token_0, "channel_id": channel_0_id, "message": "@first0last0 I am messag."})
     channel_message_1_message_id = json.loads(dm_message_0.text).get("message_id")
 
     def test_invalid_token():
@@ -921,9 +921,9 @@ def test_message_unpin(parameters, parameters1, parameters2):
     token_1 = json.loads(user1.text).get("token")
     token_2 = json.loads(user2.text).get("token")
 
-    u_id_0 = json.loads(user0.text).get("auth_user_id")
+    json.loads(user0.text).get("auth_user_id")
     u_id_1 = json.loads(user1.text).get("auth_user_id")
-    u_id_2 = json.loads(user2.text).get("auth_user_id")
+    json.loads(user2.text).get("auth_user_id")
 
     dm = requests.post(config.url + "dm/create/v1", json={"token": token_0, "u_ids": [u_id_1]})
     dm_0_id = json.loads(dm.text).get("dm_id")
