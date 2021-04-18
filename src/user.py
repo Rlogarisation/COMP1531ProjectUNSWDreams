@@ -6,7 +6,7 @@ from PIL import Image
 import requests
 import os
 import io
-from typing import Any, List, Dict, Tuple
+from typing import Dict
 
 """
 user.py
@@ -14,7 +14,7 @@ Auther: Lan Lin
 """
 
 
-def user_profile_v1(token: str, u_id: int) -> dict:
+def user_profile_v1(token: str, u_id: int) -> Dict:
     # find the user to show the profile
     user = get_user_by_token(token)
     if user is None:
@@ -30,7 +30,7 @@ def user_profile_v1(token: str, u_id: int) -> dict:
     }
 
 
-def user_profile_setname_v1(token: str, name_first: str, name_last: str) -> dict:
+def user_profile_setname_v1(token: str, name_first: str, name_last: str) -> Dict:
     # find the user to update the name
     user = get_user_by_token(token)
     if user is None:
@@ -49,7 +49,7 @@ def user_profile_setname_v1(token: str, name_first: str, name_last: str) -> dict
     return {}
 
 
-def user_profile_setemail_v1(token: str, email: str) -> dict:
+def user_profile_setemail_v1(token: str, email: str) -> Dict:
     # find the user to update the email
     user = get_user_by_token(token)
     if user is None:
@@ -69,7 +69,7 @@ def user_profile_setemail_v1(token: str, email: str) -> dict:
     return {}
 
 
-def user_profile_sethandle_v1(token: str, handle_str: str) -> dict:
+def user_profile_sethandle_v1(token: str, handle_str: str) -> Dict:
     # find the user to update the handle
     user = get_user_by_token(token)
     if user is None:
@@ -88,7 +88,7 @@ def user_profile_sethandle_v1(token: str, handle_str: str) -> dict:
     return {}
 
 
-def users_all(token: str) -> dict:
+def users_all(token: str) -> Dict:
     # Pull the data of user from data_file
     user = get_user_by_token(token)
     if user is None:
@@ -102,7 +102,7 @@ def users_all(token: str) -> dict:
     }
 
 
-def admin_user_remove(token: str, u_id: int) -> dict:
+def admin_user_remove(token: str, u_id: int) -> Dict:
     # find the owner to implement the remove
     owner = get_user_by_token(token)
     if owner is None:
@@ -139,7 +139,7 @@ def admin_user_remove(token: str, u_id: int) -> dict:
     return {}
 
 
-def admin_userpermission_change(token: str, u_id: int, permission_id: int) -> dict:
+def admin_userpermission_change(token: str, u_id: int, permission_id: int) -> Dict:
     owner = get_user_by_token(token)
     if owner is None:
         raise AccessError(description="Token passed in is invalid")
@@ -155,7 +155,7 @@ def admin_userpermission_change(token: str, u_id: int, permission_id: int) -> di
     return {}
 
 
-def user_stats_v1(token: str) -> dict:
+def user_stats_v1(token: str) -> Dict:
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token passed in is invalid")
@@ -179,7 +179,7 @@ def user_stats_v1(token: str) -> dict:
     }
 
 
-def users_stats_v1(token: str) -> dict:
+def users_stats_v1(token: str) -> Dict:
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token passed in is invalid")
@@ -203,7 +203,7 @@ def users_stats_v1(token: str) -> dict:
     }
 
 
-def user_profile_uploadphoto_v1(token: str, img_url: str, x_start: int, y_start: int, x_end: int, y_end: int) -> dict:
+def user_profile_uploadphoto_v1(token: str, img_url: str, x_start: int, y_start: int, x_end: int, y_end: int) -> Dict:
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token passed in is invalid")

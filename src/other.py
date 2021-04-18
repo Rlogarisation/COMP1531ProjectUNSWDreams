@@ -2,7 +2,7 @@ from src.data_file import data, DATA, dump_data, Notification, Message
 from src.auth import get_user_by_uid, get_user_by_token
 from src.error import InputError, AccessError
 import re
-from typing import Any, List, Dict, Tuple
+from typing import Dict
 """
 Author: Lan Lin
 
@@ -40,7 +40,7 @@ Access Error: Token is invalid
 """
 
 
-def search_v1(token: str, query_str: str) -> dict:
+def search_v1(token: str, query_str: str) -> Dict:
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token is invalid")
@@ -81,7 +81,7 @@ Access Error: Token is invalid
 """
 
 
-def notification_get_v1(token: str) -> dict:
+def notification_get_v1(token: str) -> Dict:
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token is invalid")
