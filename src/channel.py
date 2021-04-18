@@ -1,8 +1,8 @@
-from src.data_file import data, Permission, Notification
+from src.data_file import Channel, User, data, Permission, Notification, current_time
 from src.error import InputError, AccessError
 from src.auth import session_to_token, token_to_session, get_user_by_token, auth_register_v1, \
     auth_login_v1
-
+from typing import Any, List, Dict, Tuple, Union
 #############################################################################
 #                                                                           #
 #                           Interface function                              #
@@ -29,7 +29,7 @@ AccessError:
 """
 
 
-def channel_invite_v1(token, channel_id, u_id):
+def channel_invite_v1(token: str, channel_id: int, u_id: int) -> dict:
     # Case 1 error checks
     # Checks for cases of InputError indicated by invalid channel_id or u_id
     # In addition, checks for cases of AccessError indicated by authorised user calling
@@ -50,6 +50,9 @@ def channel_invite_v1(token, channel_id, u_id):
     notification_message = f"{inviter.handle_str} added you to {channel.name}"
     notification = Notification(channel.channel_id, -1, notification_message)
     invitee.notifications.append(notification)
+
+    # update user's stats
+    update_channel_user_stat(invitee)
     return {}
 
 
@@ -72,7 +75,7 @@ AccessError:
 """
 
 
-def channel_details_v1(token, channel_id):
+def channel_details_v1(token: str, channel_id: int) -> dict:
     # Case 1 InputError checks
     # Checks for cases of InputError indicated by invalid channel_id
     channel = get_channel_by_channel_id(channel_id)
@@ -98,24 +101,10 @@ def channel_details_v1(token, channel_id):
     owner_list = []
     member_list = []
     for owner in channel.owner_members:
-        dict_owner = {
-            "u_id": owner.u_id,
-            "email": owner.email,
-            "name_first": owner.name_first,
-            "name_last": owner.name_last,
-            "handle_str": owner.handle_str
-        }
-        owner_list.append(dict_owner)
+        owner_list.append(owner.return_type_user_v2())
 
     for member in channel.all_members:
-        dict_member = {
-            "u_id": member.u_id,
-            "email": member.email,
-            "name_first": member.name_first,
-            "name_last": member.name_last,
-            "handle_str": member.handle_str
-        }
-        member_list.append(dict_member)
+        member_list.append(member.return_type_user_v2())
 
     return {
         'name': channel.name,
@@ -144,7 +133,7 @@ AccessError:
 """
 
 
-def channel_messages_v1(token, channel_id, start):
+def channel_messages_v1(token, channel_id, start) -> dict:
     # Input error when channel_id does not refer to an existing channel.
     channel = get_channel_by_channel_id(channel_id)
     if channel is None:
@@ -169,7 +158,12 @@ def channel_messages_v1(token, channel_id, start):
         counter_end = 0
         end = -1
     while counter_start >= counter_end:
-        return_message.append(channel.messages[counter_start].return_type_message())
+        msg = channel.messages[counter_start].return_type_message_v2()
+        if user.u_id in msg['reacts'][0]['u_ids']:
+            msg['reacts'][0]['is_this_user_reacted'] = True
+        else:
+            msg['reacts'][0]['is_this_user_reacted'] = False
+        return_message.append(msg)
         counter_start -= 1
 
     return {
@@ -197,7 +191,7 @@ AccessError:
 """
 
 
-def channel_join_v1(token, channel_id):
+def channel_join_v1(token, channel_id) -> dict:
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token passed in is invalid")
@@ -210,6 +204,9 @@ def channel_join_v1(token, channel_id):
         raise (AccessError(description="channel_join_v1 : channel is PRIVATE."))
 
     add_user_into_channel(target_channel, user)
+
+    # update user's stats
+    update_channel_user_stat(user)
     return {}
 
 
@@ -233,7 +230,7 @@ AccessError:
 """
 
 
-def channel_leave_v1(token, channel_id):
+def channel_leave_v1(token, channel_id) -> dict:
     # Get channel and user
     channel = get_channel_by_channel_id(channel_id)
     user = get_user_by_token(token)
@@ -255,6 +252,9 @@ def channel_leave_v1(token, channel_id):
     # Case 3 succesfull function calling
     # Expected outcome is user leaves channel
     user_leaves_channel(channel, user, u_id, channel_id)
+
+    # update user's stats
+    update_channel_user_stat(user)
     return {}
 
 
@@ -277,7 +277,7 @@ AccessError:
 """
 
 
-def channel_addowner_v1(token, channel_id, u_id):
+def channel_addowner_v1(token, channel_id, u_id) -> dict:
     # Case 1 InputError checks
     # Checks for cases of InputError indicated by invalid channel_id
     channel = get_channel_by_channel_id(channel_id)
@@ -331,7 +331,7 @@ AccessError:
 """
 
 
-def channel_removeowner_v1(token, channel_id, u_id):
+def channel_removeowner_v1(token, channel_id, u_id) -> dict:
     # Case 1 InputError checks
     # Checks for cases of InputError indicated by invalid channel_id
     channel = get_channel_by_channel_id(channel_id)
@@ -461,17 +461,34 @@ def remove_user_from_owner_channel(channel, owner):
         next_owner.channel_owns.append(channel)
 
 
-def user_leaves_channel(channel, user, u_id, channel_id):
+def user_leaves_channel(channel: Channel, user: User, u_id: int, channel_id: int) -> Any:
     user.part_of_channel.remove(channel)
     channel.all_members.remove(user)
     if is_user_owner_channel(channel_id, u_id) is not None:
         remove_user_from_owner_channel(channel, user)
 
 
-def token_into_u_id(token):
+def token_into_u_id(token: str) -> Union[int, None]:
     user = get_user_by_token(token)
     if user is None:
         return None
     u_id = user.u_id
     return u_id
 
+
+# update user's stats about channel joined
+def update_channel_user_stat(user: User) -> Any:
+    stat_channel_user = {
+        'num_channels_joined': len(user.part_of_channel),
+        'time_stamp': current_time()
+    }
+    user.channels_joined.append(stat_channel_user)
+
+
+# update Dreams stats about channels
+def update_channel_dreams_stat() -> Any:
+    stat_channel = {
+        'num_channels_exist': len(data['class_channels']),
+        'time_stamp': current_time()
+    }
+    data['channels_exist'].append(stat_channel)

@@ -559,3 +559,4 @@ def test_dm_all_normal_cases_http(parameters0, parameters1, parameters2):
     }
     status = requests.delete(config.url + 'dm/remove/v1', json=remove_input).status_code
     assert status == 200
+    requests.delete(config.url + 'clear/v1')

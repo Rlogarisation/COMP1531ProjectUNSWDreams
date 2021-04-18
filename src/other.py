@@ -1,7 +1,8 @@
-from src.data_file import data, DATA, dump_data, Notification
+from src.data_file import data, DATA, dump_data, Notification, Message
 from src.auth import get_user_by_uid, get_user_by_token
 from src.error import InputError, AccessError
 import re
+from typing import Any, List, Dict, Tuple
 """
 Author: Lan Lin
 
@@ -14,6 +15,10 @@ def clear_v1():
     data['class_users'] = []
     data['class_channels'] = []
     data['class_dms'] = []
+    data['class_messages'] = []
+    data['channels_exist'] = []
+    data['dms_exist'] = []
+    data['messages_exist'] = []
     data['session_num'] = 0
     data['message_num'] = 0
     data['channel_num'] = 0
@@ -35,7 +40,7 @@ Access Error: Token is invalid
 """
 
 
-def search_v1(token, query_str):
+def search_v1(token: str, query_str: str) -> dict:
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token is invalid")
@@ -47,12 +52,22 @@ def search_v1(token, query_str):
     for channel in user.part_of_channel:
         for chaneel_message in channel.messages:
             if check_contain_query(query_str, chaneel_message) is True:
-                return_list.append(chaneel_message.return_type_message())
+                msg = chaneel_message.return_type_message_v2()
+                if user.u_id in msg['reacts'][0]['u_ids']:
+                    msg['reacts'][0]['is_this_user_reacted'] = True
+                else:
+                    msg['reacts'][0]['is_this_user_reacted'] = False
+                return_list.append(msg)
 
     for dm in user.part_of_dm:
         for dm_message in dm.dm_messages:
             if check_contain_query(query_str, dm_message) is True:
-                return_list.append(dm_message.return_type_message())
+                msg = dm_message.return_type_message_v2()
+                if user.u_id in msg['reacts'][0]['u_ids']:
+                    msg['reacts'][0]['is_this_user_reacted'] = True
+                else:
+                    msg['reacts'][0]['is_this_user_reacted'] = False
+                return_list.append(msg)
 
     return {
         'messages': return_list
@@ -66,7 +81,7 @@ Access Error: Token is invalid
 """
 
 
-def notification_get_v1(token):
+def notification_get_v1(token: str) -> dict:
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token is invalid")
@@ -95,7 +110,7 @@ def notification_get_v1(token):
 
 # check if the query is contained in the message
 # it is case insensitive
-def check_contain_query(query, _message):
+def check_contain_query(query: str, _message: Message) -> bool:
     if re.search(query, _message.message, re.IGNORECASE):
         return True
     else:

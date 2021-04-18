@@ -85,3 +85,4 @@ def test_search_v1():
     test_search_in_channel()
     test_search_in_dm()
     pass
+    clear_v1()

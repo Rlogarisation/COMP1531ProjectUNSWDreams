@@ -1,15 +1,12 @@
 # channels.py is used to implement the functions for channels
 # including channels_list and chennels_listall
 # for 21T1 COMP1531 project
-# Written by Zheng Luo (z5206267@ad.unsw.edu.au) on 02/Mar/2021
-# Written by Lan (channels_create_v1)
-
-
 from src.auth import auth_login_v1, auth_register_v1, session_to_token, token_to_session, \
     get_user_by_token
 from src.error import InputError, AccessError
 from src.data_file import Channel, data
-
+from src.channel import update_channel_user_stat, update_channel_dreams_stat
+from typing import Any, List, Dict, Tuple
 #############################################################################
 #                                                                           #
 #                               Channels_list_v1                            #
@@ -27,7 +24,7 @@ Return Type:{channels}
 """
 
 
-def channels_list_v1(token):
+def channels_list_v1(token: str) -> dict:
     # Pull the data of user from data_file
     user = get_user_by_token(token)
     if user is None:
@@ -57,7 +54,7 @@ Return Type:{channels}
 """
 
 
-def channels_listall_v1(token):
+def channels_listall_v1(token: str) -> dict:
     # Pull the data of user from data_file
     user = get_user_by_token(token)
     if user is None:
@@ -86,13 +83,13 @@ Return Type: { channel_id }
 """
 
 
-def create_channel_id():
+def create_channel_id() -> int:
     new_id = data['channel_num']
     data['channel_num'] = data['channel_num'] + 1
     return new_id
 
 
-def channels_create_v1(token, name, is_public):
+def channels_create_v1(token: str, name: str, is_public: bool) -> dict:
     # error check that the name is more than 20 characters
     if len(name) > 20:
         raise InputError(description='Error! Name is more than 20 characters')
@@ -112,12 +109,11 @@ def channels_create_v1(token, name, is_public):
     channel.owner_members.append(owner)
     channel.all_members.append(owner)
 
+    # update user's stats
+    update_channel_user_stat(owner)
+    # update Dreams' stats
+    update_channel_dreams_stat()
+
     return {
         'channel_id': channel_id
     }
-
-
-
-
-
-

@@ -138,3 +138,4 @@ def test_notification(parameters, parameters1):
     notification_list = json.loads(notification_list.text).get('notifications')
     assert notification_list[1]['notification_message'] == "lanlin added you to lanlin, lanlin0"
     assert notification_list[0]['notification_message'] == "lanlin tagged you in lanlin, lanlin0: It's the message sen"
+    requests.delete(config.url + 'clear/v1')

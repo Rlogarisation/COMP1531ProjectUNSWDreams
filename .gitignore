@@ -135,3 +135,4 @@ dmypy.json
 /tests/db.p
 /db.p
 /http_tests/db.p
+/src/static/

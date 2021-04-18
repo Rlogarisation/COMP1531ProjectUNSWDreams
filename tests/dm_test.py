@@ -505,3 +505,4 @@ def test_dm_messages_v1():
     test_normal_case_less_50_msg()
     test_normal_case_more_50_msg()
     pass
+    clear_v1()

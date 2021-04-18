@@ -175,3 +175,4 @@ def test_auth_logout_successfully_http(parameters):
     resp_logout1 = requests.post(config.url + 'auth/logout/v1', json={"token": token1})
     assert json.loads(resp_logout0.text).get('is_success') is True
     assert json.loads(resp_logout1.text).get('is_success') is True
+    requests.delete(config.url + 'clear/v1')

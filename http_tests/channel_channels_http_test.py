@@ -649,3 +649,4 @@ def test_channel_channels_valid_implementation(user1,user2,user3):
     details3 = requests.get(config.url + 'channel/details/v2' + f'?token={token1}&channel_id={channel_id}')
     assert len(json.loads(details3.text).get('owner_members')) == 1
     assert len(json.loads(details3.text).get('all_members')) == 2
+    requests.delete(config.url + 'clear/v1')
