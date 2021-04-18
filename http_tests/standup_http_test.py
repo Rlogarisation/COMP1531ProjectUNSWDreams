@@ -238,7 +238,9 @@ def test_standup_active(parameters, parameters1, parameters2):
 
         time_finish = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
 
-        assert time_finish == time_finish_1 + 1 == time_finish_2 == time_sent + 3
+        assert time_finish_1 + 1 - 2 <= time_finish <= time_finish_1 + 1 + 2
+        assert time_finish_2 - 2 <= time_finish <= time_finish_2 + 2
+        assert time_sent + 3 - 2 <= time_finish <= time_sent + 3 + 2
     # ----------------------------testing------------------------------------
     test_invalid_token()
     test_invalid_channel_id()
