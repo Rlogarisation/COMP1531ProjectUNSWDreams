@@ -1,7 +1,6 @@
-from tests.message_test import test_invalid_token1
 import pytest
 from datetime import datetime, timezone
-from time import sleep, time
+from time import sleep
 from src.other import clear_v1
 from src.auth import auth_login_v1, auth_register_v1, auth_logout
 from src.error import InputError, AccessError
@@ -107,7 +106,7 @@ def test_standup_active_standup_present():
     auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
     token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
     channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
-    time_finish_check = standup_start_v1(token1, channel_id1, 0.5)
+    time_finish_check = standup_start_v1(token1, channel_id1, 1)
     standup_info = standup_active_v1(token1, channel_id1)
     assert standup_info['time_finish'] == time_finish_check['time_finish']
     assert standup_info['is_active'] is True
@@ -129,7 +128,7 @@ def test_standup_active_invalid_channel():
     token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
     channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
     invalid_channelid = 100
-    standup_start_v1(token1, channel_id1, 0.5)
+    standup_start_v1(token1, channel_id1, 1)
     with pytest.raises(InputError):
         standup_active_v1(token1, invalid_channelid)
 
@@ -140,7 +139,7 @@ def test_standup_active_invalid_token():
     token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
     channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
     invalid_token = token1 + 'vwkudhbae'
-    standup_start_v1(token1, channel_id1, 0.5)
+    standup_start_v1(token1, channel_id1, 1)
     with pytest.raises(AccessError):
         standup_active_v1(invalid_token, channel_id1)
 
@@ -176,7 +175,7 @@ def test_standup_send_invalid_channel():
     token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
     channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
     invalid_channelid = 100
-    standup_start_v1(token1, channel_id1, 0.5)
+    standup_start_v1(token1, channel_id1, 1)
     with pytest.raises(InputError):
         standup_send_v1(token1, invalid_channelid, 'This is the first message')
 
@@ -186,7 +185,7 @@ def test_standup_send_invalid_message():
     auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
     token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
     channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
-    standup_start_v1(token1, channel_id1, 0.5)
+    standup_start_v1(token1, channel_id1, 1)
     message = 'a' * 1500
     with pytest.raises(InputError):
         standup_send_v1(token1, channel_id1, message)
@@ -200,16 +199,17 @@ def test_standup_send_no_active_standup():
     with pytest.raises(InputError):
         standup_send_v1(token1, channel_id1, 'This is the first message')
 
-# def test_standup_send_unauthorised_user():
-#     clear_v1()
-#     auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
-#     auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
-#     token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
-#     token2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")['token']
-#     channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
-#     standup_start_v1(token1, channel_id1, 0.5)
-#     with pytest.raises(AccessError):
-#         standup_send_v1(token2, channel_id1, "this is a test")
+
+def test_standup_send_unauthorised_user():
+    clear_v1()
+    auth_register_v1('haha@gmail.com', '123123123', 'Peter', 'White')
+    auth_register_v1("test@testexample.com", "wp01^#$dp1o23", "Tom", "Green")
+    token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
+    token2 = auth_login_v1("test@testexample.com", "wp01^#$dp1o23")['token']
+    channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
+    standup_start_v1(token1, channel_id1, 1)
+    with pytest.raises(AccessError):
+        standup_send_v1(token2, channel_id1, "this is a test")
 
 
 def test_standup_send_invalid_token():
@@ -218,7 +218,7 @@ def test_standup_send_invalid_token():
     token1 = auth_login_v1('haha@gmail.com', '123123123')['token']
     channel_id1 = channels_create_v1(token1, 'ChannelOne', True)['channel_id']
     invalid_token = token1 + 'qytwiefvgiauwgfv'
-    standup_start_v1(token1, channel_id1, 0.5)
+    standup_start_v1(token1, channel_id1, 1)
     with pytest.raises(AccessError):
         standup_send_v1(invalid_token, channel_id1, 'This is the first message')
 
@@ -231,12 +231,12 @@ def test_standup_send_invalid_token():
 def test_standup_start():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
-    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")["token"]
+    auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")
     token_2 = auth_register_v1("test_email2@gmail.com", "password", "First2", "Last2")["token"]
 
-    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")["auth_user_id"]
-    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")["auth_user_id"]
-    u_id_2 = auth_login_v1("test_email2@gmail.com", "password")["auth_user_id"]
+    auth_login_v1("test_email0@gmail.com", "password")
+    auth_login_v1("test_email1@gmail.com", "password")
+    auth_login_v1("test_email2@gmail.com", "password")
 
     channel_0_id = channels_create_v1(token_0, "channel_0", True)["channel_id"]
     channel_1_id = channels_create_v1(token_0, "channel_1", True)["channel_id"]
@@ -310,12 +310,12 @@ def test_standup_start():
 def test_standup_active():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
-    token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")["token"]
-    token_2 = auth_register_v1("test_email2@gmail.com", "password", "First2", "Last2")["token"]
+    auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")
+    auth_register_v1("test_email2@gmail.com", "password", "First2", "Last2")
 
-    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")["auth_user_id"]
-    u_id_1 = auth_login_v1("test_email1@gmail.com", "password")["auth_user_id"]
-    u_id_2 = auth_login_v1("test_email2@gmail.com", "password")["auth_user_id"]
+    auth_login_v1("test_email0@gmail.com", "password")
+    auth_login_v1("test_email1@gmail.com", "password")
+    auth_login_v1("test_email2@gmail.com", "password")
 
     channel_0_id = channels_create_v1(token_0, "channel_0", True)["channel_id"]
     channel_1_id = channels_create_v1(token_0, "channel_1", True)["channel_id"]
@@ -342,19 +342,19 @@ def test_standup_active():
         time_expected_1 = standup_start_v1(token_0, channel_0_id, 2)
         time_expected_2 = standup_start_v1(token_0, channel_1_id, 3)
 
-        assert standup_active_v1(token_0, channel_0_id)['is_active'] == True
+        assert standup_active_v1(token_0, channel_0_id)['is_active'] is True
         assert standup_active_v1(token_0, channel_0_id)['time_finish'] == time_sent + 2
 
-        assert standup_active_v1(token_0, channel_1_id)['is_active'] == True
+        assert standup_active_v1(token_0, channel_1_id)['is_active'] is True
         assert standup_active_v1(token_0, channel_1_id)['time_finish'] == time_sent + 3
 
         sleep(2)
-        assert standup_active_v1(token_0, channel_0_id)['is_active'] == False
-        assert standup_active_v1(token_0, channel_1_id)['is_active'] == True
+        assert standup_active_v1(token_0, channel_0_id)['is_active'] is False
+        assert standup_active_v1(token_0, channel_1_id)['is_active'] is True
 
         sleep(1)
-        assert standup_active_v1(token_0, channel_0_id)['is_active'] == False
-        assert standup_active_v1(token_0, channel_1_id)['is_active'] == False
+        assert standup_active_v1(token_0, channel_0_id)['is_active'] is False
+        assert standup_active_v1(token_0, channel_1_id)['is_active'] is False
 
         time_finish = int(datetime.utcnow().replace(tzinfo=timezone.utc).timestamp())
         print(type(time_finish), type(time_expected_1), type(time_expected_2), time_sent + 3)
@@ -384,9 +384,9 @@ def test_standup_send():
     token_1 = auth_register_v1("test_email1@gmail.com", "password", "First1", "Last1")["token"]
     token_2 = auth_register_v1("test_email2@gmail.com", "password", "First2", "Last2")["token"]
 
-    u_id_0 = auth_login_v1("test_email0@gmail.com", "password")["auth_user_id"]
+    auth_login_v1("test_email0@gmail.com", "password")
     u_id_1 = auth_login_v1("test_email1@gmail.com", "password")["auth_user_id"]
-    u_id_2 = auth_login_v1("test_email2@gmail.com", "password")["auth_user_id"]
+    auth_login_v1("test_email2@gmail.com", "password")
 
     channel_0_id = channels_create_v1(token_0, "channel_0", True)["channel_id"]
     channel_invite_v1(token_0, channel_0_id, u_id_1)
