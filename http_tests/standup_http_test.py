@@ -356,4 +356,3 @@ def test_standup_send(parameters, parameters1, parameters2):
     test_user_isnot_member_of_channel()
     test_normal_test01()
     requests.delete(config.url + "clear/v1")
-    pass

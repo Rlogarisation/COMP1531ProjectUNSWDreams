@@ -61,7 +61,7 @@ def test_clear(parameters):
     requests.delete(config.url + 'clear/v1')
     # check that the user does not exist
     assert requests.get(config.url + 'user/profile/v2?token=' + token + '&u_id=' + str(u_id)).status_code == 403
-    requests.delete(config.url + "clear/v1")
+
 
 #############################################################################
 #                                                                           #
@@ -86,7 +86,7 @@ def test_search_invalid_length(parameters, parameters1):
     invalid_query = "h" * 1005
     status = requests.get(config.url + 'search/v2?token=' + token0 + '&query_str=' + invalid_query).status_code
     assert status == 400
-    requests.delete(config.url + "clear/v1")
+
 
 def test_search_valid(parameters, parameters1):
     requests.delete(config.url + 'clear/v1')
@@ -110,7 +110,7 @@ def test_search_valid(parameters, parameters1):
     message_list = json.loads(message_list.text).get('messages')
     assert message_list[0]['message'] == "haha0"
     assert message_list[1]['message'] == "you know HAHA"
-    requests.delete(config.url + "clear/v1")
+
 
 #############################################################################
 #                                                                           #
@@ -138,4 +138,4 @@ def test_notification(parameters, parameters1):
     notification_list = json.loads(notification_list.text).get('notifications')
     assert notification_list[1]['notification_message'] == "lanlin added you to lanlin, lanlin0"
     assert notification_list[0]['notification_message'] == "lanlin tagged you in lanlin, lanlin0: It's the message sen"
-    requests.delete(config.url + "clear/v1")
+    requests.delete(config.url + 'clear/v1')
