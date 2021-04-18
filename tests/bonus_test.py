@@ -173,7 +173,8 @@ def test_pak_to_txt():
 
     def normal_test():
         with open("123.pak", "wb") as FILE:
-            content = pickle.dump("123", FILE)
+            content = "123"
+            pickle.dump(content, FILE)
         FILE.close()
 
         pak_to_txt("123")

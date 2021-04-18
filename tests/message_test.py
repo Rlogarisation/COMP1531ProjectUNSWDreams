@@ -532,7 +532,7 @@ def test_message_share_user_invalid():
     clear_v1()
 
 
-def test_message_share_dm_normal_case():
+def test_message_share_dm_normal_case2():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
     auth_login_v1("test_email0@gmail.com", "password")
@@ -552,7 +552,7 @@ def test_message_share_dm_normal_case():
     clear_v1()
 
 
-def test_message_share_user_invalid():
+def test_message_share_user_invalid2():
     clear_v1()
     token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
     auth_login_v1("test_email0@gmail.com", "password")
