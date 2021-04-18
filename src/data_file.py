@@ -191,8 +191,6 @@ DATA = {
     'session_num': 0,
     # to record the number of messages
     'message_num': 0,
-    # threads
-    'threads': [],
     # number of channel and dm
     'channel_num': 0,
     'dm_num': 0,

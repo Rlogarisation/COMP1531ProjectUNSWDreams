@@ -1,4 +1,4 @@
-from src.data_file import data, DATA, dump_data, Notification
+from src.data_file import data, DATA, dump_data, Notification, Message
 from src.auth import get_user_by_uid, get_user_by_token
 from src.error import InputError, AccessError
 import re
@@ -40,7 +40,7 @@ Access Error: Token is invalid
 """
 
 
-def search_v1(token: str, query_str: str):
+def search_v1(token: str, query_str: str) -> dict:
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token is invalid")
@@ -81,7 +81,7 @@ Access Error: Token is invalid
 """
 
 
-def notification_get_v1(token: str):
+def notification_get_v1(token: str) -> dict:
     user = get_user_by_token(token)
     if user is None:
         raise AccessError(description="Token is invalid")
@@ -110,7 +110,7 @@ def notification_get_v1(token: str):
 
 # check if the query is contained in the message
 # it is case insensitive
-def check_contain_query(query: str, _message: str) -> bool:
+def check_contain_query(query: str, _message: Message) -> bool:
     if re.search(query, _message.message, re.IGNORECASE):
         return True
     else:

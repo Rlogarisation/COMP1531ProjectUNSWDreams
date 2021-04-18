@@ -34,7 +34,7 @@ AccessError:
 """
 
 
-def message_send_v2(token: str, channel_id: int, message: str):
+def message_send_v2(token: str, channel_id: int, message: str) -> dict:
     # error check
     auth_user, message, channel = helper_message_send_v2(token, channel_id, message)
 
@@ -79,7 +79,7 @@ AccessError:
 """
 
 
-def message_senddm_v1(token: str, dm_id: int, message: str):
+def message_senddm_v1(token: str, dm_id: int, message: str) -> dict:
     # error check
     auth_user, message, dm = helper_message_senddm_v1(token, dm_id, message)
 
@@ -123,7 +123,7 @@ AccessError:
 """
 
 
-def message_edit_v2(token: str, message_id: int, message: str) -> Dict:
+def message_edit_v2(token: str, message_id: int, message: str) -> dict:
     # InputError 1: invalid token.
     auth_user = get_user_by_token(token)
     if auth_user is None:
@@ -197,7 +197,7 @@ AccessError:
 """
 
 
-def message_remove_v1(token: str, message_id: int) -> Dict:
+def message_remove_v1(token: str, message_id: int) -> dict:
     # InputError 1: invalid token.
     auth_user = get_user_by_token(token)
     if auth_user is None:
@@ -271,7 +271,7 @@ AccessError:
 """
 
 
-def message_share_v1(token: str, og_message_id: int, message: str, channel_id: int, dm_id: int) -> Dict:
+def message_share_v1(token: str, og_message_id: int, message: str, channel_id: int, dm_id: int) -> dict:
     if channel_id == -1 and dm_id != -1:
         mem_list = get_dm_by_dm_id(dm_id).dm_members
     elif channel_id != -1 and dm_id == -1:
@@ -310,7 +310,7 @@ def message_share_v1(token: str, og_message_id: int, message: str, channel_id: i
     }
 
 
-def message_sendlater_v1(token: str, channel_id: int, message: str, time_sent: int) -> Dict:
+def message_sendlater_v1(token: str, channel_id: int, message: str, time_sent: int) -> dict:
     # Type checking
     if type(channel_id) != int or type(message) != str or type(time_sent) != int:
         raise InputError(description="message_sendlater_v1 : incorrect type for your inputs.")
@@ -349,7 +349,7 @@ def message_sendlater_v1(token: str, channel_id: int, message: str, time_sent: i
     }
 
 
-def message_sendlaterdm_v1(token: str, dm_id: int, message: str, time_sent: int) -> Dict:
+def message_sendlaterdm_v1(token: str, dm_id: int, message: str, time_sent: int) -> dict:
     # Type checking
     if type(dm_id) != int or type(message) != str or type(time_sent) != int:
         raise InputError(description="message_sendlaterdm_v1 : incorrect type for your inputs.")
@@ -390,7 +390,7 @@ def message_sendlaterdm_v1(token: str, dm_id: int, message: str, time_sent: int)
     }
 
 
-def message_react_v1(token: str, message_id: int, react_id: int) -> Dict:
+def message_react_v1(token: str, message_id: int, react_id: int) -> dict:
     message, user, channel_dm = return_message_if_valid(token, message_id, react_id, 0)
     message.reacted_users.append(user)
 
@@ -409,13 +409,13 @@ def message_react_v1(token: str, message_id: int, react_id: int) -> Dict:
     return {}
 
 
-def message_unreact_v1(token: str, message_id: int, react_id: int) -> Dict:
+def message_unreact_v1(token: str, message_id: int, react_id: int) -> dict:
     message, user, channel_dm = return_message_if_valid(token, message_id, react_id, 1)
     message.reacted_users.remove(user)
     return {}
 
 
-def message_pin_v1(token: str, message_id: int) -> Dict:
+def message_pin_v1(token: str, message_id: int) -> dict:
     # Type checking
     if type(message_id) != int:
         raise InputError(description="message_pin_v1 : incorrect type for your inputs.")
@@ -425,7 +425,7 @@ def message_pin_v1(token: str, message_id: int) -> Dict:
     return {}
 
 
-def message_unpin_v1(token: str, message_id: int) -> Dict:
+def message_unpin_v1(token: str, message_id: int) -> dict:
     # Type checking
     if type(message_id) != int:
         raise InputError(description="message_pin_v1 : incorrect type for your inputs.")
@@ -472,7 +472,7 @@ def get_message_by_message_id(message_id: int) -> Union[Message, None]:
 
 
 # return class channel or dm by message id
-def get_channel_dm_by_message_id(message_id: int) -> Union[List, None]:
+def get_channel_dm_by_message_id(message_id: int) -> Union[list, None]:
     for i in data['class_channels']:
         for j in i.messages:
             if j.message_id == message_id:
@@ -486,7 +486,7 @@ def get_channel_dm_by_message_id(message_id: int) -> Union[List, None]:
 
 # find the class Message by message id
 # delete the Message
-def delete_message_by_message_id(message_id: int) -> None:
+def delete_message_by_message_id(message_id: int) -> Any:
     target_msg = get_message_by_message_id(message_id)
     for i in data['class_channels']:
         for j in i.messages:
@@ -502,7 +502,7 @@ def delete_message_by_message_id(message_id: int) -> None:
 
 
 # tagging user if the message include @handle
-def tagging_user(message: str, channel_id: int, dm_id: int, sender: User) -> None:
+def tagging_user(message: str, channel_id: int, dm_id: int, sender: User) -> Any:
     channel = None
     dm = None
     if channel_id != -1:
@@ -545,7 +545,7 @@ def tagging_user(message: str, channel_id: int, dm_id: int, sender: User) -> Non
                 invitee.notifications.append(notification)
 
 
-def return_message_if_valid(token: str, message_id: int, react_id: int, flag: int) -> List:
+def return_message_if_valid(token: str, message_id: int, react_id: int, flag: int) -> list:
     if react_id != 1:
         raise InputError(description="react_id is not valid")
 
@@ -623,7 +623,7 @@ def return_message_to_pin(token: str, message_id: int, flag: int) -> Message:
 
 
 # update user's stats about channel joined
-def update_message_user_stat(user: User) -> None:
+def update_message_user_stat(user: User) -> Any:
     stat_message_user = {
         'num_messages_sent': len(user.messages),
         'time_stamp': current_time()
@@ -632,7 +632,7 @@ def update_message_user_stat(user: User) -> None:
 
 
 # update Dreams stats about channels
-def update_message_dreams_stat() -> None:
+def update_message_dreams_stat() -> Any:
     stat_message = {
         'num_messages_exist': len(data['class_messages']),
         'time_stamp': current_time()
@@ -640,7 +640,7 @@ def update_message_dreams_stat() -> None:
     data['messages_exist'].append(stat_message)
 
 
-def helper_message_send_v2(token: str, channel_id: int, message: str) -> List:
+def helper_message_send_v2(token: str, channel_id: int, message: str) -> list:
     if type(channel_id) != int or type(message) != str:
         raise InputError(description="incorrect type for your inputs.")
 
@@ -665,7 +665,7 @@ def helper_message_send_v2(token: str, channel_id: int, message: str) -> List:
     return [auth_user, message, channel]
 
 
-def helper2_message_send_v2(message_id: int, auth_user: User, message: Message, channel: Channel) -> None:
+def helper2_message_send_v2(message_id: int, auth_user: User, message: str, channel: Channel) -> Any:
     time_created = current_time()
     message_created = Message(message_id, auth_user.u_id, message, time_created, channel.channel_id, -1)
     channel.messages.append(message_created)
@@ -681,7 +681,7 @@ def helper2_message_send_v2(message_id: int, auth_user: User, message: Message, 
     tagging_user(message, channel.channel_id, -1, auth_user)
 
 
-def helper_message_senddm_v1(token: str, dm_id: int, message: str) -> List:
+def helper_message_senddm_v1(token: str, dm_id: int, message: str) -> list:
     if type(dm_id) != int or type(message) != str:
         raise InputError(description="incorrect type for your inputs.")
 
@@ -706,7 +706,7 @@ def helper_message_senddm_v1(token: str, dm_id: int, message: str) -> List:
     return [auth_user, message, dm]
 
 
-def helper2_message_senddm_v1(message_id: int, auth_user: User, message: Message, dm: DM) -> None:
+def helper2_message_senddm_v1(message_id: int, auth_user: User, message: str, dm: DM) -> Any:
     created_time = current_time()
     message_created = Message(message_id, auth_user.u_id, message, created_time, -1, dm.dm_id)
     dm.dm_messages.append(message_created)

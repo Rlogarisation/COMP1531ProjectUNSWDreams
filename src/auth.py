@@ -3,9 +3,7 @@ import jwt
 import hashlib
 import random
 import smtplib
-from typing import Any, List, Dict, Tuple, Union
-
-from jwt import InvalidSignatureError, InvalidTokenError
+from typing import Any, Union
 from src.data_file import User, Permission, current_time, data, Status
 from src.error import InputError
 
@@ -33,7 +31,7 @@ InputError:
 """
 
 
-def auth_register_v1(email: str, password: str, name_first: str, name_last: str):
+def auth_register_v1(email: str, password: str, name_first: str, name_last: str) -> dict:
     auth_register_check_error(email, password, name_first, name_last)
 
     u_id = create_uid()
@@ -71,7 +69,7 @@ InputError:
 """
 
 
-def auth_login_v1(email: str, password: str):
+def auth_login_v1(email: str, password: str) -> dict:
     auth_login_error_check(email, password)
 
     user = get_user_by_email(email)
@@ -89,7 +87,7 @@ def auth_login_v1(email: str, password: str):
     }
 
 
-def auth_logout(token: str):
+def auth_logout(token: str) -> dict:
     user_session = get_user_session_by_token(token)
     if user_session is not None:
         user = user_session[0]
@@ -105,7 +103,7 @@ def auth_logout(token: str):
     return {'is_success': False}
 
 
-def auth_passwordreset_request_v1(email: str):
+def auth_passwordreset_request_v1(email: str) -> dict:
     user = get_user_by_email(email)
     if user is None:
         raise InputError(description="The email is invalid")
@@ -129,7 +127,7 @@ def auth_passwordreset_request_v1(email: str):
     }
 
 
-def auth_passwordreset_reset_v1(reset_code: int, new_password: str):
+def auth_passwordreset_reset_v1(reset_code: str, new_password: str) -> dict:
     user = get_user_by_code(reset_code)
     if user is None:
         raise InputError(description="reset_code is not a valid reset code")
@@ -159,7 +157,7 @@ def is_email_valid(email: str) -> bool:
         return False
 
 
-def get_user_by_code(reset_code: int) -> bool:
+def get_user_by_code(reset_code: str) -> Union[User, None]:
     if reset_code is None:
         return None
     for user in data['class_users']:
@@ -168,7 +166,7 @@ def get_user_by_code(reset_code: int) -> bool:
     return None
 
 
-def get_user_by_token(token: str) -> User:
+def get_user_by_token(token: str) -> Union[User, None]:
     if token is None:
         return None
     session_dict = token_to_session(token)
@@ -183,7 +181,7 @@ def get_user_by_token(token: str) -> User:
     return None
 
 
-def get_user_session_by_token(token: str) -> Union[List, None]:
+def get_user_session_by_token(token: str) -> Union[list, None]:
     if token is None:
         return None
     session_dict = token_to_session(token)
@@ -202,7 +200,7 @@ def get_user_session_by_token(token: str) -> Union[List, None]:
 # the user is a class
 
 
-def get_user_by_uid(u_id: int) -> User:
+def get_user_by_uid(u_id: int) -> Union[User, None]:
     if u_id is None:
         return None
     for user in data['class_users']:
@@ -214,7 +212,7 @@ def get_user_by_uid(u_id: int) -> User:
 
 # return the specific user with email
 # the user is a class
-def get_user_by_email(email: str) -> User:
+def get_user_by_email(email: str) -> Union[User, None]:
     if email is None:
         return None
     for user in data['class_users']:
@@ -226,7 +224,7 @@ def get_user_by_email(email: str) -> User:
 
 # return the specific user with handle_str
 # the user is a class
-def get_user_by_handle(handle: str) -> User:
+def get_user_by_handle(handle: str) -> Union[User, None]:
     # handle will never be None
     for user in data['class_users']:
         if user.handle_str == handle:
@@ -236,7 +234,7 @@ def get_user_by_handle(handle: str) -> User:
 
 
 # check the InputError for auth_register
-def auth_register_check_error(email: str, password: str, name_first: str, name_last: str) -> None:
+def auth_register_check_error(email: str, password: str, name_first: str, name_last: str) -> Any:
     # if the email address is invalid
     if not is_email_valid(email):
         raise InputError(description='Email address is not valid')
@@ -271,7 +269,7 @@ def create_auth_user_id(u_id: int) -> int:
     return u_id
 
 
-def create_reset_code() -> int:
+def create_reset_code() -> str:
     code = ''
     for _i in range(4):
         code += str(random.randint(0, 9))
@@ -285,11 +283,11 @@ def create_session_id() -> int:
     return new_id
 
 
-def session_to_token(session_id: int) -> bytes:
+def session_to_token(session_id: int) -> str:
     return jwt.encode({'sessionID': session_id}, data['secret'], algorithm='HS256')
 
 
-def token_to_session(token: str) -> Union[Dict, None]:
+def token_to_session(token: str) -> Any:
     try:
         decode_session = jwt.decode(token, data['secret'], algorithms=['HS256'])
         return decode_session
@@ -349,7 +347,7 @@ def create_permission(u_id: int) -> int:
 # which include invalid email address,
 # the email entered does not belong to a user
 # and the password is incorrect
-def auth_login_error_check(email: str, password: str) -> None:
+def auth_login_error_check(email: str, password: str) -> Any:
     user = get_user_by_email(email)
     if user is None:
         raise InputError(description='Email entered does not belong to a user')

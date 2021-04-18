@@ -8,13 +8,13 @@ import pickle
 from typing import Any, List, Dict, Tuple
 
 
-def asciimoji_import_package(token: str, package: str, pkg_type: str) -> None:
+def asciimoji_import_package(token: str, package: str, pkg_type: str) -> Any:
     # input checking
     if type(token) != str or type(package) != str or type(pkg_type) != str:
         raise InputError(description="asciimoji_import_package : Parameters' type has error.")
 
     user = get_user_by_token(token)
-    if user == None:
+    if user is None:
         raise InputError(description="asciimoji_import_package : user not found.")
 
     if pkg_type == "pak":
@@ -34,13 +34,13 @@ def asciimoji_import_package(token: str, package: str, pkg_type: str) -> None:
     FILE.close()
 
 
-def asciimoji_export_package(token: str, package: str, pkg_type: str) -> None:
+def asciimoji_export_package(token: str, package: str, pkg_type: str) -> Any:
     # input checking
     if type(token) != str or type(package) != str or type(pkg_type) != str:
         raise InputError(description="asciimoji_export_package : Parameters' type has error.")
 
     user = get_user_by_token(token)
-    if user == None:
+    if user is None:
         raise InputError(description="asciimoji_export_package : user not found.")
 
     asciimoji_saved = str(user.asciimoji)
@@ -93,11 +93,11 @@ def message_to_common_words(token: str, message_id: int) -> None:
         raise InputError(description="message_to_common_words : Parameters' type has error.")
 
     user = get_user_by_token(token)
-    if user == None:
+    if user is None:
         raise InputError(description="message_to_common_words : user not found.")
 
     message = get_message_by_message_id(message_id)
-    if message == None:
+    if message is None:
         raise AccessError(description="message_to_common_words : target message not found.")
 
     user.common_words.append(message.message)
@@ -105,24 +105,24 @@ def message_to_common_words(token: str, message_id: int) -> None:
 
 def get_user_status_by_u_id(u_id: int) -> int:
     user = get_user_by_uid(u_id)
-    if user == None:
+    if user is None:
         raise InputError(description="get_user_status_by_u_id : u_id is invalid.")
     else:
         return user.status
 
 
-def user_status_switch_personlly(u_id: int, status: int) -> int:
+def user_status_switch_personlly(u_id: int, status: int) -> Any:
     if type(status) != int:
         raise InputError(description="user_status_switch_personlly : invalid status.")
     user = get_user_by_uid(u_id)
-    if user == None:
+    if user is None:
         raise InputError(description="user_status_switch_personlly : user not found.")
     user.status = status
 
 
-def status_auto_switch(u_id: int) -> None:
+def status_auto_switch(u_id: int) -> Any:
     user = get_user_by_uid(u_id)
-    if user == None:
+    if user is None:
         raise InputError(description="get_user_by_uid : u_id not found.")
 
     login_time = user.login_time

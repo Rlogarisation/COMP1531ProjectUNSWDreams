@@ -24,7 +24,7 @@ Return Type:{channels}
 """
 
 
-def channels_list_v1(token: str) -> Dict:
+def channels_list_v1(token: str) -> dict:
     # Pull the data of user from data_file
     user = get_user_by_token(token)
     if user is None:
@@ -54,7 +54,7 @@ Return Type:{channels}
 """
 
 
-def channels_listall_v1(token: str) -> Dict:
+def channels_listall_v1(token: str) -> dict:
     # Pull the data of user from data_file
     user = get_user_by_token(token)
     if user is None:
@@ -89,7 +89,7 @@ def create_channel_id() -> int:
     return new_id
 
 
-def channels_create_v1(token: str, name: str, is_public: bool) -> Dict:
+def channels_create_v1(token: str, name: str, is_public: bool) -> dict:
     # error check that the name is more than 20 characters
     if len(name) > 20:
         raise InputError(description='Error! Name is more than 20 characters')
