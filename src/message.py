@@ -292,11 +292,6 @@ def message_share_v1(token: str, og_message_id: int, message: str, channel_id: i
                     f'"""' \
                     f'{og_message.message}' \
                     f'"""'
-    # message_added = ''.join([message, '\n', '"""', '\n', og_message.message, '\n', '"""'])
-    # add og_message to new_message
-    # created_time = datetime.utcnow().isoformat() ???
-    # created_time = current_time()
-    # new_message = Message(create_message_id(), user.u_id, message_added, created_time, channel_id, dm_id)
 
     # send shared message to the channel or dm
     message_id = None
@@ -308,6 +303,15 @@ def message_share_v1(token: str, og_message_id: int, message: str, channel_id: i
     return {
         'shared_message_id': message_id
     }
+
+
+"""
+Auther: Lan Lin
+
+Background: 
+Send a message from authorised_user to the channel specified 
+by channel_id automatically at a specified time in the future
+"""
 
 
 def message_sendlater_v1(token: str, channel_id: int, message: str, time_sent: int) -> Dict:
@@ -347,6 +351,15 @@ def message_sendlater_v1(token: str, channel_id: int, message: str, time_sent: i
     return {
         'message_id': new_message_id
     }
+
+
+"""
+Auther: Lan Lin
+
+Background: 
+Send a message from authorised_user to the dm specified 
+by dm_id automatically at a specified time in the future
+"""
 
 
 def message_sendlaterdm_v1(token: str, dm_id: int, message: str, time_sent: int) -> Dict:
@@ -390,6 +403,15 @@ def message_sendlaterdm_v1(token: str, dm_id: int, message: str, time_sent: int)
     }
 
 
+"""
+Auther: Lan Lin
+
+Background: 
+Given a message within a channel or DM the authorised user is part of, 
+add a "react" to that particular message
+"""
+
+
 def message_react_v1(token: str, message_id: int, react_id: int) -> Dict:
     message, user, channel_dm = return_message_if_valid(token, message_id, react_id, 0)
     message.reacted_users.append(user)
@@ -409,10 +431,28 @@ def message_react_v1(token: str, message_id: int, react_id: int) -> Dict:
     return {}
 
 
+"""
+Auther: Lan Lin
+
+Background: 
+Given a message within a channel or DM the authorised user is part of, 
+remove a "react" to that particular message
+"""
+
+
 def message_unreact_v1(token: str, message_id: int, react_id: int) -> Dict:
     message, user, _channel_dm = return_message_if_valid(token, message_id, react_id, 1)
     message.reacted_users.remove(user)
     return {}
+
+
+"""
+Auther: Lan Lin
+
+Background: 
+Given a message within a channel or DM, mark it as "pinned" 
+to be given special display treatment by the frontend
+"""
 
 
 def message_pin_v1(token: str, message_id: int) -> Dict:
@@ -423,6 +463,14 @@ def message_pin_v1(token: str, message_id: int) -> Dict:
     message = return_message_to_pin(token, message_id, 0)
     message.is_pinned = True
     return {}
+
+
+"""
+Auther: Lan Lin
+
+Background: 
+Given a message within a channel or DM, remove it's mark as unpinned
+"""
 
 
 def message_unpin_v1(token: str, message_id: int) -> Dict:

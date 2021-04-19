@@ -5,6 +5,10 @@ from src.auth import get_user_by_token, get_user_by_handle, get_user_by_uid
 from src.channel import get_channel_by_channel_id, is_user_owner_channel, is_user_in_channel
 from src.message import message_send_v2
 from typing import Dict
+
+"""
+Auther: Lan Lin
+"""
 #############################################################################
 #                                                                           #
 #                           Interface function                              #

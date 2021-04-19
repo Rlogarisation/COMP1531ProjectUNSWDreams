@@ -136,8 +136,8 @@ def status_auto_switch(u_id: int) -> Any:
             # lastest_message = message
 
     if time_now - lastest_message_time >= 15 * 60 and get_user_status_by_u_id(u_id) == Status.online and user.online_time >= 15 * 60:
-        # 距离最近一次发消息已有15多分钟， 在线超过15分钟
+        # 15min from the most recent message, online more than 15min
         user.status = Status.busy_working
     elif time_now - lastest_message_time >= 45 * 60 and user.online_time >= 60 * 60:
-        # 距离最近一次发消息已有45多分钟, 在线超过60分钟
+        # 45min from the most recent message, online more than 60min
         user.status = Status.leave_away
