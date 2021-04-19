@@ -40,7 +40,7 @@ def auth_register_v1(email: str, password: str, name_first: str, name_last: str)
     permission_id = create_permission(u_id)
     hashed_password = hash_password(password)
 
-    user_ = User(u_id, email, hashed_password, name_first, name_last, handle, auth_user_id, permission_id, Status.offline)
+    user_ = User(u_id, email, hashed_password, name_first, name_last, handle, auth_user_id, permission_id, Status.online)
     session_id = create_session_id()
     token = session_to_token(session_id)
     user_.current_sessions.append(session_id)
@@ -74,12 +74,16 @@ def auth_login_v1(email: str, password: str) -> Dict:
 
     user = get_user_by_email(email)
     session_id = create_session_id()
-    user.current_sessions.append(session_id)
-    token = session_to_token(session_id)
 
     # bonus
-    user.status = Status.online
-    user.login_time = current_time()
+    # if there is no current sessions
+    # when the user login, status changes to online
+    if len(user.current_sessions) == 0:
+        user.status = Status.online
+        user.login_time = current_time()
+
+    user.current_sessions.append(session_id)
+    token = session_to_token(session_id)
 
     return {
         'token': token,
@@ -95,12 +99,27 @@ def auth_logout(token: str) -> Dict:
         user.current_sessions.remove(session_id)
 
         # bonus
-        user.status = Status.offline
-        user.login_time = -1
-        user.online_time = 0
+        # if there is no current sessions after logout
+        # user's status changes to offline
+        if len(user.current_sessions) == 0:
+            user.status = Status.offline
+            user.login_time = -1
+            user.online_time = 0
+
         return {'is_success': True}
 
     return {'is_success': False}
+
+
+"""
+Auther: Lan Lin
+
+Background: 
+Given an email address, if the user is a registered user, 
+sends them an email containing a specific secret code, 
+that when entered in auth_passwordreset_reset, shows that the user trying to 
+reset the password is the one who got sent this email.
+"""
 
 
 def auth_passwordreset_request_v1(email: str) -> Dict:
@@ -125,6 +144,14 @@ def auth_passwordreset_request_v1(email: str) -> Dict:
     return {
         'reset_code': reset_code
     }
+
+
+"""
+Auther: Lan Lin
+
+Background: 
+Given a reset code for a user, set that user's new password to the password provided
+"""
 
 
 def auth_passwordreset_reset_v1(reset_code: str, new_password: str) -> Dict:

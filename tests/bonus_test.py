@@ -204,13 +204,25 @@ def test_get_user_status_by_token():
     clear_v1()
 
     def test_normal_case():
-        token_0 = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")["token"]
-        u_id_0 = auth_login_v1("test_email0@gmail.com", "password")['auth_user_id']
+        register = auth_register_v1("test_email0@gmail.com", "password", "First0", "Last0")
+        token_0 = register['token']
+        u_id_0 = register['auth_user_id']
 
         user_status = get_user_status_by_u_id(u_id_0)
         assert user_status == Status.online
 
+        login = auth_login_v1("test_email0@gmail.com", "password")
+        token_1 = login['token']
+        u_id_1 = login['auth_user_id']
+
+        user_status = get_user_status_by_u_id(u_id_1)
+        assert user_status == Status.online
+
         auth_logout(token_0)
+        user_status = get_user_status_by_u_id(u_id_0)
+        assert user_status == Status.online
+
+        auth_logout(token_1)
         user_status = get_user_status_by_u_id(u_id_0)
         assert user_status == Status.offline
 
