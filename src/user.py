@@ -96,7 +96,7 @@ def users_all(token: str) -> Dict:
 
     list_return = []
     for i in data['class_users']:
-        list_return.append(i.return_type_user_v1())
+        list_return.append(i.return_type_user_v2())
     return {
         'users': list_return
     }
