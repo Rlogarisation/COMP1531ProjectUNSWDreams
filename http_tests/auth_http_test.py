@@ -176,3 +176,25 @@ def test_auth_logout_successfully_http(parameters):
     assert json.loads(resp_logout0.text).get('is_success') is True
     assert json.loads(resp_logout1.text).get('is_success') is True
     requests.delete(config.url + 'clear/v1')
+#############################################################################
+#                                                                           #
+#   Test for auth_passwordreset_request_v1 and auth_passwordreset_reset_v1  #
+#                                                                           #
+#############################################################################
+
+
+def test_for_request_and_reset_password(parameters):
+    requests.delete(config.url + 'clear/v1')
+    requests.post(config.url + "auth/register/v2", json=parameters)
+
+    def test_auth_passwordrequest_invalid_email():
+        resp = requests.post(config.url + "auth/passwordreset/request/v1", json={'email': 'heihei@gmail.com'})
+        assert resp.status_code == 400
+
+    def test_auth_passwordreset_request_valid():
+        resp = requests.post(config.url + "auth/passwordreset/request/v1", json={'email': 'haha@gmail.com'})
+        assert resp.status_code == 200
+
+    test_auth_passwordrequest_invalid_email()
+    test_auth_passwordreset_request_valid()
+    requests.delete(config.url + 'clear/v1')

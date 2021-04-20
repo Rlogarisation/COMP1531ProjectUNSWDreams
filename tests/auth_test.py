@@ -282,6 +282,28 @@ def test_auth_logout_successfully_large():
 #############################################################################
 
 
+def test_auth_passwordreset_successful1():
+    clear_v1()
+    id_check = auth_register_v1('styuannj@163.com', '123123123', 'Peter', 'White')['auth_user_id']
+    reset_code_1 = auth_passwordreset_request_v1('styuannj@163.com')['reset_code']
+
+    sleep(2)
+    msg = get_email_content("styuannj@163.com", "UXRVCTIAEQZVVGAG", "pop.163.com")
+
+    error_wait = 0
+    reset_code_2 = parser_reset_code(msg)
+    while reset_code_1 != reset_code_2 and error_wait <= 5:
+        sleep(1)
+        reset_code_2 = parser_reset_code(msg)
+        error_wait += 1
+    assert reset_code_1 == reset_code_2
+
+    auth_passwordreset_reset_v1(reset_code_2, 'TheNewPassword')
+    assert auth_login_v1('styuannj@163.com', 'TheNewPassword')['auth_user_id'] == id_check
+
+    clear_v1()
+
+
 def test_auth_passwordreset_successful2():
     clear_v1()
     id_check = auth_register_v1('cblinker17@gmail.com', '123123123', 'Peter', 'White')['auth_user_id']
@@ -318,28 +340,6 @@ def test_auth_passwordreset_reset_invalid_reset_code():
     with pytest.raises(InputError):
         auth_passwordreset_reset_v1(invalid_reset_code, 'TheNewPassword')
     clear_v1()
-
-
-# def test_auth_passwordreset_successful1():
-#     clear_v1()
-#     id_check = auth_register_v1('styuannj@163.com', '123123123', 'Peter', 'White')['auth_user_id']
-#     reset_code_1 = auth_passwordreset_request_v1('styuannj@163.com')['reset_code']
-#
-#     sleep(2)
-#     msg = get_email_content("styuannj@163.com", "UXRVCTIAEQZVVGAG", "pop.163.com")
-#
-#     error_wait = 0
-#     reset_code_2 = parser_reset_code(msg)
-#     while reset_code_1 != reset_code_2 and error_wait <= 5:
-#         sleep(1)
-#         reset_code_2 = parser_reset_code(msg)
-#         error_wait += 1
-#     assert reset_code_1 == reset_code_2
-#
-#     auth_passwordreset_reset_v1(reset_code_2, 'TheNewPassword')
-#     assert auth_login_v1('styuannj@163.com', 'TheNewPassword')['auth_user_id'] == id_check
-#
-#     clear_v1()
 #############################################################################
 #                                                                           #
 #                              Helper function                              #
