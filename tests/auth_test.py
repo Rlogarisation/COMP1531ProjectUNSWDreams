@@ -294,6 +294,7 @@ def test_auth_passwordreset_successful1():
     reset_code_2 = parser_reset_code(msg)
     while reset_code_1 != reset_code_2 and error_wait <= 5:
         sleep(1)
+        msg = get_email_content("styuannj@163.com", "UXRVCTIAEQZVVGAG", "pop.163.com")
         reset_code_2 = parser_reset_code(msg)
         error_wait += 1
     assert reset_code_1 == reset_code_2
@@ -340,8 +341,6 @@ def test_auth_passwordreset_reset_invalid_reset_code():
     with pytest.raises(InputError):
         auth_passwordreset_reset_v1(invalid_reset_code, 'TheNewPassword')
     clear_v1()
-
-
 #############################################################################
 #                                                                           #
 #                              Helper function                              #
